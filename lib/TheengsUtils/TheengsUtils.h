@@ -34,8 +34,10 @@ public:
     static std::string generateHash(const std::string& input);
     static unsigned long uptime();
     static void syncNTP();
+    static void setTimezone(String const& timezone);
     static int unixtimestamp();
     static String UTCtimestamp();
+    static String localtimestamp();
     static void revert_hex_data(const char* in, char* out, int l);
     static long value_from_hex_data(const char* service_data, int offset, int data_length, bool reverse, bool canBeNegative = true);
     static double round2(float value);
