@@ -21,6 +21,10 @@
 
 #include "TheengsUtils.h"
 
+#ifndef NTP_SERVER
+#  define NTP_SERVER "pool.ntp.org"
+#endif
+
 String TheengsUtils::toString(uint64_t input) {
   String result = "";
   uint8_t base = 10;
@@ -86,12 +90,17 @@ unsigned long TheengsUtils::uptime() {
 }
 
 void TheengsUtils::syncNTP() {
-  configTime(0, 0, "pool.ntp.org");
+  configTime(0, 0, NTP_SERVER);
   time_t now = time(nullptr);
   while (now < 8 * 3600 * 2) {
     delay(500);
     now = time(nullptr);
   }
+}
+
+void TheengsUtils::setTimezone(String const& timezone){
+  setenv("TZ", timezone.c_str(), 1);
+  tzset();
 }
 
 int TheengsUtils::unixtimestamp() {
@@ -103,6 +112,14 @@ String TheengsUtils::UTCtimestamp() {
   time(&now);
   char buffer[sizeof "yyyy-MM-ddThh:mm:ssZ"];
   strftime(buffer, sizeof buffer, "%FT%TZ", gmtime(&now));
+  return buffer;
+}
+
+String TheengsUtils::localtimestamp() {
+  time_t now;
+  time(&now);
+  char buffer[sizeof "yyyy-MM-ddThh:mm:ssS00:00"];
+  strftime(buffer, sizeof buffer, "%FT%T%z", localtime(&now));
   return buffer;
 }
 

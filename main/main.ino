@@ -393,6 +393,9 @@ bool jsonDispatch(JsonObject& data) {
 #if message_UTCtimestamp == true
     data["UTCtime"] = TheengsUtils::UTCtimestamp();
 #endif
+#if message_localtimestamp == true
+    data["time"] = TheengsUtils::localtimestamp();
+#endif
 #if message_unixtimestamp == true
     data["unixtime"] = TheengsUtils::unixtimestamp();
 #endif
@@ -2508,8 +2511,11 @@ void loop() {
     ArduinoOTA.handle();
     failure_number_ntwk = 0;
     if (now > (timer_sys_checks + (TimeBetweenCheckingSYS * 1000)) || !timer_sys_checks) {
-#if message_UTCtimestamp || message_unixtimestamp
+#if message_UTCtimestamp || message_unixtimestamp || message_localtimestamp
       TheengsUtils::syncNTP();
+#if message_localtimestamp
+      TheengsUtils::setTimezone(TIMEZONE);
+#endif
 #endif
       if (!timer_sys_checks) { // Update check at start up only
 #if defined(ESP32) && defined(MQTT_HTTPS_FW_UPDATE)

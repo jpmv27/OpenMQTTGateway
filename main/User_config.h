@@ -409,6 +409,9 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #ifndef message_UTCtimestamp
 #  define message_UTCtimestamp false //define true if you want messages to be timestamped in ISO8601 UTC format (e.g.: "UTCtime"="2023-12-26T19:10:20Z")
 #endif
+#ifndef message_localtimestamp
+#  define message_localtimestamp false //define true if you want messages to be timestamped in ISO8601 UTC format with time zone (e.g.: "UTCtime"="2023-12-26T19:10:20-05:00")
+#endif
 #ifndef message_unixtimestamp
 #  define message_unixtimestamp false //define true if you want messages to have an unix timestamp (e.g.: "unixtime"=1679015107)
 #endif
