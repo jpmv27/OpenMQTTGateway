@@ -2190,6 +2190,8 @@ void setupWiFiManager() {
   Log.notice(F("OTA Hostname: %s.local" CR), ota_hostname);
 #  endif
 
+  wifiManager.setHostname(gateway_name);
+
   wifiManager.setDebugOutput(WM_DEBUG);
 
   // The extra parameters to be configured (can be either global or just in the setup)
