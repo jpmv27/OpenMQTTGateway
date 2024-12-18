@@ -27,7 +27,7 @@
 #  include <SPIFFS.h>
 #  include <WebServer.h> // Docs for this are here - https://github.com/espressif/arduino-esp32/tree/master/libraries/WebServer
 
-#  include "ArduinoLog.h"
+#  include "Elog.h"
 #  include "config_WebContent.h"
 #  include "config_WebUI.h"
 
@@ -410,7 +410,7 @@ void handleRoot() {
         server.send(200, "application/json", "{t}{s}Uptime:{m}" + String(uptime()) + "{e}</table>");
       }
     } else if (server.hasArg("rst")) { // TODO: This should redirect to the RST page
-      Log.warning(F("[WebUI] Restart" CR));
+      Logger.warning(0, F("[WebUI] Restart" CR));
       char jsonChar[100];
       serializeJson(modules, jsonChar, measureJson(modules) + 1);
       char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
@@ -521,7 +521,7 @@ void handleWU() {
   String response = String(buffer);
   response += String(script);
   response += String(style);
-  int logLevel = Log.getLevel();
+  int logLevel = 0; //FUTURE Log.getLevel();
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_webui_body, jsonChar, gateway_name, (displayMetric ? "checked" : ""), (webUISecure ? "checked" : ""));
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
@@ -641,7 +641,7 @@ void handleWI() {
       }
       if (update) {
         String topic = String(mqtt_topic) + String(gateway_name) + String(subjectMQTTtoSYSset);
-        Log.warning(F("[WebUI] Save WiFi and Restart" CR));
+        Logger.warning(0, F("[WebUI] Save WiFi and Restart" CR));
         char jsonChar[100];
         serializeJson(modules, jsonChar, measureJson(modules) + 1);
         char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
@@ -661,7 +661,7 @@ void handleWI() {
         XtoSYS((char*)topic.c_str(), WEBtoSYS);
         return;
       } else {
-        Log.warning(F("[WebUI] No changes" CR));
+        Logger.warning(0, F("[WebUI] No changes" CR));
       }
     }
   }
@@ -743,7 +743,7 @@ void handleMQ() {
       WEBtoSYS["mqtt_secure"] = server.hasArg("sc");
 
       if (!update) {
-        Log.warning(F("[WebUI] clearing" CR));
+        Logger.warning(0, F("[WebUI] clearing" CR));
         for (JsonObject::iterator it = WEBtoSYS.begin(); it != WEBtoSYS.end(); ++it) {
           WEBtoSYS.remove(it);
         }
@@ -774,7 +774,7 @@ void handleMQ() {
 
 #  ifndef ESPWifiManualSetup
       if (update) {
-        Log.warning(F("[WebUI] Save MQTT and Reconnect" CR));
+        Logger.warning(0, F("[WebUI] Save MQTT and Reconnect" CR));
         WEBtoSYS["cnt_index"] = CNT_DEFAULT_INDEX;
         WEBtoSYS["save_cnt"] = true;
         char jsonChar[100];
@@ -797,7 +797,7 @@ void handleMQ() {
         XtoSYS((char*)topic.c_str(), WEBtoSYS);
         return;
       } else {
-        Log.warning(F("[WebUI] No changes" CR));
+        Logger.warning(0, F("[WebUI] No changes" CR));
       }
 #  endif
     }
@@ -859,7 +859,7 @@ void handleCG() {
   }
 
   if (update) {
-    Log.warning(F("[WebUI] Save Password and Restart" CR));
+    Logger.warning(0, F("[WebUI] Save Password and Restart" CR));
 
     char jsonChar[100];
     serializeJson(modules, jsonChar, measureJson(modules) + 1);
@@ -880,7 +880,7 @@ void handleCG() {
     String topic = String(mqtt_topic) + String(gateway_name) + String(subjectMQTTtoSYSset);
     XtoSYS((char*)topic.c_str(), WEBtoSYS);
   } else {
-    Log.warning(F("[WebUI] No changes" CR));
+    Logger.warning(0, F("[WebUI] No changes" CR));
   }
 
   char jsonChar[100];
@@ -913,9 +913,9 @@ void handleLO() {
     for (uint8_t i = 0; i < server.args(); i++) {
       WEBUI_TRACE_LOG(F("handleLO Arg: %d, %s=%s" CR), i, server.argName(i).c_str(), server.arg(i).c_str());
     }
-    if (server.hasArg("save") && server.hasArg("lo") && server.arg("lo").toInt() != Log.getLevel()) {
-      Log.fatal(F("[WebUI] Log level changed to: %d" CR), server.arg("lo").toInt());
-      Log.setLevel(server.arg("lo").toInt());
+    if (server.hasArg("save") && server.hasArg("lo") && server.arg("lo").toInt() != 0) { //FUTURE Log.getLevel()) {
+      Logger.emergency(0, F("[WebUI] Log level changed to: %d" CR), server.arg("lo").toInt());
+      // FUTURE Log.setLevel(server.arg("lo").toInt());
     }
   }
 
@@ -928,7 +928,7 @@ void handleLO() {
   String response = String(buffer);
   response += String(script);
   response += String(style);
-  int logLevel = Log.getLevel();
+  int logLevel = 0; //FUTURE Log.getLevel();
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_logging_body, jsonChar, gateway_name, (logLevel == 0 ? "selected" : ""), (logLevel == 1 ? "selected" : ""), (logLevel == 2 ? "selected" : ""), (logLevel == 3 ? "selected" : ""), (logLevel == 4 ? "selected" : ""), (logLevel == 5 ? "selected" : ""), (logLevel == 6 ? "selected" : ""));
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
@@ -1022,11 +1022,11 @@ void handleLA() {
         update = true;
       }
       if (update) {
-        Log.notice(F("[WebUI] Save data" CR));
+        Logger.notice(0, F("[WebUI] Save data" CR));
         WEBtoLORA["save"] = true;
         LORAConfig_fromJson(WEBtoLORA);
         stateLORAMeasures();
-        Log.trace(F("[WebUI] LORAConfig end" CR));
+        Logger.debug(0, F("[WebUI] LORAConfig end" CR));
       }
     }
   }
@@ -1155,7 +1155,7 @@ void handleRF() {
           WEBtoRF["frequency"] = RFConfig.frequency;
           update = true;
         } else {
-          Log.warning(F("[WebUI] Invalid Frequency" CR));
+          Logger.warning(0, F("[WebUI] Invalid Frequency" CR));
         }
       }
       if (server.hasArg("ar")) {
@@ -1165,7 +1165,7 @@ void handleRF() {
           WEBtoRF["activereceiver"] = RFConfig.activeReceiver;
           update = true;
         } else {
-          Log.warning(F("[WebUI] Invalid Active Receiver" CR));
+          Logger.warning(0, F("[WebUI] Invalid Active Receiver" CR));
         }
       }
       if (server.hasArg("oo")) {
@@ -1179,11 +1179,11 @@ void handleRF() {
         update = true;
       }
       if (update) {
-        Log.notice(F("[WebUI] Save data" CR));
+        Logger.notice(0, F("[WebUI] Save data" CR));
         WEBtoRF["save"] = true;
         RFConfig_fromJson(WEBtoRF);
         stateRFMeasures();
-        Log.trace(F("[WebUI] RFConfig end" CR));
+        Logger.debug(0, F("[WebUI] RFConfig end" CR));
       }
     }
   }
@@ -1222,7 +1222,7 @@ void handleRT() {
   if (server.hasArg("non")) {
     char jsonChar[100];
     serializeJson(modules, jsonChar, measureJson(modules) + 1);
-    Log.warning(F("[WebUI] Erase and Restart" CR));
+    Logger.warning(0, F("[WebUI] Erase and Restart" CR));
 
     char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
@@ -1333,7 +1333,7 @@ void handleTK() {
     } else {
       WEBUI_TRACE_LOG(F("handleTK: uptime: %u, uptime: %u, ok: %T" CR), server.arg("uptime").toInt(), uptime(), server.arg("uptime").toInt() + 600 > uptime());
       WEBUI_TRACE_LOG(F("handleTK: RT: %d, RT: %d, ok: %T " CR), server.arg("RT").toInt(), requestToken, server.arg("RT").toInt() == requestToken);
-      Log.error(F("[WebUI] Invalid Token Response: RT: %T, uptime: %T" CR), server.arg("RT").toInt() == requestToken, server.arg("uptime").toInt() + 600 > uptime());
+      Logger.error(0, F("[WebUI] Invalid Token Response: RT: %T, uptime: %T" CR), server.arg("RT").toInt() == requestToken, server.arg("uptime").toInt() + 600 > uptime());
       server.send(500, "text/html", "Internal ERROR - Invalid Token");
     }
   }
@@ -1396,7 +1396,7 @@ void handleIN() {
     // WEBUI_TRACE_LOG(F("[WebUI] informationDisplay after %s" CR), informationDisplay.c_str());
 
     if (informationDisplay.length() > WEB_TEMPLATE_BUFFER_MAX_SIZE) {
-      Log.warning(F("[WebUI] informationDisplay content length ( %d ) greater than WEB_TEMPLATE_BUFFER_MAX_SIZE.  Display truncated" CR), informationDisplay.length());
+      Logger.warning(0, F("[WebUI] informationDisplay content length ( %d ) greater than WEB_TEMPLATE_BUFFER_MAX_SIZE.  Display truncated" CR), informationDisplay.length());
     }
 
     char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
@@ -1454,7 +1454,7 @@ void handleUP() {
 
         String output;
         serializeJson(WEBtoSYS, output);
-        Log.notice(F("[WebUI] XtoSYSupdate %s" CR), output.c_str());
+        Logger.notice(0, F("[WebUI] XtoSYSupdate %s" CR), output.c_str());
       }
 
       String topic = String(mqtt_topic) + String(gateway_name) + String(subjectMQTTtoSYSupdate);
@@ -1470,7 +1470,7 @@ void handleUP() {
 
           String output;
           serializeJson(WEBtoSYS, output);
-          Log.notice(F("[WebUI] XtoSYSupdate %s" CR), output.c_str());
+          Logger.notice(0, F("[WebUI] XtoSYSupdate %s" CR), output.c_str());
         }
 
         String topic = String(mqtt_topic) + String(gateway_name) + String(subjectMQTTtoSYSupdate);
@@ -1536,7 +1536,7 @@ void handleCS() {
         WEBUI_TRACE_LOG(F("[WebUI] handleCS inject MQTT Command topic: '%s', command: '%s'" CR), cmdTopic.c_str(), command.c_str());
         receivingDATA(cmdTopic.c_str(), command.c_str());
       } else {
-        Log.warning(F("[WebUI] Missing command: '%s', command: '%s'" CR), cmdTopic.c_str(), command.c_str());
+        Logger.warning(0, F("[WebUI] Missing command: '%s', command: '%s'" CR), cmdTopic.c_str(), command.c_str());
       }
     }
 
@@ -1594,7 +1594,7 @@ void notFound() {
       path += ".html";
     } else {
 #  endif
-      Log.warning(F("[WebUI] notFound: uri: %s, args: %d, method: %d" CR), server.uri(), server.args(), server.method());
+      Logger.warning(0, F("[WebUI] notFound: uri: %s, args: %d, method: %d" CR), server.uri(), server.args(), server.method());
       server.send(404, "text/plain", "Not found");
       return;
 #  ifdef WEBUI_DEVELOPMENT
@@ -1657,13 +1657,13 @@ void WebUISetup() {
   server.on("/favicon.ico", handleFavicon); // Information
   server.begin();
 
-  Log.begin(LOG_LEVEL, &WebLog);
+  //FUTURE Log.begin(LOG_LEVEL, &WebLog);
 
-  Log.trace(F("[WebUI] displayMetric %T" CR), displayMetric);
-  Log.trace(F("[WebUI] WebUI Secure %T" CR), webUISecure);
-  Log.notice(F("OpenMQTTGateway URL: http://%s/" CR), WiFi.localIP().toString().c_str());
+  Logger.debug(0, F("[WebUI] displayMetric %T" CR), displayMetric);
+  Logger.debug(0, F("[WebUI] WebUI Secure %T" CR), webUISecure);
+  Logger.notice(0, F("OpenMQTTGateway URL: http://%s/" CR), WiFi.localIP().toString().c_str());
   displayPrint("URL: http://", (char*)WiFi.localIP().toString().c_str());
-  Log.notice(F("ZwebUI setup done" CR));
+  Logger.notice(0, F("ZwebUI setup done" CR));
 }
 
 unsigned long nextWebUIMessage = uptime() + DISPLAY_WEBUI_INTERVAL;
@@ -1691,25 +1691,25 @@ void XtoWebUI(const char* topicOri, JsonObject& WebUIdata) { // json object deco
     // properties
     if (WebUIdata.containsKey("displayMetric")) {
       displayMetric = WebUIdata["displayMetric"].as<bool>();
-      Log.notice(F("Set displayMetric: %T" CR), displayMetric);
+      Logger.notice(0, F("Set displayMetric: %T" CR), displayMetric);
       success = true;
     }
     // save, load, init, erase
     if (WebUIdata.containsKey("save") && WebUIdata["save"]) {
       success = WebUIConfig_save();
       if (success) {
-        Log.notice(F("WebUI config saved" CR));
+        Logger.notice(0, F("WebUI config saved" CR));
       }
     } else if (WebUIdata.containsKey("load") && WebUIdata["load"]) {
       success = WebUIConfig_load();
       if (success) {
-        Log.notice(F("WebUI config loaded" CR));
+        Logger.notice(0, F("WebUI config loaded" CR));
       }
     } else if (WebUIdata.containsKey("init") && WebUIdata["init"]) {
       WebUIConfig_init();
       success = true;
       if (success) {
-        Log.notice(F("WebUI config initialised" CR));
+        Logger.notice(0, F("WebUI config initialised" CR));
       }
     } else if (WebUIdata.containsKey("erase") && WebUIdata["erase"]) {
       // Erase config from NVS (non-volatile storage)
@@ -1717,13 +1717,13 @@ void XtoWebUI(const char* topicOri, JsonObject& WebUIdata) { // json object deco
       success = preferences.remove("WebUIConfig");
       preferences.end();
       if (success) {
-        Log.notice(F("WebUI config erased" CR));
+        Logger.notice(0, F("WebUI config erased" CR));
       }
     }
     if (success) {
       stateWebUIStatus();
     } else {
-      Log.error(F("[ WebUI ] XtoWebUI Fail json" CR), WebUIdata);
+      Logger.error(0, F("[ WebUI ] XtoWebUI Fail json" CR), WebUIdata);
     }
   }
 }
@@ -1756,14 +1756,14 @@ bool WebUIConfig_save() {
   preferences.begin(Gateway_Short_Name, false);
   int result = preferences.putString("WebUIConfig", conf);
   preferences.end();
-  Log.trace(F("[WebUI] WebUIConfig_save: %s, result: %d" CR), conf.c_str(), result);
+  Logger.debug(0, F("[WebUI] WebUIConfig_save: %s, result: %d" CR), conf.c_str(), result);
   return true;
 }
 
 void WebUIConfig_init() {
   displayMetric = DISPLAY_METRIC;
   webUISecure = WEBUI_AUTH;
-  Log.notice(F("WebUI config initialised" CR));
+  Logger.notice(0, F("WebUI config initialised" CR));
 }
 
 bool WebUIConfig_load() {
@@ -1773,11 +1773,11 @@ bool WebUIConfig_load() {
     auto error = deserializeJson(jsonBuffer, preferences.getString("WebUIConfig", "{}"));
     preferences.end();
     if (error) {
-      Log.error(F("WebUI config deserialization failed: %s, buffer capacity: %u" CR), error.c_str(), jsonBuffer.capacity());
+      Logger.error(0, F("WebUI config deserialization failed: %s, buffer capacity: %u" CR), error.c_str(), jsonBuffer.capacity());
       return false;
     }
     if (jsonBuffer.isNull()) {
-      Log.warning(F("WebUI config is null" CR));
+      Logger.warning(0, F("WebUI config is null" CR));
       return false;
     }
     JsonObject jo = jsonBuffer.as<JsonObject>();
@@ -1786,7 +1786,7 @@ bool WebUIConfig_load() {
     return true;
   } else {
     preferences.end();
-    Log.notice(F("No WebUI config to load" CR));
+    Logger.notice(0, F("No WebUI config to load" CR));
     return false;
   }
 }
@@ -1847,10 +1847,10 @@ void webUIPubPrint(const char* topicori, JsonObject& data) {
           // Queue completed message
 
           if (xQueueSend(webUIQueue, (void*)&message, 0) != pdTRUE) {
-            Log.warning(F("[ WebUI ] ERROR: webUIQueue full, discarding %s" CR), message->title);
+            Logger.warning(0, F("[ WebUI ] ERROR: webUIQueue full, discarding %s" CR), message->title);
             free(message);
           } else {
-            // Log.notice(F("[ WebUI ] Queued %s" CR), message->title);
+            // Logger.notice(0, F("[ WebUI ] Queued %s" CR), message->title);
           }
           break;
         }
@@ -1937,13 +1937,13 @@ void webUIPubPrint(const char* topicori, JsonObject& data) {
             // Queue completed message
 
             if (xQueueSend(webUIQueue, (void*)&message, 0) != pdTRUE) {
-              Log.warning(F("[ WebUI ] webUIQueue full, discarding signal %s" CR), message->title);
+              Logger.warning(0, F("[ WebUI ] webUIQueue full, discarding signal %s" CR), message->title);
               free(message);
             } else {
-              // Log.notice(F("[ WebUI ] Queued %s" CR), message->title);
+              // Logger.notice(0, F("[ WebUI ] Queued %s" CR), message->title);
             }
           } else {
-            Log.error(F("[ WebUI ] rtl_433 not displaying %s" CR), message->title);
+            Logger.error(0, F("[ WebUI ] rtl_433 not displaying %s" CR), message->title);
             free(message);
           }
           break;
@@ -2003,10 +2003,10 @@ void webUIPubPrint(const char* topicori, JsonObject& data) {
           // Queue completed message
 
           if (xQueueSend(webUIQueue, (void*)&message, 0) != pdTRUE) {
-            Log.warning(F("[ WebUI ] webUIQueue full, discarding signal %s" CR), message->title);
+            Logger.warning(0, F("[ WebUI ] webUIQueue full, discarding signal %s" CR), message->title);
             free(message);
           } else {
-            // Log.notice(F("[ WebUI ] Queued %s" CR), message->title);
+            // Logger.notice(0, F("[ WebUI ] Queued %s" CR), message->title);
           }
           break;
         }
@@ -2331,10 +2331,10 @@ void webUIPubPrint(const char* topicori, JsonObject& data) {
               line4.toCharArray(message->line4, WEBUI_TEXT_WIDTH);
 
               if (xQueueSend(webUIQueue, (void*)&message, 0) != pdTRUE) {
-                Log.warning(F("[ WebUI ] webUIQueue full, discarding signal %s" CR), message->title);
+                Logger.warning(0, F("[ WebUI ] webUIQueue full, discarding signal %s" CR), message->title);
                 free(message);
               } else {
-                // Log.notice(F("[ WebUI ] Queued %s" CR), message->title);
+                // Logger.notice(0, F("[ WebUI ] Queued %s" CR), message->title);
               }
             } else {
               WEBUI_TRACE_LOG(F("[ WebUI ] incomplete messaage %s" CR), topicori);
@@ -2389,10 +2389,10 @@ void webUIPubPrint(const char* topicori, JsonObject& data) {
           // Queue completed message
 
           if (xQueueSend(webUIQueue, (void*)&message, 0) != pdTRUE) {
-            Log.warning(F("[ WebUI ] webUIQueue full, discarding signal %s" CR), message->title);
+            Logger.warning(0, F("[ WebUI ] webUIQueue full, discarding signal %s" CR), message->title);
             free(message);
           } else {
-            // Log.notice(F("[ WebUI ] Queued %s" CR), message->title);
+            // Logger.notice(0, F("[ WebUI ] Queued %s" CR), message->title);
           }
           break;
         }
@@ -2441,23 +2441,24 @@ void webUIPubPrint(const char* topicori, JsonObject& data) {
           // Queue completed message
 
           if (xQueueSend(webUIQueue, (void*)&message, 0) != pdTRUE) {
-            Log.warning(F("[ WebUI ] webUIQueue full, discarding signal %s" CR), message->title);
+            Logger.warning(0, F("[ WebUI ] webUIQueue full, discarding signal %s" CR), message->title);
             free(message);
           } else {
-            // Log.notice(F("[ WebUI ] Queued %s" CR), message->title);
+            // Logger.notice(0, F("[ WebUI ] Queued %s" CR), message->title);
           }
           break;
         }
 #  endif
         default:
-          Log.verbose(F("[ WebUI ] unhandled topic %s" CR), message->title);
+          Logger.debug(0, F("[ WebUI ] unhandled topic %s" CR), message->title);
           free(message);
       }
     } else {
-      Log.error(F("[ WebUI ] insufficent memory " CR));
+      Logger.error(0, F("[ WebUI ] insufficent memory " CR));
     }
   } else {
-    Log.error(F("[ WebUI ] not initalized " CR));
+    Logger.error(0, F("[ WebUI ] not initalized " CR));
+    Logger.error(0, F("[ WebUI ] not initalized ")); //DEBUG
   }
 }
 

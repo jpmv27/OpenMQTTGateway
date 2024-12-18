@@ -52,23 +52,23 @@ Adafruit_AHTX0 ahtSensor;
 
 void setupZsensorAHTx0() {
   delay(10); // Gives the Sensor enough time to turn on
-  Log.notice(F("AHTx0 Initialized - begin()" CR));
+  Logger.notice(0, F("AHTx0 Initialized - begin()" CR));
 
 #  if defined(ESP32)
   Wire.begin(AHT_I2C_SDA, AHT_I2C_SCL);
   if (!ahtSensor.begin(&Wire)) {
-    Log.error(F("Failed to initialize AHTx0 sensor!" CR));
+    Logger.error(0, F("Failed to initialize AHTx0 sensor!" CR));
   }
 #  else
   if (!ahtSensor.begin()) {
-    Log.error(F("Failed to initialize AHTx0 sensor!" CR));
+    Logger.error(0, F("Failed to initialize AHTx0 sensor!" CR));
   }
 #  endif
 }
 
 void MeasureAHTTempHum() {
   if (millis() > (timeAHTx0 + TimeBetweenReadingAHTx0)) {
-    Log.trace(F("Read AHTx0 Sensor" CR));
+    Logger.debug(0, F("Read AHTx0 Sensor" CR));
 
     timeAHTx0 = millis();
     static float persisted_aht_tempc;
@@ -77,15 +77,15 @@ void MeasureAHTTempHum() {
     sensors_event_t ahtTempC, ahtHum;
     if (!ahtSensor.getEvent(&ahtHum, &ahtTempC)) // get sensor data
     {
-      Log.error(F("Failed to read from sensor AHTx0!" CR));
+      Logger.error(0, F("Failed to read from sensor AHTx0!" CR));
       return;
     }
 
     // Check if reads failed and exit early (to try again).
     if (isnan(ahtTempC.temperature) || isnan(ahtHum.relative_humidity)) {
-      Log.error(F("Failed to read from sensor AHTx0!" CR));
+      Logger.error(0, F("Failed to read from sensor AHTx0!" CR));
     } else {
-      Log.notice(F("Creating AHTx0 buffer" CR));
+      Logger.notice(0, F("Creating AHTx0 buffer" CR));
       StaticJsonDocument<JSON_MSG_BUFFER> AHTx0dataBuffer;
       JsonObject AHTx0data = AHTx0dataBuffer.to<JsonObject>();
       // Generate Temperature in degrees C
@@ -94,14 +94,14 @@ void MeasureAHTTempHum() {
         AHTx0data["tempc"] = (float)ahtTempC.temperature;
         AHTx0data["tempf"] = (float)ahtTempF;
       } else {
-        Log.notice(F("Same Temp. Don't send it" CR));
+        Logger.notice(0, F("Same Temp. Don't send it" CR));
       }
 
       // Generate Humidity in percent
       if (ahtHum.relative_humidity != persisted_aht_hum || AHTx0_always) {
         AHTx0data["hum"] = (float)ahtHum.relative_humidity;
       } else {
-        Log.notice(F("Same Humidity. Don't send it" CR));
+        Logger.notice(0, F("Same Humidity. Don't send it" CR));
       }
       AHTx0data["origin"] = AHTTOPIC;
       enqueueJsonObject(AHTx0data);

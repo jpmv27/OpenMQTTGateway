@@ -52,7 +52,7 @@
 #endif
 
 #ifdef WEBUI_TRACE_LOGGING
-#  define WEBUI_TRACE_LOG(...) Log.trace(__VA_ARGS__)
+#  define WEBUI_TRACE_LOG(...) Logger.debug(0, __VA_ARGS__)
 #else
 #  define WEBUI_TRACE_LOG(...)
 #endif

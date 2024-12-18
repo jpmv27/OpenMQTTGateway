@@ -137,7 +137,7 @@ const char parameters[51][4][24] = {
     {"wind_speed_m_s", "Wind speed", "m/s", "wind_speed"}};
 #  endif
 #  ifdef RTL_433_DISCOVERY_LOGGING
-#    define DISCOVERY_TRACE_LOG(...) Log.trace(__VA_ARGS__)
+#    define DISCOVERY_TRACE_LOG(...) Logger.debug(0, __VA_ARGS__)
 #  else
 #    define DISCOVERY_TRACE_LOG(...)
 #  endif
