@@ -1302,7 +1302,11 @@ void updateAndHandleLEDsTask() {
 void setup() {
   //Launch serial for debugging purposes
   Serial.begin(SERIAL_BAUD);
-  //FUTURE Log.begin(LOG_LEVEL, &Serial);
+  Logger.registerSerial(0, LOG_LEVEL, "OMG");
+#if LOG_TO_SYSLOG
+  Logger.configureSyslog(syslogServer, syslogPort, gateway_name);
+  Logger.registerSyslog(0, LOG_LEVEL_SYSLOG, FAC_USER, "OMG");
+#endif
   Logger.notice(0, F(CR "************* WELCOME TO OpenMQTTGateway **************" CR));
 #if defined(TRIGGER_GPIO) && !defined(ESPWifiManualSetup)
   pinMode(TRIGGER_GPIO, INPUT_PULLUP);

@@ -200,6 +200,22 @@
 #  define NTP_SERVER "pool.ntp.org"
 #endif
 
+#ifndef LOG_TO_SYSLOG
+#  define LOG_TO_SYSLOG false
+#endif
+
+#if LOG_TO_SYSLOG
+#  ifndef ELOG_SYSLOG_ENABLE
+#    error ELOG_SYSLOG_ENABLE must be defined
+#  endif
+#  ifndef SYSLOG_SERVER
+#    error SYSLOG_SERVER must be defined
+#  endif
+#  ifndef SYSLOG_PORT
+#    define SYSLOG_PORT 514
+#  endif
+#endif
+
 #ifndef MQTT_SECURE_DEFAULT
 #  define MQTT_SECURE_DEFAULT false
 #endif
@@ -598,6 +614,11 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #ifndef LOG_LEVEL
 #  define LOG_LEVEL ELOG_LEVEL_NOTICE
 #endif
+#if LOG_TO_SYSLOG
+#  ifndef LOG_LEVEL_SYSLOG
+#    define LOG_LEVEL_SYSLOG LOG_LEVEL
+#  endif
+#endif
 
 /*-------------------ESP Wifi band and tx power ---------------------*/
 //Certain sensors are sensitive to Wifi which can cause interference with their normal operation
@@ -624,6 +645,11 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 
 char mqtt_topic[parameters_size + 1] = Base_Topic;
 char gateway_name[parameters_size + 1] = Gateway_Name;
+
+#if LOG_TO_SYSLOG
+char syslogServer[parameters_size + 1] = SYSLOG_SERVER;
+uint16_t syslogPort = SYSLOG_PORT;
+#endif
 
 void connectMQTT();
 
