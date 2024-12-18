@@ -1657,7 +1657,7 @@ void WebUISetup() {
   server.on("/favicon.ico", handleFavicon); // Information
   server.begin();
 
-  //FUTURE Log.begin(LOG_LEVEL, &WebLog);
+  Logger.registerSerial(0, LOG_LEVEL, "OMG", WebLog);
 
   Logger.debug(0, F("[WebUI] displayMetric %T" CR), displayMetric);
   Logger.debug(0, F("[WebUI] WebUI Secure %T" CR), webUISecure);

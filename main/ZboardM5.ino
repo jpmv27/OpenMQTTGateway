@@ -42,7 +42,11 @@
 #    include <M5Tough.h>
 #  endif
 void logToLCD(bool display) {
-  //FUTURE display ? Log.begin(LOG_LEVEL_LCD, &M5.Lcd) : Log.begin(LOG_LEVEL, &Serial); // Log on LCD following LOG_LEVEL_LCD
+  if (display) {
+    Logger.registerSerial(0, LOG_LEVEL_LCD, "OMG", M5.Lcd); // Log on LCD following LOG_LEVEL_LCD
+  } else {
+    Logger.registerSerial(0, LOG_LEVEL, "OMG");
+  }
 }
 
 void setBrightness(int brightness) {
@@ -64,7 +68,7 @@ void setupM5() {
   M5.Lcd.fillScreen(WHITE);
   displayIntro(M5.Lcd.width() * 0.25, (M5.Lcd.width() / 2) + M5.Lcd.width() * 0.12, (M5.Lcd.height() / 2) + M5.Lcd.height() * 0.2);
 #  if LOG_TO_LCD
-  //FUTURE Log.begin(LOG_LEVEL_LCD, &M5.Lcd); // Log on LCD following LOG_LEVEL_LCD
+  Logger.registerSerial(0, LOG_LEVEL_LCD, "OMG", M5.Lcd); // Log on LCD following LOG_LEVEL_LCD
 #  endif
 
   Logger.notice(0, F("Setup M5 end" CR));
