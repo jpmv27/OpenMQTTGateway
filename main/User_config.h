@@ -611,6 +611,9 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #endif
 #define TimeToResetAtStart 5000 // Time we allow the user at start for the reset command by button press
 /*-------------------DEFINE LOG LEVEL----------------------*/
+#ifndef OMG_LOGID
+#  define OMG_LOGID 0
+#endif
 #ifndef LOG_LEVEL
 #  define LOG_LEVEL ELOG_LEVEL_NOTICE
 #endif

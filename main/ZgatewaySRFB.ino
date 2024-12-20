@@ -36,8 +36,8 @@ unsigned char _uartbuf[RF_MESSAGE_SIZE + 3] = {0};
 unsigned char _uartpos = 0;
 
 void setupSRFB() {
-  Logger.debug(0, F("ZgatewaySRFB setup done " CR));
-  Logger.debug(0, F("Serial Baud: %l" CR), SERIAL_BAUD);
+  Logger.debug(OMG_LOGID, F("ZgatewaySRFB setup done " CR));
+  Logger.debug(OMG_LOGID, F("Serial Baud: %l" CR), SERIAL_BAUD);
 }
 
 void _rfbSend(byte* message) {
@@ -55,7 +55,7 @@ void _rfbSend(byte* message) {
 void _rfbSend(byte* message, int times) {
   char buffer[RF_MESSAGE_SIZE];
   TheengsUtils::_rawToHex(message, buffer, RF_MESSAGE_SIZE);
-  Logger.notice(0, F("[RFBRIDGE] Sending MESSAGE" CR));
+  Logger.notice(OMG_LOGID, F("[RFBRIDGE] Sending MESSAGE" CR));
 
   for (int i = 0; i < times; i++) {
     if (i > 0) {
@@ -101,7 +101,7 @@ void _rfbDecode() {
   if (action == RF_CODE_RFIN) {
     TheengsUtils::_rawToHex(&_uartbuf[1], buffer, RF_MESSAGE_SIZE);
 
-    Logger.debug(0, F("Creating SRFB buffer" CR));
+    Logger.debug(OMG_LOGID, F("Creating SRFB buffer" CR));
     StaticJsonDocument<JSON_MSG_BUFFER> SRFBdataBuffer;
     JsonObject SRFBdata = SRFBdataBuffer.to<JsonObject>();
     SRFBdata["raw"] = String(buffer).substring(0, 18);
@@ -119,13 +119,13 @@ void _rfbDecode() {
     SRFBdata["value"] = (unsigned long)MQTTvalue;
 
     if (!isAduplicateSignal(MQTTvalue) && MQTTvalue != 0) { // conditions to avoid duplications of RF -->MQTT
-      Logger.debug(0, F("Adv data SRFBtoMQTT" CR));
+      Logger.debug(OMG_LOGID, F("Adv data SRFBtoMQTT" CR));
       SRFBdata["origin"] = subjectSRFBtoMQTT;
       enqueueJsonObject(SRFBdata);
-      Logger.debug(0, F("Store val: %lu" CR), MQTTvalue);
+      Logger.debug(OMG_LOGID, F("Store val: %lu" CR), MQTTvalue);
       storeSignalValue(MQTTvalue);
       if (repeatSRFBwMQTT) {
-        Logger.debug(0, F("Publish SRFB for rpt" CR));
+        Logger.debug(OMG_LOGID, F("Publish SRFB for rpt" CR));
         SRFBdata["origin"] = subjectMQTTtoSRFB;
         enqueueJsonObject(SRFBdata);
       }
@@ -135,7 +135,7 @@ void _rfbDecode() {
 }
 
 void _rfbAck() {
-  Logger.debug(0, F("[RFBRIDGE] Sending ACK\n" CR));
+  Logger.debug(OMG_LOGID, F("[RFBRIDGE] Sending ACK\n" CR));
   Serial.println();
   Serial.write(RF_CODE_START);
   Serial.write(RF_CODE_ACK);
@@ -159,31 +159,31 @@ void XtoSRFB(const char* topicOri, const char* datacallback) {
     if (pos != -1) {
       pos = pos + +strlen(SRFBRptKey);
       valueRPT = (topic.substring(pos, pos + 1)).toInt();
-      Logger.notice(0, F("SRFB Repeat: %d" CR), valueRPT);
+      Logger.notice(OMG_LOGID, F("SRFB Repeat: %d" CR), valueRPT);
     }
 
     int pos2 = topic.lastIndexOf(SRFBminipulselengthKey);
     if (pos2 != -1) {
       pos2 = pos2 + strlen(SRFBminipulselengthKey);
       valueMiniPLSL = (topic.substring(pos2, pos2 + 3)).toInt();
-      Logger.notice(0, F("RF Mini Pulse Lgth: %d" CR), valueMiniPLSL);
+      Logger.notice(OMG_LOGID, F("RF Mini Pulse Lgth: %d" CR), valueMiniPLSL);
     }
 
     int pos3 = topic.lastIndexOf(SRFBmaxipulselengthKey);
     if (pos3 != -1) {
       pos3 = pos3 + strlen(SRFBmaxipulselengthKey);
       valueMaxiPLSL = (topic.substring(pos3, pos3 + 2)).toInt();
-      Logger.notice(0, F("RF Maxi Pulse Lgth: %d" CR), valueMaxiPLSL);
+      Logger.notice(OMG_LOGID, F("RF Maxi Pulse Lgth: %d" CR), valueMaxiPLSL);
     }
 
     int pos4 = topic.lastIndexOf(SRFBsyncKey);
     if (pos4 != -1) {
       pos4 = pos4 + strlen(SRFBsyncKey);
       valueSYNC = (topic.substring(pos4, pos4 + 2)).toInt();
-      Logger.notice(0, F("RF sync: %d" CR), valueSYNC);
+      Logger.notice(OMG_LOGID, F("RF sync: %d" CR), valueSYNC);
     }
 
-    Logger.debug(0, F("MQTTtoSRFB prts" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoSRFB prts" CR));
     if (valueRPT == 0)
       valueRPT = 1;
     if (valueMiniPLSL == 0)
@@ -227,7 +227,7 @@ void XtoSRFB(const char* topicOri, const char* datacallback) {
     if (pos != -1) {
       pos = pos + +strlen(SRFBRptKey);
       valueRPT = (topic.substring(pos, pos + 1)).toInt();
-      Logger.notice(0, F("SRFB Repeat: %d" CR), valueRPT);
+      Logger.notice(OMG_LOGID, F("SRFB Repeat: %d" CR), valueRPT);
     }
     if (valueRPT == 0)
       valueRPT = 1;
@@ -246,16 +246,16 @@ void XtoSRFB(const char* topicOri, JsonObject& SRFBdata) {
   const char* raw = SRFBdata["raw"];
   int valueRPT = SRFBdata["repeat"] | 1;
   if (cmpToMainTopic(topicOri, subjectMQTTtoSRFB)) {
-    Logger.debug(0, F("MQTTtoSRFB json" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoSRFB json" CR));
     if (raw) { // send raw in priority when defined in the json
-      Logger.debug(0, F("MQTTtoSRFB raw ok" CR));
+      Logger.debug(OMG_LOGID, F("MQTTtoSRFB raw ok" CR));
       byte message_b[RF_MESSAGE_SIZE];
       TheengsUtils::_hexToRaw(raw, message_b, RF_MESSAGE_SIZE);
       _rfbSend(message_b, valueRPT);
     } else {
       unsigned long data = SRFBdata["value"];
       if (data != 0) {
-        Logger.notice(0, F("MQTTtoSRFB data ok" CR));
+        Logger.notice(OMG_LOGID, F("MQTTtoSRFB data ok" CR));
         int valueMiniPLSL = SRFBdata["val_Tlow"];
         int valueMaxiPLSL = SRFBdata["val_Thigh"];
         int valueSYNC = SRFBdata["delay"];
@@ -269,10 +269,10 @@ void XtoSRFB(const char* topicOri, JsonObject& SRFBdata) {
         if (valueSYNC == 0)
           valueSYNC = 9500;
 
-        Logger.notice(0, F("SRFB Repeat: %d" CR), valueRPT);
-        Logger.notice(0, F("RF Mini Pulse Lgth: %d" CR), valueMiniPLSL);
-        Logger.notice(0, F("RF Maxi Pulse Lgth: %d" CR), valueMaxiPLSL);
-        Logger.notice(0, F("RF sync: %d" CR), valueSYNC);
+        Logger.notice(OMG_LOGID, F("SRFB Repeat: %d" CR), valueRPT);
+        Logger.notice(OMG_LOGID, F("RF Mini Pulse Lgth: %d" CR), valueMiniPLSL);
+        Logger.notice(OMG_LOGID, F("RF Maxi Pulse Lgth: %d" CR), valueMaxiPLSL);
+        Logger.notice(OMG_LOGID, F("RF sync: %d" CR), valueSYNC);
 
         byte hex_valueMiniPLSL[2];
         hex_valueMiniPLSL[0] = (int)((valueMiniPLSL >> 8) & 0xFF);
@@ -298,12 +298,12 @@ void XtoSRFB(const char* topicOri, JsonObject& SRFBdata) {
         memcpy(message_b + 4, hex_valueMaxiPLSL, 2);
         memcpy(message_b + 6, hex_data, 3);
 
-        Logger.notice(0, F("MQTTtoSRFB OK" CR));
+        Logger.notice(OMG_LOGID, F("MQTTtoSRFB OK" CR));
         _rfbSend(message_b, valueRPT);
         SRFBdata["origin"] = subjectGTWSRFBtoMQTT;
         enqueueJsonObject(SRFBdata); // we acknowledge the sending by publishing the value to an acknowledgement topic, for the moment even if it is a signal repetition we acknowledge also
       } else {
-        Logger.error(0, F("MQTTtoSRFB error decoding value" CR));
+        Logger.error(OMG_LOGID, F("MQTTtoSRFB error decoding value" CR));
       }
     }
   }

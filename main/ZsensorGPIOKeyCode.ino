@@ -60,14 +60,14 @@ void MeasureGPIOKeyCode() {
       InputStateGPIOKeyCode = reading;
       sprintf(hex, "%02x", InputStateGPIOKeyCode);
       hex[2] = 0;
-      Logger.notice(0, F("GPIOKeyCode %H" CR), hex);
+      Logger.notice(OMG_LOGID, F("GPIOKeyCode %H" CR), hex);
       pub(subjectGPIOKeyCodetoMQTT, hex);
       lastLatchStateGPIOKeyCode = latch;
     }
 
     if (latch != lastLatchStateGPIOKeyCode) {
       lastLatchStateGPIOKeyCode = latch;
-      Logger.notice(0, F("GPIOKeyCode latch %d" CR), latch);
+      Logger.notice(OMG_LOGID, F("GPIOKeyCode latch %d" CR), latch);
       if (latch == 0)
         pub(subjectGPIOKeyCodeStatetoMQTT, "done");
     }

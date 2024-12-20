@@ -52,7 +52,7 @@ void blufi_dh_negotiate_data_handler(uint8_t* data, int len, uint8_t** output_da
   uint8_t type = data[0];
 
   if (blufi_sec == NULL) {
-    Logger.error(0, F("BLUFI Security is not initialized" CR));
+    Logger.error(OMG_LOGID, F("BLUFI Security is not initialized" CR));
     btc_blufi_report_error(ESP_BLUFI_INIT_SECURITY_ERROR);
     return;
   }
@@ -67,13 +67,13 @@ void blufi_dh_negotiate_data_handler(uint8_t* data, int len, uint8_t** output_da
       blufi_sec->dh_param = (uint8_t*)malloc(blufi_sec->dh_param_len);
       if (blufi_sec->dh_param == NULL) {
         btc_blufi_report_error(ESP_BLUFI_DH_MALLOC_ERROR);
-        Logger.error(0, F("%s, malloc failed\n" CR), __func__);
+        Logger.error(OMG_LOGID, F("%s, malloc failed\n" CR), __func__);
         return;
       }
       break;
     case SEC_TYPE_DH_PARAM_DATA: {
       if (blufi_sec->dh_param == NULL) {
-        Logger.error(0, F("%s, blufi_sec->dh_param == NULL" CR), __func__);
+        Logger.error(OMG_LOGID, F("%s, blufi_sec->dh_param == NULL" CR), __func__);
         btc_blufi_report_error(ESP_BLUFI_DH_PARAM_ERROR);
         return;
       }
@@ -81,7 +81,7 @@ void blufi_dh_negotiate_data_handler(uint8_t* data, int len, uint8_t** output_da
       memcpy(blufi_sec->dh_param, &data[1], blufi_sec->dh_param_len);
       ret = mbedtls_dhm_read_params(&blufi_sec->dhm, &param, &param[blufi_sec->dh_param_len]);
       if (ret) {
-        Logger.error(0, F("%s read param failed %d" CR), __func__, ret);
+        Logger.error(OMG_LOGID, F("%s read param failed %d" CR), __func__, ret);
         btc_blufi_report_error(ESP_BLUFI_READ_PARAM_ERROR);
         return;
       }
@@ -90,7 +90,7 @@ void blufi_dh_negotiate_data_handler(uint8_t* data, int len, uint8_t** output_da
 
       ret = mbedtls_dhm_make_public(&blufi_sec->dhm, (int)mbedtls_mpi_size(&blufi_sec->dhm.P), blufi_sec->self_public_key, blufi_sec->dhm.len, myrand, NULL);
       if (ret) {
-        Logger.error(0, F("%s make public failed %d" CR), __func__, ret);
+        Logger.error(OMG_LOGID, F("%s make public failed %d" CR), __func__, ret);
         btc_blufi_report_error(ESP_BLUFI_MAKE_PUBLIC_ERROR);
         return;
       }
@@ -101,7 +101,7 @@ void blufi_dh_negotiate_data_handler(uint8_t* data, int len, uint8_t** output_da
                                     &blufi_sec->share_len,
                                     myrand, NULL);
       if (ret) {
-        Logger.error(0, F("%s mbedtls_dhm_calc_secret failed %d" CR), __func__, ret);
+        Logger.error(OMG_LOGID, F("%s mbedtls_dhm_calc_secret failed %d" CR), __func__, ret);
         btc_blufi_report_error(ESP_BLUFI_DH_PARAM_ERROR);
         return;
       }

@@ -39,29 +39,29 @@ void setupSomfy() {
 
 #  if defined(ESP32)
   if (!EEPROM.begin(max(4, SOMFY_REMOTE_NUM * 2))) {
-    Logger.error(0, F("failed to initialise EEPROM" CR));
+    Logger.error(OMG_LOGID, F("failed to initialise EEPROM" CR));
   }
 #  elif defined(ESP8266)
   EEPROM.begin(max(4, SOMFY_REMOTE_NUM * 2));
 #  endif
 
-  Logger.debug(0, F("ZactuatorSomfy setup done " CR));
+  Logger.debug(OMG_LOGID, F("ZactuatorSomfy setup done " CR));
 }
 
 #  if jsonReceiving
 void XtoSomfy(const char* topicOri, JsonObject& jsonData) {
   if (cmpToMainTopic(topicOri, subjectMQTTtoSomfy)) {
-    Logger.debug(0, F("MQTTtoSomfy json data analysis" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoSomfy json data analysis" CR));
     float txFrequency = jsonData["frequency"] | RFConfig.frequency;
 #    ifdef ZradioCC1101 // set Receive off and Transmitt on
     disableCurrentReceiver();
     ELECHOUSE_cc1101.SetTx(txFrequency);
-    Logger.notice(0, F("Transmit frequency: %F" CR), txFrequency);
+    Logger.notice(OMG_LOGID, F("Transmit frequency: %F" CR), txFrequency);
 #    endif
 
     const int remoteIndex = jsonData["remote"];
     if (remoteIndex >= SOMFY_REMOTE_NUM) {
-      Logger.warning(0, F("ZactuatorSomfy remote does not exist" CR));
+      Logger.warning(OMG_LOGID, F("ZactuatorSomfy remote does not exist" CR));
       return;
     }
     const String commandData = jsonData["command"];

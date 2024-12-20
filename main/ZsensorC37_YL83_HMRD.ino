@@ -32,14 +32,14 @@ unsigned int persisteddigital = 0;
 
 void setupZsensorC37_YL83_HMRD() {
   pinMode(C37_YL83_HMRD_Digital_GPIO, INPUT);
-  Logger.debug(0, F("C37_YL83_HMRD: digital configured pin: %d" CR), C37_YL83_HMRD_Digital_GPIO);
+  Logger.debug(OMG_LOGID, F("C37_YL83_HMRD: digital configured pin: %d" CR), C37_YL83_HMRD_Digital_GPIO);
 
   pinMode(C37_YL83_HMRD_Analog_GPIO, INPUT);
-  Logger.debug(0, F("C37_YL83_HMRD: Analog configured pin: %d" CR), C37_YL83_HMRD_Analog_GPIO);
+  Logger.debug(OMG_LOGID, F("C37_YL83_HMRD: Analog configured pin: %d" CR), C37_YL83_HMRD_Analog_GPIO);
 
 #  ifdef C37_YL83_HMRD_Analog_RESOLUTION
   analogReadResolution(C37_YL83_HMRD_Analog_RESOLUTION);
-  Logger.debug(0, F("C37_YL83_HMRD: resolution: %d" CR), C37_YL83_HMRD_Analog_RESOLUTION);
+  Logger.debug(OMG_LOGID, F("C37_YL83_HMRD: resolution: %d" CR), C37_YL83_HMRD_Analog_RESOLUTION);
 #  endif
 }
 
@@ -52,18 +52,18 @@ void MeasureC37_YL83_HMRDWater() {
     int sensorDigitalValue = digitalRead(C37_YL83_HMRD_Digital_GPIO); // Read the analog value from sensor
     int sensorAnalogValue = analogRead(C37_YL83_HMRD_Analog_GPIO);
 
-    Logger.debug(0, F("Creating C37_YL83_HMRD buffer" CR));
+    Logger.debug(OMG_LOGID, F("Creating C37_YL83_HMRD buffer" CR));
     StaticJsonDocument<JSON_MSG_BUFFER> C37_YL83_HMRDdataBuffer;
     JsonObject C37_YL83_HMRDdata = C37_YL83_HMRDdataBuffer.to<JsonObject>();
     if (sensorDigitalValue != persisteddigital || C37_YL83_HMRD_ALWAYS) {
       C37_YL83_HMRDdata["detected"] = (sensorDigitalValue == 1 ? "false" : "true");
     } else {
-      Logger.debug(0, F("Same digital don't send it" CR));
+      Logger.debug(OMG_LOGID, F("Same digital don't send it" CR));
     }
     if (sensorAnalogValue != persistedanalog || C37_YL83_HMRD_ALWAYS) {
       C37_YL83_HMRDdata["reading"] = sensorAnalogValue;
     } else {
-      Logger.debug(0, F("Same analog don't send it" CR));
+      Logger.debug(OMG_LOGID, F("Same analog don't send it" CR));
     }
     if (C37_YL83_HMRDdata.size() > 0) {
       C37_YL83_HMRDdata["origin"] = C37_YL83_HMRD_TOPIC;

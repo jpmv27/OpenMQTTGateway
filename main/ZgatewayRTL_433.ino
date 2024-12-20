@@ -73,7 +73,7 @@ void dumpRTL_433Devices() {
 
 void createOrUpdateDeviceRTL_433(const char* id, const char* model, const char* type, uint8_t flags) {
   if (xSemaphoreTake(semaphorecreateOrUpdateDeviceRTL_433, pdMS_TO_TICKS(30000)) == pdFALSE) {
-    Logger.error(0, F("[rtl_433] semaphorecreateOrUpdateDeviceRTL_433 Semaphore NOT taken" CR));
+    Logger.error(OMG_LOGID, F("[rtl_433] semaphorecreateOrUpdateDeviceRTL_433 Semaphore NOT taken" CR));
     return;
   }
 
@@ -83,13 +83,13 @@ void createOrUpdateDeviceRTL_433(const char* id, const char* model, const char* 
     //new device
     device = new RTL_433device();
     if (strlcpy(device->uniqueId, id, uniqueIdSize) > uniqueIdSize) {
-      Logger.warning(0, F("[rtl_433] Device id %s exceeds available space" CR), id); // Remove from production release ?
+      Logger.warning(OMG_LOGID, F("[rtl_433] Device id %s exceeds available space" CR), id); // Remove from production release ?
     };
     if (strlcpy(device->modelName, model, modelNameSize) > modelNameSize) {
-      Logger.warning(0, F("[rtl_433] Device model %s exceeds available space" CR), model); // Remove from production release ?
+      Logger.warning(OMG_LOGID, F("[rtl_433] Device model %s exceeds available space" CR), model); // Remove from production release ?
     };
     if (strlcpy(device->type, type, typeSize) > typeSize) {
-      Logger.warning(0, F("[rtl_433] Device type %s exceeds available space" CR), type); // Remove from production release ?
+      Logger.warning(OMG_LOGID, F("[rtl_433] Device type %s exceeds available space" CR), type); // Remove from production release ?
     }
     DISCOVERY_TRACE_LOG(F("[rtl_433] Device type is %s." CR), device->type); // Remove from production release ?
     device->isDisc = flags & device_flags_isDisc;
@@ -112,7 +112,7 @@ void launchRTL_433Discovery(bool overrideDiscovery) {
   if (!overrideDiscovery && newRTL_433Devices == 0)
     return;
   if (xSemaphoreTake(semaphorecreateOrUpdateDeviceRTL_433, pdMS_TO_TICKS(QueueSemaphoreTimeOutLoop)) == pdFALSE) {
-    Logger.error(0, F("[rtl_433] semaphorecreateOrUpdateDeviceRTL_433 Semaphore NOT taken" CR));
+    Logger.error(OMG_LOGID, F("[rtl_433] semaphorecreateOrUpdateDeviceRTL_433 Semaphore NOT taken" CR));
     return;
   }
   newRTL_433Devices = 0;
@@ -128,7 +128,7 @@ void launchRTL_433Discovery(bool overrideDiscovery) {
         char deviceKeyParameter[25];
         memcpy(deviceKeyParameter, &pdevice->uniqueId[strlen(pdevice->uniqueId) - strlen(parameters[i][0])], strlen(parameters[i][0]));
         deviceKeyParameter[strlen(parameters[i][0])] = '\0';
-        Logger.debug(0, F("deviceKeyParameter: %s" CR), deviceKeyParameter);
+        Logger.debug(OMG_LOGID, F("deviceKeyParameter: %s" CR), deviceKeyParameter);
 
         if (strcmp(deviceKeyParameter, parameters[i][0]) == 0) {
           // Remove the key from the unique id to extract the device id
@@ -273,7 +273,7 @@ void rtl_433_Callback(char* message) {
   JsonObject RFrtl_433_ESPdata = jsonBuffer2.to<JsonObject>();
   auto error = deserializeJson(jsonBuffer2, message);
   if (error) {
-    Logger.error(0, F("[rtl_433] deserializeJson() failed: %s" CR), error.c_str());
+    Logger.error(OMG_LOGID, F("[rtl_433] deserializeJson() failed: %s" CR), error.c_str());
     return;
   }
 
@@ -312,7 +312,7 @@ void rtl_433_Callback(char* message) {
     storeSignalValue(MQTTvalue);
   }
 #  ifdef MEMORY_DEBUG
-  Logger.debug(0, F("Post rtl_433_Callback: %d" CR), ESP.getFreeHeap());
+  Logger.debug(OMG_LOGID, F("Post rtl_433_Callback: %d" CR), ESP.getFreeHeap());
 #  endif
 }
 
@@ -322,8 +322,8 @@ void setupRTL_433() {
   semaphorecreateOrUpdateDeviceRTL_433 = xSemaphoreCreateBinary();
   xSemaphoreGive(semaphorecreateOrUpdateDeviceRTL_433);
 #  endif
-  Logger.debug(0, F("ZgatewayRTL_433 command topic: %s%s%s" CR), mqtt_topic, gateway_name, subjectMQTTtoRFset);
-  Logger.notice(0, F("ZgatewayRTL_433 setup done " CR));
+  Logger.debug(OMG_LOGID, F("ZgatewayRTL_433 command topic: %s%s%s" CR), mqtt_topic, gateway_name, subjectMQTTtoRFset);
+  Logger.notice(OMG_LOGID, F("ZgatewayRTL_433 setup done " CR));
 }
 
 void RTL_433Loop() {
@@ -331,13 +331,13 @@ void RTL_433Loop() {
 }
 
 extern void enableRTLreceive() {
-  Logger.notice(0, F("Enable RTL_433 Receiver: %FMhz" CR), RFConfig.frequency);
+  Logger.notice(OMG_LOGID, F("Enable RTL_433 Receiver: %FMhz" CR), RFConfig.frequency);
   rtl_433.initReceiver(RF_MODULE_RECEIVER_GPIO, RFConfig.frequency);
   rtl_433.enableReceiver();
 }
 
 extern void disableRTLreceive() {
-  Logger.debug(0, F("disableRTLreceive" CR));
+  Logger.debug(OMG_LOGID, F("disableRTLreceive" CR));
   rtl_433.disableReceiver();
 }
 

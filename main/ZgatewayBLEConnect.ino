@@ -12,19 +12,19 @@ NimBLERemoteCharacteristic* zBLEConnect::getCharacteristic(const NimBLEUUID& ser
                                                            const NimBLEUUID& characteristic) {
   BLERemoteCharacteristic* pRemoteCharacteristic = nullptr;
   if (!m_pClient) {
-    Logger.error(0, F("No BLE client" CR));
+    Logger.error(OMG_LOGID, F("No BLE client" CR));
   } else if (!m_pClient->isConnected() && !m_pClient->connect()) {
-    Logger.error(0, F("Connect to: %s failed" CR), m_pClient->getPeerAddress().toString().c_str());
+    Logger.error(OMG_LOGID, F("Connect to: %s failed" CR), m_pClient->getPeerAddress().toString().c_str());
   } else {
     BLERemoteService* pRemoteService = m_pClient->getService(service);
     if (!pRemoteService) {
-      Logger.notice(0, F("Failed to find service UUID: %s" CR), service.toString().c_str());
+      Logger.notice(OMG_LOGID, F("Failed to find service UUID: %s" CR), service.toString().c_str());
     } else {
-      Logger.debug(0, F("Found service: %s" CR), service.toString().c_str());
-      Logger.debug(0, F("Client isConnected, freeHeap: %d" CR), ESP.getFreeHeap());
+      Logger.debug(OMG_LOGID, F("Found service: %s" CR), service.toString().c_str());
+      Logger.debug(OMG_LOGID, F("Client isConnected, freeHeap: %d" CR), ESP.getFreeHeap());
       pRemoteCharacteristic = pRemoteService->getCharacteristic(characteristic);
       if (!pRemoteCharacteristic) {
-        Logger.notice(0, F("Failed to find characteristic UUID: %s" CR), characteristic.toString().c_str());
+        Logger.notice(OMG_LOGID, F("Failed to find characteristic UUID: %s" CR), characteristic.toString().c_str());
       }
     }
   }
@@ -39,7 +39,7 @@ bool zBLEConnect::writeData(BLEAction* action) {
       case BLE_VAL_HEX: {
         int len = action->value.length();
         if (len % 2) {
-          Logger.error(0, F("Invalid HEX value length" CR));
+          Logger.error(OMG_LOGID, F("Invalid HEX value length" CR));
           return false;
         }
 
@@ -85,11 +85,11 @@ bool zBLEConnect::processActions(std::vector<BLEAction>& actions) {
         BLEdata["characteristic"] = it.characteristic.toString();
 
         if (it.write) {
-          Logger.debug(0, F("processing BLE write" CR));
+          Logger.debug(OMG_LOGID, F("processing BLE write" CR));
           BLEdata["write"] = it.value;
           result = writeData(&it);
         } else {
-          Logger.debug(0, F("processing BLE read" CR));
+          Logger.debug(OMG_LOGID, F("processing BLE read" CR));
           result = readData(&it);
           if (result) {
             switch (it.value_type) {
@@ -135,10 +135,10 @@ void LYWSD03MMC_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pD
     return; // unexpected notification
   }
   if (!BTProcessLock) {
-    Logger.debug(0, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
+    Logger.debug(OMG_LOGID, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
 
     if (length == 5) {
-      Logger.debug(0, F("Device identified creating BLE buffer" CR));
+      Logger.debug(OMG_LOGID, F("Device identified creating BLE buffer" CR));
       DynamicJsonDocument BLEdataBuffer(JSON_MSG_BUFFER);
       JsonObject BLEdata = BLEdataBuffer.to<JsonObject>();
       String mac_address = m_pClient->getPeerAddress().toString().c_str();
@@ -153,7 +153,7 @@ void LYWSD03MMC_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pD
         }
       }
       BLEdata["id"] = (char*)mac_address.c_str();
-      Logger.debug(0, F("Device identified in CB: %s" CR), (char*)mac_address.c_str());
+      Logger.debug(OMG_LOGID, F("Device identified in CB: %s" CR), (char*)mac_address.c_str());
       BLEdata["tempc"] = (float)((pData[0] | (pData[1] << 8)) * 0.01);
       BLEdata["tempf"] = (float)(convertTemp_CtoF((pData[0] | (pData[1] << 8)) * 0.01));
       BLEdata["hum"] = (float)(pData[2]);
@@ -162,11 +162,11 @@ void LYWSD03MMC_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pD
       buildTopicFromId(BLEdata, subjectBTtoMQTT);
       enqueueJsonObject(BLEdata, QueueSemaphoreTimeOutTask);
     } else {
-      Logger.notice(0, F("Invalid notification data" CR));
+      Logger.notice(OMG_LOGID, F("Invalid notification data" CR));
       return;
     }
   } else {
-    Logger.debug(0, F("Callback process canceled by BTProcessLock" CR));
+    Logger.debug(OMG_LOGID, F("Callback process canceled by BTProcessLock" CR));
   }
 
   xTaskNotifyGive(m_taskHandle);
@@ -178,7 +178,7 @@ void LYWSD03MMC_connect::publishData() {
   NimBLERemoteCharacteristic* pChar = getCharacteristic(serviceUUID, charUUID);
 
   if (pChar && pChar->canNotify()) {
-    Logger.debug(0, F("Registering notification" CR));
+    Logger.debug(OMG_LOGID, F("Registering notification" CR));
     if (pChar->subscribe(true, std::bind(&LYWSD03MMC_connect::notifyCB, this,
                                          std::placeholders::_1, std::placeholders::_2,
                                          std::placeholders::_3, std::placeholders::_4))) {
@@ -187,7 +187,7 @@ void LYWSD03MMC_connect::publishData() {
         m_taskHandle = nullptr;
       }
     } else {
-      Logger.notice(0, F("Failed registering notification" CR));
+      Logger.notice(OMG_LOGID, F("Failed registering notification" CR));
     }
   }
 }
@@ -199,7 +199,7 @@ void DT24_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, s
   }
 
   if (!BTProcessLock) {
-    Logger.debug(0, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
+    Logger.debug(OMG_LOGID, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
     if (length == 20) {
       m_data.assign(pData, pData + length);
       return;
@@ -209,14 +209,14 @@ void DT24_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, s
       // DT24-BLE data format
       // https://github.com/NiceLabs/atorch-console/blob/master/docs/protocol-design.md#dc-meter-report
       // Data comes as two packets ( 20 and 16 ), and am only processing first
-      Logger.debug(0, F("Device identified creating BLE buffer" CR));
+      Logger.debug(OMG_LOGID, F("Device identified creating BLE buffer" CR));
       DynamicJsonDocument BLEdataBuffer(JSON_MSG_BUFFER);
       JsonObject BLEdata = BLEdataBuffer.to<JsonObject>();
       String mac_address = m_pClient->getPeerAddress().toString().c_str();
       mac_address.toUpperCase();
       BLEdata["model"] = "DT24";
       BLEdata["id"] = (char*)mac_address.c_str();
-      Logger.debug(0, F("Device identified in CB: %s" CR), (char*)mac_address.c_str());
+      Logger.debug(OMG_LOGID, F("Device identified in CB: %s" CR), (char*)mac_address.c_str());
       BLEdata["volt"] = (float)(((m_data[4] * 256 * 256) + (m_data[5] * 256) + m_data[6]) / 10.0);
       BLEdata["current"] = (float)(((m_data[7] * 256 * 256) + (m_data[8] * 256) + m_data[9]) / 1000.0);
       BLEdata["power"] = (float)(((m_data[10] * 256 * 256) + (m_data[11] * 256) + m_data[12]) / 10.0);
@@ -227,11 +227,11 @@ void DT24_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, s
       buildTopicFromId(BLEdata, subjectBTtoMQTT);
       enqueueJsonObject(BLEdata, QueueSemaphoreTimeOutTask);
     } else {
-      Logger.notice(0, F("Invalid notification data" CR));
+      Logger.notice(OMG_LOGID, F("Invalid notification data" CR));
       return;
     }
   } else {
-    Logger.debug(0, F("Callback process canceled by BTProcessLock" CR));
+    Logger.debug(OMG_LOGID, F("Callback process canceled by BTProcessLock" CR));
   }
 
   xTaskNotifyGive(m_taskHandle);
@@ -243,7 +243,7 @@ void DT24_connect::publishData() {
   NimBLERemoteCharacteristic* pChar = getCharacteristic(serviceUUID, charUUID);
 
   if (pChar && pChar->canNotify()) {
-    Logger.debug(0, F("Registering notification" CR));
+    Logger.debug(OMG_LOGID, F("Registering notification" CR));
     if (pChar->subscribe(true, std::bind(&DT24_connect::notifyCB, this,
                                          std::placeholders::_1, std::placeholders::_2,
                                          std::placeholders::_3, std::placeholders::_4))) {
@@ -252,7 +252,7 @@ void DT24_connect::publishData() {
         m_taskHandle = nullptr;
       }
     } else {
-      Logger.notice(0, F("Failed registering notification" CR));
+      Logger.notice(OMG_LOGID, F("Failed registering notification" CR));
     }
   }
 }
@@ -264,9 +264,9 @@ void BM2_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, si
   }
 
   if (!BTProcessLock) {
-    Logger.debug(0, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
+    Logger.debug(OMG_LOGID, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
     if (length == 16) {
-      Logger.debug(0, F("Device identified creating BLE buffer" CR));
+      Logger.debug(OMG_LOGID, F("Device identified creating BLE buffer" CR));
       DynamicJsonDocument BLEdataBuffer(JSON_MSG_BUFFER);
       JsonObject BLEdata = BLEdataBuffer.to<JsonObject>();
       String mac_address = m_pClient->getPeerAddress().toString().c_str();
@@ -300,17 +300,17 @@ void BM2_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, si
       mbedtls_aes_free(&aes);
       float volt = ((output[2] | (output[1] << 8)) >> 4) / 100.0f;
       BLEdata["volt"] = volt;
-      Logger.debug(0, F("volt: %F" CR), volt);
+      Logger.debug(OMG_LOGID, F("volt: %F" CR), volt);
       // to avoid the BM2 device tracker going offline because of the voltage MQTT message without an RSSI value
       BLEdata["rssi"] = -60;
       buildTopicFromId(BLEdata, subjectBTtoMQTT);
       enqueueJsonObject(BLEdata, QueueSemaphoreTimeOutTask);
     } else {
-      Logger.notice(0, F("Invalid notification data" CR));
+      Logger.notice(OMG_LOGID, F("Invalid notification data" CR));
       return;
     }
   } else {
-    Logger.debug(0, F("Callback process canceled by BTProcessLock" CR));
+    Logger.debug(OMG_LOGID, F("Callback process canceled by BTProcessLock" CR));
   }
 
   xTaskNotifyGive(m_taskHandle);
@@ -322,7 +322,7 @@ void BM2_connect::publishData() {
   NimBLERemoteCharacteristic* pChar = getCharacteristic(serviceUUID, charUUID);
 
   if (pChar && pChar->canNotify()) {
-    Logger.debug(0, F("Registering notification" CR));
+    Logger.debug(OMG_LOGID, F("Registering notification" CR));
     if (pChar->subscribe(true, std::bind(&BM2_connect::notifyCB, this,
                                          std::placeholders::_1, std::placeholders::_2,
                                          std::placeholders::_3, std::placeholders::_4))) {
@@ -331,7 +331,7 @@ void BM2_connect::publishData() {
         m_taskHandle = nullptr;
       }
     } else {
-      Logger.notice(0, F("Failed registering notification" CR));
+      Logger.notice(OMG_LOGID, F("Failed registering notification" CR));
     }
   }
 }
@@ -344,7 +344,7 @@ void HHCCJCY01HHCC_connect::publishData() {
   NimBLERemoteCharacteristic* pChar = getCharacteristic(serviceUUID, charUUID);
 
   if (pChar) {
-    Logger.debug(0, F("Read mode" CR));
+    Logger.debug(OMG_LOGID, F("Read mode" CR));
     uint8_t buf[2] = {0xA0, 0x1F};
     pChar->writeValue(buf, 2, true);
     int batteryValue = -1;
@@ -364,10 +364,10 @@ void HHCCJCY01HHCC_connect::publishData() {
       buildTopicFromId(BLEdata, subjectBTtoMQTT);
       enqueueJsonObject(BLEdata, QueueSemaphoreTimeOutTask);
     } else {
-      Logger.notice(0, F("Failed getting characteristic" CR));
+      Logger.notice(OMG_LOGID, F("Failed getting characteristic" CR));
     }
   } else {
-    Logger.notice(0, F("Failed getting characteristic" CR));
+    Logger.notice(OMG_LOGID, F("Failed getting characteristic" CR));
   }
 }
 
@@ -377,17 +377,17 @@ void XMWSDJ04MMC_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* p
     return; // unexpected notification
   }
   if (!BTProcessLock) {
-    Logger.debug(0, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
+    Logger.debug(OMG_LOGID, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
 
     if (length == 6) {
-      Logger.debug(0, F("Device identified creating BLE buffer" CR));
+      Logger.debug(OMG_LOGID, F("Device identified creating BLE buffer" CR));
       DynamicJsonDocument BLEdataBuffer(JSON_MSG_BUFFER);
       JsonObject BLEdata = BLEdataBuffer.to<JsonObject>();
       String mac_address = m_pClient->getPeerAddress().toString().c_str();
       mac_address.toUpperCase();
       BLEdata["model"] = "XMWSDJ04MMC";
       BLEdata["id"] = (char*)mac_address.c_str();
-      Logger.debug(0, F("Device identified in CB: %s" CR), (char*)mac_address.c_str());
+      Logger.debug(OMG_LOGID, F("Device identified in CB: %s" CR), (char*)mac_address.c_str());
       BLEdata["tempc"] = (float)((pData[0] | (pData[1] << 8)) * 0.1);
       BLEdata["tempf"] = (float)(convertTemp_CtoF((pData[0] | (pData[1] << 8)) * 0.1));
       BLEdata["hum"] = (float)((pData[2] | (pData[3] << 8)) * 0.1);
@@ -396,11 +396,11 @@ void XMWSDJ04MMC_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* p
       buildTopicFromId(BLEdata, subjectBTtoMQTT);
       enqueueJsonObject(BLEdata, QueueSemaphoreTimeOutTask);
     } else {
-      Logger.notice(0, F("Invalid notification data" CR));
+      Logger.notice(OMG_LOGID, F("Invalid notification data" CR));
       return;
     }
   } else {
-    Logger.debug(0, F("Callback process canceled by BTProcessLock" CR));
+    Logger.debug(OMG_LOGID, F("Callback process canceled by BTProcessLock" CR));
   }
 
   xTaskNotifyGive(m_taskHandle);
@@ -412,7 +412,7 @@ void XMWSDJ04MMC_connect::publishData() {
   NimBLERemoteCharacteristic* pChar = getCharacteristic(serviceUUID, charUUID);
 
   if (pChar && pChar->canNotify()) {
-    Logger.debug(0, F("Registering notification" CR));
+    Logger.debug(OMG_LOGID, F("Registering notification" CR));
     if (pChar->subscribe(true, std::bind(&XMWSDJ04MMC_connect::notifyCB, this,
                                          std::placeholders::_1, std::placeholders::_2,
                                          std::placeholders::_3, std::placeholders::_4))) {
@@ -421,7 +421,7 @@ void XMWSDJ04MMC_connect::publishData() {
         m_taskHandle = nullptr;
       }
     } else {
-      Logger.notice(0, F("Failed registering notification" CR));
+      Logger.notice(OMG_LOGID, F("Failed registering notification" CR));
     }
   }
 }
@@ -432,16 +432,16 @@ void SBS1_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, s
     return; // unexpected notification
   }
   if (!BTProcessLock) {
-    Logger.debug(0, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
+    Logger.debug(OMG_LOGID, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
 
     if (length) {
       m_notifyVal = *pData;
     } else {
-      Logger.notice(0, F("Invalid notification data" CR));
+      Logger.notice(OMG_LOGID, F("Invalid notification data" CR));
       return;
     }
   } else {
-    Logger.debug(0, F("Callback process canceled by BTProcessLock" CR));
+    Logger.debug(OMG_LOGID, F("Callback process canceled by BTProcessLock" CR));
   }
 
   xTaskNotifyGive(m_taskHandle);
@@ -465,7 +465,7 @@ bool SBS1_connect::processActions(std::vector<BLEAction>& actions) {
         NimBLERemoteCharacteristic* pNotifyChar = getCharacteristic(serviceUUID, notifyCharUUID);
 
         if (it.write && pChar && pNotifyChar) {
-          Logger.debug(0, F("processing Switchbot %s" CR), it.value.c_str());
+          Logger.debug(OMG_LOGID, F("processing Switchbot %s" CR), it.value.c_str());
           if (pNotifyChar->subscribe(true,
                                      std::bind(&SBS1_connect::notifyCB,
                                                this, std::placeholders::_1, std::placeholders::_2,
@@ -515,16 +515,16 @@ void SBBT_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, s
     return; // unexpected notification
   }
   if (!BTProcessLock) {
-    Logger.debug(0, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
+    Logger.debug(OMG_LOGID, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
 
     if (length) {
       m_notifyVal = *pData;
     } else {
-      Logger.notice(0, F("Invalid notification data" CR));
+      Logger.notice(OMG_LOGID, F("Invalid notification data" CR));
       return;
     }
   } else {
-    Logger.debug(0, F("Callback process canceled by BTProcessLock" CR));
+    Logger.debug(OMG_LOGID, F("Callback process canceled by BTProcessLock" CR));
   }
 
   xTaskNotifyGive(m_taskHandle);
@@ -551,7 +551,7 @@ bool SBBT_connect::processActions(std::vector<BLEAction>& actions) {
           value = std::stoi(it.value);
         }
         if (it.write && pChar && pNotifyChar) {
-          Logger.debug(0, F("processing Switchbot %s" CR), it.value.c_str());
+          Logger.debug(OMG_LOGID, F("processing Switchbot %s" CR), it.value.c_str());
           if (pNotifyChar->subscribe(true,
                                      std::bind(&SBBT_connect::notifyCB,
                                                this, std::placeholders::_1, std::placeholders::_2,
@@ -621,16 +621,16 @@ void SBCU_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, s
     return; // unexpected notification
   }
   if (!BTProcessLock) {
-    Logger.debug(0, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
+    Logger.debug(OMG_LOGID, F("Callback from %s characteristic" CR), pChar->getUUID().toString().c_str());
 
     if (length) {
       m_notifyVal = *pData;
     } else {
-      Logger.notice(0, F("Invalid notification data" CR));
+      Logger.notice(OMG_LOGID, F("Invalid notification data" CR));
       return;
     }
   } else {
-    Logger.debug(0, F("Callback process canceled by BTProcessLock" CR));
+    Logger.debug(OMG_LOGID, F("Callback process canceled by BTProcessLock" CR));
   }
 
   xTaskNotifyGive(m_taskHandle);
@@ -656,7 +656,7 @@ bool SBCU_connect::processActions(std::vector<BLEAction>& actions) {
           value = std::stoi(it.value);
         }
         if (it.write && pChar && pNotifyChar) {
-          Logger.debug(0, F("processing Switchbot %s" CR), it.value.c_str());
+          Logger.debug(OMG_LOGID, F("processing Switchbot %s" CR), it.value.c_str());
           if (pNotifyChar->subscribe(true,
                                      std::bind(&SBCU_connect::notifyCB,
                                                this, std::placeholders::_1, std::placeholders::_2,

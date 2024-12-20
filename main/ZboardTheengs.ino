@@ -52,7 +52,7 @@ void testDevice() {
 }
 
 void testLeds() {
-  Logger.notice(0, F("LED Test" CR));
+  Logger.notice(OMG_LOGID, F("LED Test" CR));
   ledManager.setMode(0, 0, LEDManager::Mode::STATIC, LED_NETWORK_OK_COLOR, -1);
   delay(1000);
   ledManager.setMode(0, 1, LEDManager::Mode::STATIC, LED_NETWORK_OK_COLOR, -1);
@@ -60,25 +60,25 @@ void testLeds() {
   ledManager.setMode(0, 2, LEDManager::Mode::STATIC, LED_NETWORK_OK_COLOR, -1);
   delay(1000);
   ledManager.setMode(0, 3, LEDManager::Mode::STATIC, LED_NETWORK_OK_COLOR, -1);
-  Logger.notice(0, F("LED Test Finished" CR));
+  Logger.notice(OMG_LOGID, F("LED Test Finished" CR));
 }
 
 void checkSerial() {
-  Logger.notice(0, F("READY_FOR_SELFTEST" CR));
+  Logger.notice(OMG_LOGID, F("READY_FOR_SELFTEST" CR));
   unsigned long start = millis();
   while (millis() - start < 1000) {
     if (Serial.available() > 0) {
       String input = Serial.readStringUntil('\n');
       input.trim(); // Remove any extra whitespace
       if (input == "SELFTEST") {
-        Logger.notice(0, F("SELFTEST Launched" CR));
+        Logger.notice(OMG_LOGID, F("SELFTEST Launched" CR));
         testLeds();
         // Print 20 times the test data
         for (int i = 0; i < 20; i++) {
           testDevice();
           delay(1000);
         }
-        Logger.notice(0, F("SELFTEST Finished" CR));
+        Logger.notice(OMG_LOGID, F("SELFTEST Finished" CR));
         // Restart
         ESPRestart(9);
       }
