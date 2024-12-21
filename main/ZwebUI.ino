@@ -2591,7 +2591,11 @@ Write line of text to the display with vertical scrolling of screen
 size_t SerialWeb::write(const uint8_t* buffer, size_t size) {
   // Default to Serial output if the display is not available
   addLog(buffer, size);
+#  if WEBUI_LOG_TO_SERIAL
   return Serial.write(buffer, size);
+#  else
+  return size;
+#  endif
 }
 
 char line[ROW_LENGTH];

@@ -31,6 +31,10 @@
 
 #define WEBUI_TEXT_WIDTH 128
 
+#ifndef WEBUI_LOG_TO_SERIAL
+#  define WEBUI_LOG_TO_SERIAL true
+#endif
+
 /*------------------- Optional Compiler Directives ----------------------*/
 
 #ifndef WEB_TEMPLATE_BUFFER_MAX_SIZE
