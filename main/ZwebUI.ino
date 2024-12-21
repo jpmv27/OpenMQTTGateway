@@ -521,7 +521,7 @@ void handleWU() {
   String response = String(buffer);
   response += String(script);
   response += String(style);
-  int logLevel = 0; //FUTURE Log.getLevel();
+  int logLevel = Logger.getSerialLogLevel(OMG_LOGID, WebLog);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_webui_body, jsonChar, gateway_name, (displayMetric ? "checked" : ""), (webUISecure ? "checked" : ""));
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
@@ -913,9 +913,9 @@ void handleLO() {
     for (uint8_t i = 0; i < server.args(); i++) {
       WEBUI_TRACE_LOG(F("handleLO Arg: %d, %s=%s" CR), i, server.argName(i).c_str(), server.arg(i).c_str());
     }
-    if (server.hasArg("save") && server.hasArg("lo") && server.arg("lo").toInt() != 0) { //FUTURE Log.getLevel()) {
+    if (server.hasArg("save") && server.hasArg("lo") && server.arg("lo").toInt() != Logger.getSerialLogLevel(OMG_LOGID, WebLog)) {
       Logger.emergency(OMG_LOGID, F("[WebUI] Log level changed to: %d" CR), server.arg("lo").toInt());
-      // FUTURE Log.setLevel(server.arg("lo").toInt());
+      Logger.setSerialLogLevel(OMG_LOGID, server.arg("lo").toInt(), WebLog);
     }
   }
 
@@ -928,8 +928,8 @@ void handleLO() {
   String response = String(buffer);
   response += String(script);
   response += String(style);
-  int logLevel = 0; //FUTURE Log.getLevel();
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_logging_body, jsonChar, gateway_name, (logLevel == 0 ? "selected" : ""), (logLevel == 1 ? "selected" : ""), (logLevel == 2 ? "selected" : ""), (logLevel == 3 ? "selected" : ""), (logLevel == 4 ? "selected" : ""), (logLevel == 5 ? "selected" : ""), (logLevel == 6 ? "selected" : ""));
+  int logLevel = Logger.getSerialLogLevel(OMG_LOGID, WebLog);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_logging_body, jsonChar, gateway_name, (logLevel == ELOG_LEVEL_NOLOG ? "selected" : ""), (logLevel == ELOG_LEVEL_EMERGENCY ? "selected" : ""), (logLevel == ELOG_LEVEL_ALERT ? "selected" : ""), (logLevel == ELOG_LEVEL_CRITICAL ? "selected" : ""), (logLevel == ELOG_LEVEL_ERROR ? "selected" : ""), (logLevel == ELOG_LEVEL_WARNING ? "selected" : ""), (logLevel == ELOG_LEVEL_NOTICE ? "selected" : ""), (logLevel == ELOG_LEVEL_INFO ? "selected" : ""), (logLevel == ELOG_LEVEL_DEBUG ? "selected" : ""));
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);
