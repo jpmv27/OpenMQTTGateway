@@ -1304,8 +1304,12 @@ void setup() {
   Serial.begin(SERIAL_BAUD);
   Logger.registerSerial(OMG_LOGID, LOG_LEVEL, "OMG");
 #if LOG_TO_SYSLOG
-  Logger.configureSyslog(syslogServer, String(syslogPort).toInt(), gateway_name);
-  Logger.registerSyslog(OMG_LOGID, LOG_LEVEL_SYSLOG, FAC_USER, "OMG");
+  if (strcmp(syslogServer, "") != 0 && strcmp(syslogPort, "") != 0) {
+    Logger.configureSyslog(syslogServer, String(syslogPort).toInt(), gateway_name);
+    Logger.registerSyslog(OMG_LOGID, LOG_LEVEL_SYSLOG, FAC_USER, "OMG");
+  } else {
+    Logger.error(OMG_LOGID, F("Invalid syslog configuration, skipping registration" CR));
+  }
 #endif
   Logger.notice(OMG_LOGID, F(CR "************* WELCOME TO OpenMQTTGateway **************" CR));
 #if defined(TRIGGER_GPIO) && !defined(ESPWifiManualSetup)
