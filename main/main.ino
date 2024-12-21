@@ -1304,7 +1304,7 @@ void setup() {
   Serial.begin(SERIAL_BAUD);
   Logger.registerSerial(OMG_LOGID, LOG_LEVEL, "OMG");
 #if LOG_TO_SYSLOG
-  Logger.configureSyslog(syslogServer, syslogPort, gateway_name);
+  Logger.configureSyslog(syslogServer, String(syslogPort).toInt(), gateway_name);
   Logger.registerSyslog(OMG_LOGID, LOG_LEVEL_SYSLOG, FAC_USER, "OMG");
 #endif
   Logger.notice(OMG_LOGID, F(CR "************* WELCOME TO OpenMQTTGateway **************" CR));
@@ -2012,6 +2012,10 @@ void saveConfig() {
 #  endif
   json["gateway_name"] = gateway_name;
   json["ota_pass"] = ota_pass;
+#  if LOG_TO_SYSLOG
+  json["syslog_server"] = syslogServer;
+  json["syslog_port"] = syslogPort;
+#  endif
 
   File configFile = SPIFFS.open("/config.json", "w");
   if (!configFile) {
@@ -2159,6 +2163,12 @@ bool loadConfigFromFlash() {
           }
 #  endif
         }
+#  if LOG_TO_SYSLOG
+        if (json.containsKey("syslog_server"))
+          strcpy(syslogServer, json["syslog_server"]);
+        if (json.containsKey("syslog_port"))
+          strcpy(syslogPort, json["syslog_port"]);
+#  endif
         result = true;
       } else {
         Logger.warning(OMG_LOGID, F("failed to load json config" CR));
@@ -3410,6 +3420,10 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
 #ifdef ZmqttDiscovery
         (SYSdata.containsKey("discovery_prefix") && SYSdata["discovery_prefix"].is<const char*>()) ||
 #endif
+#if LOG_TO_SYSLOG
+        (SYSdata.containsKey("syslog_server") && SYSdata["syslog_server"].is<const char*>()) ||
+        (SYSdata.containsKey("syslog_port") && SYSdata["syslog_port"].is<const char*>()) ||
+#endif
         (SYSdata.containsKey("gateway_name") && SYSdata["gateway_name"].is<const char*>()) ||
         (SYSdata.containsKey("gw_pass") && SYSdata["gw_pass"].is<const char*>())) {
       if (SYSdata.containsKey("mqtt_topic")) {
@@ -3427,6 +3441,16 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
         strncpy(ota_pass, SYSdata["gw_pass"], parameters_size);
         restartESP = true;
       }
+#if LOG_TO_SYSLOG
+      if (SYSdata.containsKey("syslog_server")) {
+        strncpy(syslogServer, SYSdata["syslog_server"], parameters_size);
+        restartESP = true;
+      }
+      if (SYSdata.containsKey("syslog_port")) {
+        strncpy(syslogPort, SYSdata["syslog_port"], parameters_size);
+        restartESP = true;
+      }
+#endif
 #ifndef ESPWifiManualSetup
       saveConfig();
 #endif

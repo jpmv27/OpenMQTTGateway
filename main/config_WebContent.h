@@ -62,7 +62,11 @@
 #else
 #  define configure_6
 #endif
+#if LOG_TO_SYSLOG
+#define configure_7 "<p><form action='sy' method='get'><button>Configure Syslog</button></form></p>"
+#else
 #define configure_7
+#endif
 #define configure_8
 
 /*------------------- ----------------------*/
@@ -111,6 +115,9 @@ const char config_mqtt_body[] = body_header "<fieldset class=\"set1\"><legend><s
 const char config_gateway_body[] = body_header "<fieldset class=\"set1\"><legend><span><b>Gateway Configuration</b></span></legend><form method='post' action='cg'><p><b>Gateway Password (8 characters min)</b><br><input id='gp' name='gp' type='password' placeholder=\"********\"  minlength='8'></p><br><button name='save' type='submit' class='button bgrn'>Save</button></form></fieldset>" body_footer_config_menu;
 #endif
 const char config_logging_body[] = body_header "<fieldset class=\"set1\"><legend><span><b>OpenMQTTGateway Logging</b></span></legend><form method='get' action='lo'><p><b>Log Level</b><br><select id='lo'><option %s value='8'>No Log</option><option %s value='0'>Emergency</option><option %s value='1'>Alert</option><option %s value='2'>Critical</option><option %s value='3'>Error</option><option %s value='4'>Warning</option><option %s value='5'>Notice</option><option %s value='6'>Info</option><option %s value='7'>Debug</option></select></p><br><button name='save' type='submit' class='button bgrn'>Save</button></form></fieldset>" body_footer_config_menu;
+#if LOG_TO_SYSLOG
+const char config_syslog_body[] = body_header "<fieldset class=\"set1\"><legend><span><b>Syslog Parameters</b></span></legend><form method='get' action='sy'><p><b>Syslog Server</b><br><input id='s1' name='s1' placeholder=" SYSLOG_SERVER " value='%s'></p><p><b>Syslog Port</b><br><input id='p1' name='p1' placeholder=" SYSLOG_PORT " value='%s'></p><p><b>Log Level</b><br><select id='l1'><option %s value='8'>No Log</option><option %s value='0'>Emergency</option><option %s value='1'>Alert</option><option %s value='2'>Critical</option><option %s value='3'>Error</option><option %s value='4'>Warning</option><option %s value='5'>Notice</option><option %s value='6'>Info</option><option %s value='7'>Debug</option></select></p><br><button name='save' type='submit' class='button bgrn'>Save</button></form></fieldset>" body_footer_config_menu;
+#endif
 
 const char config_webui_body[] = body_header "<fieldset class=\"set1\"><legend><span><b>Configure WebUI</b></span></legend><form method='get' action='wu'><p><b>Display Metric</b><br><input id='dm' type='checkbox' %s></p><p><b>Secure WebUI</b><br><input id='sw' type='checkbox' %s></p><br><button name='save' type='submit' class='button bgrn'>Save</button></form></fieldset>" body_footer_config_menu;
 

@@ -212,7 +212,7 @@
 #    error SYSLOG_SERVER must be defined
 #  endif
 #  ifndef SYSLOG_PORT
-#    define SYSLOG_PORT 514
+#    define SYSLOG_PORT "514"
 #  endif
 #endif
 
@@ -651,7 +651,7 @@ char gateway_name[parameters_size + 1] = Gateway_Name;
 
 #if LOG_TO_SYSLOG
 char syslogServer[parameters_size + 1] = SYSLOG_SERVER;
-uint16_t syslogPort = SYSLOG_PORT;
+char syslogPort[parameters_size + 1] = SYSLOG_PORT;
 #endif
 
 void connectMQTT();

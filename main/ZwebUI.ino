@@ -529,6 +529,87 @@ void handleWU() {
   server.send(200, "text/html", response);
 }
 
+#if LOG_TO_SYSLOG
+/**
+ * @brief /SY - Configure Syslog Page
+ * T: handleSY: uri: /sy, args: 4, method: 1
+ * T: handleSY Arg: 0, s1=server address
+ * T: handleSY Arg: 1, p1=port
+ * T: handleSY Arg: 2, l1=logging level
+ * T: handleSY Arg: 3, save=
+ */
+void handleSY() {
+  WEBUI_TRACE_LOG(F("handleSY: uri: %s, args: %d, method: %d" CR), server.uri(), server.args(), server.method());
+  WEBUI_SECURE
+  if (server.args()) {
+    for (uint8_t i = 0; i < server.args(); i++) {
+      WEBUI_TRACE_LOG(F("handleSY Arg: %d, %s=%s" CR), i, server.argName(i).c_str(), server.arg(i).c_str());
+    }
+    if (server.hasArg("save")) {
+      StaticJsonDocument<JSON_MSG_BUFFER> WEBtoSYSBuffer;
+      JsonObject WEBtoSYS = WEBtoSYSBuffer.to<JsonObject>();
+      bool update = false;
+      if (server.hasArg("s1")) {
+        WEBtoSYS["syslog_server"] = server.arg("s1");
+        if (strncmp(syslogServer, server.arg("s1").c_str(), parameters_size)) {
+          update = true;
+        }
+      }
+      if (server.hasArg("p1")) {
+        WEBtoSYS["syslog_port"] = server.arg("p1");
+        if (strncmp(syslogPort, server.arg("p1").c_str(), parameters_size)) {
+          update = true;
+        }
+      }
+      if (server.hasArg("l1") && server.arg("l1").toInt() != Logger.getSyslogLogLevel(OMG_LOGID, FAC_USER)) {
+        Logger.emergency(OMG_LOGID, F("[WebUI] Syslog log level changed to: %d" CR), server.arg("l1").toInt());
+        Logger.setSyslogLogLevel(OMG_LOGID, server.arg("l1").toInt(), FAC_USER);
+      }
+      if (update) {
+        String topic = String(mqtt_topic) + String(gateway_name) + String(subjectMQTTtoSYSset);
+        Logger.warning(OMG_LOGID, F("[WebUI] Save Syslog and Restart" CR));
+        char jsonChar[100];
+        serializeJson(modules, jsonChar, measureJson(modules) + 1);
+        char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
+
+        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Save Syslog and Restart").c_str());
+        String response = String(buffer);
+        response += String(restart_script);
+        response += String(script);
+        response += String(style);
+        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, gateway_name, "Save Syslog and Restart");
+        response += String(buffer);
+        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
+        response += String(buffer);
+        server.send(200, "text/html", response);
+
+        delay(2000); // Wait for web page to be sent before
+        XtoSYS((char*)topic.c_str(), WEBtoSYS);
+        return;
+      } else {
+        Logger.warning(OMG_LOGID, F("[WebUI] No changes" CR));
+      }
+    }
+  }
+
+  char jsonChar[100];
+  serializeJson(modules, jsonChar, measureJson(modules) + 1);
+
+  char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
+
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Configure Syslog").c_str());
+  String response = String(buffer);
+  response += String(script);
+  response += String(style);
+  int logLevel = Logger.getSyslogLogLevel(OMG_LOGID, FAC_USER);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_syslog_body, jsonChar, gateway_name, syslogServer, syslogPort, (logLevel == ELOG_LEVEL_NOLOG ? "selected" : ""), (logLevel == ELOG_LEVEL_EMERGENCY ? "selected" : ""), (logLevel == ELOG_LEVEL_ALERT ? "selected" : ""), (logLevel == ELOG_LEVEL_CRITICAL ? "selected" : ""), (logLevel == ELOG_LEVEL_ERROR ? "selected" : ""), (logLevel == ELOG_LEVEL_WARNING ? "selected" : ""), (logLevel == ELOG_LEVEL_NOTICE ? "selected" : ""), (logLevel == ELOG_LEVEL_INFO ? "selected" : ""), (logLevel == ELOG_LEVEL_DEBUG ? "selected" : ""));
+  response += String(buffer);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
+  response += String(buffer);
+  server.send(200, "text/html", response);
+}
+#endif
+
 /**
  * @brief /WI - Configure WiFi Page
  * T: handleWI: uri: /wi, args: 4, method: 1
@@ -1652,6 +1733,9 @@ void WebUISetup() {
   server.on("/tk", handleTK); // Store Device Token
 #  endif
   server.on("/lo", handleLO); // Configure Logging
+#  if LOG_TO_SYSLOG
+  server.on("/sy", handleSY); // Configure Syslog
+#  endif
 
   server.on("/rt", handleRT); // Reset configuration ( Erase and Restart )
   server.on("/favicon.ico", handleFavicon); // Information
