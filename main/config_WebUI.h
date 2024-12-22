@@ -35,6 +35,10 @@
 #  define WEBUI_LOG_TO_SERIAL true
 #endif
 
+#ifndef LOG_LEVEL_WEBUI
+#  define LOG_LEVEL_WEBUI LOG_LEVEL
+#endif
+
 /*------------------- Optional Compiler Directives ----------------------*/
 
 #ifndef WEB_TEMPLATE_BUFFER_MAX_SIZE
