@@ -42,11 +42,13 @@
 #    include <M5Tough.h>
 #  endif
 void logToLCD(bool display) {
+#  if LOG_TO_LCD
   if (display) {
-    Logger.registerSerial(OMG_LOGID, LOG_LEVEL_LCD, "OMG", M5.Lcd); // Log on LCD following LOG_LEVEL_LCD
+    Logger.setSerialLogLevel(OMG_LOGID, LOG_LEVEL_LCD, M5.Lcd); // Log on LCD following LOG_LEVEL_LCD
   } else {
-    Logger.registerSerial(OMG_LOGID, LOG_LEVEL, "OMG");
+    Logger.setSerialLogLevel(OMG_LOGID, ELOG_LEVEL_NOLOG, M5.Lcd); // Disable logging to LCD
   }
+#  endif
 }
 
 void setBrightness(int brightness) {
@@ -96,16 +98,16 @@ void wakeScreen(int brightness) {
 
 void loopM5() {
   static int previousLogLevel;
-  int currentLogLevel = 0 //FUTURE Log.getLastMsgLevel();
+  int currentLogLevel = Logger.getSerialLastMsgLogLevel(OMG_LOGID, M5.Lcd);
   if (previousLogLevel != currentLogLevel) {
     switch (currentLogLevel) {
-      case 1:
-      case 2:
+      case ELOG_LEVEL_EMERGENCY:
+      case ELOG_LEVEL_ERROR:
         wakeScreen(NORMAL_LCD_BRIGHTNESS);
         M5.Lcd.fillScreen(TFT_RED); // FATAL, ERROR
         M5.Lcd.setTextColor(TFT_BLACK, TFT_RED);
         break;
-      case 3:
+      case ELOG_LEVEL_WARNING:
         wakeScreen(NORMAL_LCD_BRIGHTNESS);
         M5.Lcd.fillScreen(TFT_ORANGE); // WARNING
         M5.Lcd.setTextColor(TFT_BLACK, TFT_ORANGE);
