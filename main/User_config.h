@@ -417,9 +417,6 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #endif
 
 /*-------------DEFINE YOUR OTA PARAMETERS BELOW----------------*/
-#ifndef ota_hostname
-#  define ota_hostname Gateway_Name
-#endif
 #ifndef gw_password
 #  define gw_password ""
 #endif

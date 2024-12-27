@@ -242,10 +242,8 @@ void setupTLS(int index = CNT_DEFAULT_INDEX);
 char ota_pass[parameters_size] = gw_password;
 #ifdef USE_MAC_AS_GATEWAY_NAME
 #  undef WifiManager_ssid
-#  undef ota_hostname
 #  define MAC_NAME_MAX_LEN 30
 char WifiManager_ssid[MAC_NAME_MAX_LEN];
-char ota_hostname[MAC_NAME_MAX_LEN];
 #endif
 int failure_number_ntwk = 0; // number of failure connecting to network
 int failure_number_mqtt = 0; // number of failure connecting to MQTT
@@ -1640,7 +1638,7 @@ void setOTA() {
   ArduinoOTA.setPort(ota_port);
 
   // Hostname defaults to esp8266-[ChipID]
-  ArduinoOTA.setHostname(ota_hostname);
+  ArduinoOTA.setHostname(gateway_name);
 
   // No authentication by default
   ArduinoOTA.setPassword(ota_pass);
@@ -2169,6 +2167,7 @@ bool loadConfigFromFlash() {
     String s = WiFi.macAddress();
     sprintf(gateway_name, "%.2s%.2s%.2s%.2s%.2s%.2s",
             s.c_str(), s.c_str() + 3, s.c_str() + 6, s.c_str() + 9, s.c_str() + 12, s.c_str() + 15);
+    Log.notice(F("Gateway Name: %s.local" CR), gateway_name);
 #  endif
 #  ifdef WM_PWD_FROM_MAC // From ESP Mac Address, last 8 digits as the password
     sprintf(ota_pass, "%.2s%.2s%.2s%.2s",
@@ -2186,8 +2185,6 @@ void setupWiFiManager() {
 #  ifdef USE_MAC_AS_GATEWAY_NAME
   String s = WiFi.macAddress();
   snprintf(WifiManager_ssid, MAC_NAME_MAX_LEN, "%s_%.2s%.2s", Gateway_Short_Name, s.c_str(), s.c_str() + 3);
-  strcpy(ota_hostname, WifiManager_ssid);
-  Log.notice(F("OTA Hostname: %s.local" CR), ota_hostname);
 #  endif
 
   wifiManager.setHostname(gateway_name);
