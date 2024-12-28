@@ -214,6 +214,9 @@
 #  ifndef SYSLOG_PORT
 #    define SYSLOG_PORT "514"
 #  endif
+#  ifndef SYSLOG_FACILITY
+#    define SYSLOG_FACILITY FAC_USER
+#  endif
 #endif
 
 #ifndef MQTT_SECURE_DEFAULT

@@ -1306,7 +1306,7 @@ void setup() {
 #if LOG_TO_SYSLOG
   if (strcmp(syslogServer, "") != 0 && strcmp(syslogPort, "") != 0) {
     Logger.configureSyslog(syslogServer, String(syslogPort).toInt(), gateway_name);
-    Logger.registerSyslog(OMG_LOGID, LOG_LEVEL_SYSLOG, FAC_USER, "OMG");
+    Logger.registerSyslog(OMG_LOGID, LOG_LEVEL_SYSLOG, SYSLOG_FACILITY, "OMG");
   } else {
     Logger.error(OMG_LOGID, F("Invalid syslog configuration, skipping registration" CR));
   }
