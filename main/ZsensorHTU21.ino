@@ -52,7 +52,7 @@ HTU21D htuSensor;
 
 void setupZsensorHTU21() {
   delay(10); // Gives the Sensor enough time to turn on
-  Log.notice(F("HTU21 Initialized - begin()" CR));
+  Logger.notice(OMG_LOGID, F("HTU21 Initialized - begin()" CR));
 
 #  if defined(ESP32)
   Wire.begin(I2C_SDA, I2C_SCL);
@@ -64,7 +64,7 @@ void setupZsensorHTU21() {
 
 void MeasureTempHum() {
   if (millis() > (timehtu21 + TimeBetweenReadinghtu21)) {
-    Log.trace(F("Read HTU21 Sensor" CR));
+    Logger.debug(OMG_LOGID, F("Read HTU21 Sensor" CR));
 
     timehtu21 = millis();
     static float persisted_htu_tempc;
@@ -74,15 +74,15 @@ void MeasureTempHum() {
     float HtuHum = htuSensor.readHumidity();
 
     if (HtuTempC >= 998 || HtuHum >= 998) {
-      Log.error(F("Failed to read from sensor HTU21!" CR));
+      Logger.error(OMG_LOGID, F("Failed to read from sensor HTU21!" CR));
       return;
     }
 
     // Check if reads failed and exit early (to try again).
     if (isnan(HtuTempC) || isnan(HtuHum)) {
-      Log.error(F("Failed to read from sensor HTU21!" CR));
+      Logger.error(OMG_LOGID, F("Failed to read from sensor HTU21!" CR));
     } else {
-      Log.notice(F("Creating HTU21 buffer" CR));
+      Logger.notice(OMG_LOGID, F("Creating HTU21 buffer" CR));
       StaticJsonDocument<JSON_MSG_BUFFER> HTU21dataBuffer;
       JsonObject HTU21data = HTU21dataBuffer.to<JsonObject>();
       // Generate Temperature in degrees C
@@ -91,14 +91,14 @@ void MeasureTempHum() {
         HTU21data["tempc"] = (float)HtuTempC;
         HTU21data["tempf"] = (float)HtuTempF;
       } else {
-        Log.notice(F("Same Temp. Don't send it" CR));
+        Logger.notice(OMG_LOGID, F("Same Temp. Don't send it" CR));
       }
 
       // Generate Humidity in percent
       if (HtuHum != persisted_htu_hum || htu21_always) {
         HTU21data["hum"] = (float)HtuHum;
       } else {
-        Log.notice(F("Same Humidity. Don't send it" CR));
+        Logger.notice(OMG_LOGID, F("Same Humidity. Don't send it" CR));
       }
       HTU21data["origin"] = HTUTOPIC;
       enqueueJsonObject(HTU21data);

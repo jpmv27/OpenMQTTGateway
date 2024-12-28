@@ -31,6 +31,14 @@
 
 #define WEBUI_TEXT_WIDTH 128
 
+#ifndef WEBUI_LOG_TO_SERIAL
+#  define WEBUI_LOG_TO_SERIAL true
+#endif
+
+#ifndef LOG_LEVEL_WEBUI
+#  define LOG_LEVEL_WEBUI LOG_LEVEL
+#endif
+
 /*------------------- Optional Compiler Directives ----------------------*/
 
 #ifndef WEB_TEMPLATE_BUFFER_MAX_SIZE
@@ -52,7 +60,7 @@
 #endif
 
 #ifdef WEBUI_TRACE_LOGGING
-#  define WEBUI_TRACE_LOG(...) Log.trace(__VA_ARGS__)
+#  define WEBUI_TRACE_LOG(...) Logger.debug(OMG_LOGID, __VA_ARGS__)
 #else
 #  define WEBUI_TRACE_LOG(...)
 #endif

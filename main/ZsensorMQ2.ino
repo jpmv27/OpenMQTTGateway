@@ -41,10 +41,10 @@
 #  include "math.h"
 
 void setupZsensorMQ2() {
-  Log.notice(F("Setup MQ2 detection on pin: %d" CR), MQ2SENSORDETECTPIN);
+  Logger.notice(OMG_LOGID, F("Setup MQ2 detection on pin: %d" CR), MQ2SENSORDETECTPIN);
   pinMode(MQ2SENSORDETECTPIN, INPUT); // declare GPIOInput pin as input_pullup to prevent floating. Pin will be high when not connected to ground
 
-  Log.notice(F("Starting MQ2 calibration on pin: %d" CR), MQ2SENSORADCPIN);
+  Logger.notice(OMG_LOGID, F("Starting MQ2 calibration on pin: %d" CR), MQ2SENSORADCPIN);
 
   //Simple calibrate
   float sensorValue;
@@ -53,14 +53,14 @@ void setupZsensorMQ2() {
   }
   delay(1000);
 
-  Log.trace(F("MQ2 Initialized." CR));
+  Logger.debug(OMG_LOGID, F("MQ2 Initialized." CR));
 }
 
 void MeasureGasMQ2() {
   if (millis() > (timemq2 + TimeBetweenReadingmq2)) {
     timemq2 = millis();
 
-    Log.trace(F("Creating MQ2 buffer" CR));
+    Logger.debug(OMG_LOGID, F("Creating MQ2 buffer" CR));
     StaticJsonDocument<JSON_MSG_BUFFER> MQ2dataBuffer;
     JsonObject MQ2data = MQ2dataBuffer.to<JsonObject>();
 

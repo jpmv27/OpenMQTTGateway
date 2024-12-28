@@ -40,28 +40,28 @@ int unreadSMSNum = 0;
 SMSmessage sms;
 
 void setup2G() {
-  Log.notice(F("_2G_TX_GPIO: %d " CR), _2G_TX_GPIO);
-  Log.notice(F("_2G_RX_GPIO: %d " CR), _2G_RX_GPIO);
+  Logger.notice(OMG_LOGID, F("_2G_TX_GPIO: %d " CR), _2G_TX_GPIO);
+  Logger.notice(OMG_LOGID, F("_2G_RX_GPIO: %d " CR), _2G_RX_GPIO);
   setupGSM(false);
-  Log.trace(F("Zgateway2G setup done " CR));
+  Logger.debug(OMG_LOGID, F("Zgateway2G setup done " CR));
 }
 
 void setupGSM(bool deleteSMS) {
-  Log.trace(F("Init 2G module: %d" CR), _2G_PWR_GPIO);
+  Logger.debug(OMG_LOGID, F("Init 2G module: %d" CR), _2G_PWR_GPIO);
   delay(1000);
   // Power-cycle the module to reset it.
   A6l.powerCycle(_2G_PWR_GPIO);
-  Log.notice(F("waiting for network connection at bd: %d" CR), _2G_MODULE_BAUDRATE);
+  Logger.notice(OMG_LOGID, F("waiting for network connection at bd: %d" CR), _2G_MODULE_BAUDRATE);
   A6l.blockUntilReady(_2G_MODULE_BAUDRATE);
-  Log.notice(F("A6/A7 gsm ready" CR));
+  Logger.notice(OMG_LOGID, F("A6/A7 gsm ready" CR));
   signalStrengthAnalysis();
   delay(1000);
   // deleting all sms
   if (deleteSMS) {
     if (A6l.deleteSMS(1, 4) == A6_OK) {
-      Log.notice(F("delete SMS OK" CR));
+      Logger.notice(OMG_LOGID, F("delete SMS OK" CR));
     } else {
-      Log.error(F("delete SMS KO" CR));
+      Logger.error(OMG_LOGID, F("delete SMS KO" CR));
     }
   }
 }
@@ -69,9 +69,9 @@ void setupGSM(bool deleteSMS) {
 void signalStrengthAnalysis() {
   int signalStrength = 0;
   signalStrength = A6l.getSignalStrength();
-  Log.trace(F("Signal strength: %d" CR), signalStrength);
+  Logger.debug(OMG_LOGID, F("Signal strength: %d" CR), signalStrength);
   if (signalStrength < _2G_MIN_SIGNAL || signalStrength > _2G_MAX_SIGNAL) {
-    Log.trace(F("Signal too low restart the module" CR));
+    Logger.debug(OMG_LOGID, F("Signal too low restart the module" CR));
     setupGSM(false); // if we are below or above a threshold signal we relaunch the setup of GSM module
   }
 }
@@ -79,17 +79,17 @@ void signalStrengthAnalysis() {
 bool _2GtoX() {
   // Get the memory locations of unread SMS messages.
   unreadSMSNum = A6l.getUnreadSMSLocs(unreadSMSLocs, 512);
-  Log.trace(F("Creating SMS  buffer" CR));
+  Logger.debug(OMG_LOGID, F("Creating SMS  buffer" CR));
   StaticJsonDocument<JSON_MSG_BUFFER> SMSdataBuffer;
   JsonObject SMSdata = SMSdataBuffer.to<JsonObject>();
   for (int i = 0; i < unreadSMSNum; i++) {
-    Log.notice(F("New  message at index: %d" CR), unreadSMSNum);
+    Logger.notice(OMG_LOGID, F("New  message at index: %d" CR), unreadSMSNum);
     sms = A6l.readSMS(unreadSMSLocs[i]);
     SMSdata["message"] = (const char*)sms.message.c_str();
     SMSdata["date"] = (const char*)sms.date.c_str();
     SMSdata["phone"] = (const char*)sms.number.c_str();
     A6l.deleteSMS(unreadSMSLocs[i]); // we delete the SMS received
-    Log.trace(F("Adv data 2GtoMQTT" CR));
+    Logger.debug(OMG_LOGID, F("Adv data 2GtoMQTT" CR));
     SMSdata["origin"] = subject2GtoMQTT;
     return enqueueJsonObject(SMSdata);
   }
@@ -101,26 +101,26 @@ void Xto2G(const char* topicOri, const char* datacallback) {
   String topic = topicOri;
 
   if (cmpToMainTopic(topicOri, subjectMQTTto2G)) {
-    Log.trace(F("MQTTto2G data analysis" CR));
+    Logger.debug(OMG_LOGID, F("MQTTto2G data analysis" CR));
     // 2G DATA ANALYSIS
     String phone_number = "";
     int pos0 = topic.lastIndexOf(_2GPhoneKey);
     if (pos0 != -1) {
       pos0 = pos0 + strlen(_2GPhoneKey);
       phone_number = topic.substring(pos0);
-      Log.notice(F("MQTTto2G phone: %s" CR), (char*)phone_number.c_str());
-      Log.notice(F("MQTTto2G sms: %s" CR), (char*)data.c_str());
+      Logger.notice(OMG_LOGID, F("MQTTto2G phone: %s" CR), (char*)phone_number.c_str());
+      Logger.notice(OMG_LOGID, F("MQTTto2G sms: %s" CR), (char*)data.c_str());
       if (A6l.sendSMS(phone_number, data) == A6_OK) {
-        Log.notice(F("SMS OK" CR));
+        Logger.notice(OMG_LOGID, F("SMS OK" CR));
         // Acknowledgement to the GTW2G topic
         pub(subjectGTW2GtoMQTT, "SMS OK"); // we acknowledge the sending by publishing the value to an acknowledgement topic, for the moment even if it is a signal repetition we acknowledge also
       } else {
-        Log.error(F("SMS KO" CR));
+        Logger.error(OMG_LOGID, F("SMS KO" CR));
         // Acknowledgement to the GTW2G topic
         pub(subjectGTW2GtoMQTT, "SMS KO"); // we acknowledge the sending by publishing the value to an acknowledgement topic, for the moment even if it is a signal repetition we acknowledge also
       }
     } else {
-      Log.error(F("MQTTto2G Fail reading phone number" CR));
+      Logger.error(OMG_LOGID, F("MQTTto2G Fail reading phone number" CR));
     }
   }
 }
@@ -131,20 +131,20 @@ void Xto2G(const char* topicOri, JsonObject& SMSdata) {
   if (cmpToMainTopic(topicOri, subjectMQTTto2G)) {
     const char* sms = SMSdata["message"];
     const char* phone = SMSdata["phone"];
-    Log.trace(F("MQTTto2G json data analysis" CR));
+    Logger.debug(OMG_LOGID, F("MQTTto2G json data analysis" CR));
     if (sms && phone) {
-      Log.notice(F("MQTTto2G phone: %s" CR), phone);
-      Log.notice(F("MQTTto2G sms: %s" CR), sms);
+      Logger.notice(OMG_LOGID, F("MQTTto2G phone: %s" CR), phone);
+      Logger.notice(OMG_LOGID, F("MQTTto2G sms: %s" CR), sms);
       if (A6l.sendSMS(String(phone), String(sms)) == A6_OK) {
-        Log.notice(F("SMS OK" CR));
+        Logger.notice(OMG_LOGID, F("SMS OK" CR));
         // Acknowledgement to the GTW2G topic
         pub(subjectGTW2GtoMQTT, "SMS OK"); // we acknowledge the sending by publishing the value to an acknowledgement topic, for the moment even if it is a signal repetition we acknowledge also
       } else {
-        Log.error(F("SMS KO" CR));
+        Logger.error(OMG_LOGID, F("SMS KO" CR));
         pub(subjectGTW2GtoMQTT, "SMS KO"); // we acknowledge the sending by publishing the value to an acknowledgement topic, for the moment even if it is a signal repetition we acknowledge also
       }
     } else {
-      Log.error(F("MQTTto2G failed json read" CR));
+      Logger.error(OMG_LOGID, F("MQTTto2G failed json read" CR));
     }
   }
 }

@@ -51,24 +51,24 @@ Adafruit_TSL2561_Unified tsl = Adafruit_TSL2561_Unified(TSL2561_ADDR_FLOAT, 1234
 void displaySensorDetails(void) {
   sensor_t sensor;
   tsl.getSensor(&sensor);
-  Log.trace(F("------------------------------------" CR));
-  Log.trace(("Sensor: %s" CR), sensor.name);
-  Log.trace(("Driver Ver: %s" CR), sensor.version);
-  Log.trace(("Unique ID: %s" CR), sensor.sensor_id);
-  Log.trace(("Max Value: %s lux" CR), sensor.max_value);
-  Log.trace(("Min Value: %s lux" CR), sensor.min_value);
-  Log.trace(("Resolution: %s lux" CR), sensor.resolution);
-  Log.trace(F("------------------------------------" CR));
+  Logger.debug(OMG_LOGID, F("------------------------------------" CR));
+  Logger.debug(OMG_LOGID, ("Sensor: %s" CR), sensor.name);
+  Logger.debug(OMG_LOGID, ("Driver Ver: %s" CR), sensor.version);
+  Logger.debug(OMG_LOGID, ("Unique ID: %s" CR), sensor.sensor_id);
+  Logger.debug(OMG_LOGID, ("Max Value: %s lux" CR), sensor.max_value);
+  Logger.debug(OMG_LOGID, ("Min Value: %s lux" CR), sensor.min_value);
+  Logger.debug(OMG_LOGID, ("Resolution: %s lux" CR), sensor.resolution);
+  Logger.debug(OMG_LOGID, F("------------------------------------" CR));
   delay(500);
 }
 
 void setupZsensorTSL2561() {
-  Log.notice(F("Setup TSL2561 on adress: %H" CR), TSL2561_ADDR_FLOAT);
+  Logger.notice(OMG_LOGID, F("Setup TSL2561 on adress: %H" CR), TSL2561_ADDR_FLOAT);
   Wire.begin();
   Wire.beginTransmission(TSL2561_ADDR_FLOAT);
 
   if (!tsl.begin()) {
-    Log.error(F("No TSL2561 detected" CR));
+    Logger.error(OMG_LOGID, F("No TSL2561 detected" CR));
   }
 
   // enable auto ranging
@@ -80,7 +80,7 @@ void setupZsensorTSL2561() {
   // tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_101MS);  /* medium resolution and speed   */
   tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_402MS);
 
-  Log.trace(F("TSL2561 Initialized. Printing detials now." CR));
+  Logger.debug(OMG_LOGID, F("TSL2561 Initialized. Printing detials now." CR));
   displaySensorDetails();
 }
 
@@ -89,7 +89,7 @@ void MeasureLightIntensityTSL2561() {
     static uint32_t persisted_lux;
     timetsl2561 = millis();
 
-    Log.trace(F("Creating TSL2561 buffer" CR));
+    Logger.debug(OMG_LOGID, F("Creating TSL2561 buffer" CR));
     StaticJsonDocument<JSON_MSG_BUFFER> TSL2561dataBuffer;
     JsonObject TSL2561data = TSL2561dataBuffer.to<JsonObject>();
 
@@ -107,10 +107,10 @@ void MeasureLightIntensityTSL2561() {
         TSL2561data["origin"] = subjectTSL12561toMQTT;
         enqueueJsonObject(TSL2561data);
       } else {
-        Log.trace(F("Same lux value, do not send" CR));
+        Logger.debug(OMG_LOGID, F("Same lux value, do not send" CR));
       }
     } else {
-      Log.error(F("Failed to read from TSL2561" CR));
+      Logger.error(OMG_LOGID, F("Failed to read from TSL2561" CR));
     }
   }
 }

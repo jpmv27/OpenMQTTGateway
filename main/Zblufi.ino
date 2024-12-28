@@ -86,7 +86,7 @@ void receivingCommandTask(void* pvParameters) {
   JsonObject jsonBlufi = json.to<JsonObject>();
   auto error = deserializeJson(json, taskData->data, taskData->data_len);
   if (error) {
-    Log.error(F("deserialize config failed: %s, buffer capacity: %u" CR), error.c_str(), json.capacity());
+    Logger.error(OMG_LOGID, F("deserialize config failed: %s, buffer capacity: %u" CR), error.c_str(), json.capacity());
   } else {
     if (jsonBlufi.containsKey("target") && jsonBlufi["target"].is<char*>()) {
       char topic[(parameters_size)*2 + jsonBlufi["target"].size() + 1];
@@ -96,7 +96,7 @@ void receivingCommandTask(void* pvParameters) {
       serializeJson(jsonBlufi, jsonStr);
       receivingDATA(topic, jsonStr);
     } else {
-      Log.notice(F("No target found in the received command using SYS target, default index and save command" CR));
+      Logger.notice(OMG_LOGID, F("No target found in the received command using SYS target, default index and save command" CR));
       if (!json.containsKey("cnt_index")) {
         json["cnt_index"] = CNT_DEFAULT_INDEX;
         json["save_cnt"] = true;
@@ -152,7 +152,7 @@ void sendCustomDataNotification(const char* message) {
 #  ifdef BT_CONNECTION_TIMEOUT_MS
 void connection_timeout_callback(void* arg) {
   if (omg_blufi_ble_connected) {
-    Log.notice(F("BluFi connection timeout reached. Disconnecting." CR));
+    Logger.notice(OMG_LOGID, F("BluFi connection timeout reached. Disconnecting." CR));
     esp_blufi_disconnect();
     omg_blufi_ble_connected = false;
   }
@@ -170,7 +170,7 @@ void restart_connection_timer() {
   esp_timer_stop(connection_timer); // Stop the timer if it's running
   esp_err_t ret = esp_timer_start_once(connection_timer, BT_CONNECTION_TIMEOUT_MS * 1000);
   if (ret != ESP_OK) {
-    Log.error(F("Failed to start connection timer: %d" CR), ret);
+    Logger.error(OMG_LOGID, F("Failed to start connection timer: %d" CR), ret);
   }
 }
 
@@ -189,11 +189,11 @@ static void example_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_para
      * now, as a example, we do it more simply */
   switch (event) {
     case ESP_BLUFI_EVENT_INIT_FINISH:
-      Log.trace(F("BLUFI init finish" CR));
+      Logger.debug(OMG_LOGID, F("BLUFI init finish" CR));
       esp_blufi_adv_start();
       break;
     case ESP_BLUFI_EVENT_DEINIT_FINISH:
-      Log.trace(F("BLUFI deinit finish" CR));
+      Logger.debug(OMG_LOGID, F("BLUFI deinit finish" CR));
       NimBLEDevice::deinit(true);
       if (connection_timer != nullptr) {
         esp_timer_delete(connection_timer);
@@ -201,7 +201,7 @@ static void example_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_para
       }
       break;
     case ESP_BLUFI_EVENT_BLE_CONNECT:
-      Log.trace(F("BLUFI BLE connect" CR));
+      Logger.debug(OMG_LOGID, F("BLUFI BLE connect" CR));
       gatewayState = GatewayState::ONBOARDING;
       omg_blufi_ble_connected = true;
       restart_connection_timer();
@@ -209,7 +209,7 @@ static void example_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_para
       blufi_security_init();
       break;
     case ESP_BLUFI_EVENT_BLE_DISCONNECT:
-      Log.trace(F("BLUFI BLE disconnect" CR));
+      Logger.debug(OMG_LOGID, F("BLUFI BLE disconnect" CR));
       omg_blufi_ble_connected = false;
       stop_connection_timer();
       if (mqtt && mqtt->connected()) {
@@ -225,16 +225,16 @@ static void example_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_para
       esp_blufi_adv_start();
       break;
     case ESP_BLUFI_EVENT_REQ_CONNECT_TO_AP:
-      Log.trace(F("BLUFI request wifi connect to AP" CR));
+      Logger.debug(OMG_LOGID, F("BLUFI request wifi connect to AP" CR));
       WiFi.begin((char*)gl_sta_ssid, (char*)gl_sta_passwd);
       gl_sta_is_connecting = true;
       break;
     case ESP_BLUFI_EVENT_REQ_DISCONNECT_FROM_AP:
-      Log.trace(F("BLUFI request wifi disconnect from AP\n" CR));
+      Logger.debug(OMG_LOGID, F("BLUFI request wifi disconnect from AP\n" CR));
       WiFi.disconnect();
       break;
     case ESP_BLUFI_EVENT_REPORT_ERROR:
-      Log.trace(F("BLUFI report error, error code %d\n" CR), param->report_error.state);
+      Logger.debug(OMG_LOGID, F("BLUFI report error, error code %d\n" CR), param->report_error.state);
       esp_blufi_send_error_info(param->report_error.state);
       break;
     case ESP_BLUFI_EVENT_GET_WIFI_STATUS: {
@@ -255,25 +255,25 @@ static void example_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_para
       break;
     }
     case ESP_BLUFI_EVENT_RECV_SLAVE_DISCONNECT_BLE:
-      Log.trace(F("BLUFI recv slave disconnect a ble connection" CR));
+      Logger.debug(OMG_LOGID, F("BLUFI recv slave disconnect a ble connection" CR));
       esp_blufi_disconnect();
       break;
     case ESP_BLUFI_EVENT_RECV_STA_SSID:
       strncpy((char*)gl_sta_ssid, (char*)param->sta_ssid.ssid, param->sta_ssid.ssid_len);
       gl_sta_ssid[param->sta_ssid.ssid_len] = '\0';
-      Log.notice(F("Recv STA SSID %s" CR), gl_sta_ssid);
+      Logger.notice(OMG_LOGID, F("Recv STA SSID %s" CR), gl_sta_ssid);
       break;
     case ESP_BLUFI_EVENT_RECV_STA_PASSWD:
       strncpy((char*)gl_sta_passwd, (char*)param->sta_passwd.passwd, param->sta_passwd.passwd_len);
       gl_sta_passwd[param->sta_passwd.passwd_len] = '\0';
-      Log.notice(F("Recv STA PASSWORD" CR));
+      Logger.notice(OMG_LOGID, F("Recv STA PASSWORD" CR));
       break;
     case ESP_BLUFI_EVENT_GET_WIFI_LIST: {
       WiFi.scanNetworks(true);
       break;
     }
     case ESP_BLUFI_EVENT_RECV_CUSTOM_DATA: {
-      Log.notice(F("Recv Custom Data %" PRIu32 CR), param->custom_data.data_len);
+      Logger.notice(OMG_LOGID, F("Recv Custom Data %" PRIu32 CR), param->custom_data.data_len);
       esp_log_buffer_hex("Custom Data", param->custom_data.data, param->custom_data.data_len);
       createReceivingCommandTask(param->custom_data.data, param->custom_data.data_len);
       break;
@@ -320,17 +320,17 @@ void wifi_event_handler(arduino_event_id_t event) {
     case ARDUINO_EVENT_WIFI_SCAN_DONE: {
       uint16_t apCount = WiFi.scanComplete();
       if (apCount == 0) {
-        Log.error(F("No AP found" CR));
+        Logger.error(OMG_LOGID, F("No AP found" CR));
         break;
       }
-      Log.trace(F("AP found, count: %d" CR), apCount);
+      Logger.debug(OMG_LOGID, F("AP found, count: %d" CR), apCount);
       esp_blufi_ap_record_t* blufi_ap_list = (esp_blufi_ap_record_t*)malloc(apCount * sizeof(esp_blufi_ap_record_t));
       if (!blufi_ap_list) {
-        Log.error(F("Failed to allocate memory for AP list" CR));
+        Logger.error(OMG_LOGID, F("Failed to allocate memory for AP list" CR));
         break;
       }
       for (int i = 0; i < apCount; ++i) {
-        Log.notice(F("%d: %s, Ch:%d (%ddBm)" CR), i + 1, WiFi.SSID(i).c_str(), WiFi.channel(i), WiFi.RSSI(i));
+        Logger.notice(OMG_LOGID, F("%d: %s, Ch:%d (%ddBm)" CR), i + 1, WiFi.SSID(i).c_str(), WiFi.channel(i), WiFi.RSSI(i));
         blufi_ap_list[i].rssi = WiFi.RSSI(i);
         size_t ssidLength = strlen(WiFi.SSID(i).c_str());
         if (ssidLength > sizeof(blufi_ap_list[i].ssid) - 1) {
@@ -341,7 +341,7 @@ void wifi_event_handler(arduino_event_id_t event) {
       }
       if (omg_blufi_ble_connected == true) {
         if (esp_blufi_send_wifi_list(apCount, blufi_ap_list) != ESP_OK) {
-          Log.error(F("Failed to send WiFi list" CR));
+          Logger.error(OMG_LOGID, F("Failed to send WiFi list" CR));
         }
       }
       free(blufi_ap_list);
@@ -375,7 +375,7 @@ bool startBlufi() {
 
   ret = esp_blufi_register_callbacks(&example_callbacks);
   if (ret) {
-    Log.error(F("%s blufi register failed, error code = %x" CR), __func__, ret);
+    Logger.error(OMG_LOGID, F("%s blufi register failed, error code = %x" CR), __func__, ret);
     return false;
   }
 
@@ -389,14 +389,14 @@ bool startBlufi() {
   char advName[17] = {0};
   // Check length of Gateway_Short_Name
   if (strlen(Gateway_Short_Name) > 3) {
-    Log.error(F("Gateway_Short_Name is too long, max 3 characters" CR));
+    Logger.error(OMG_LOGID, F("Gateway_Short_Name is too long, max 3 characters" CR));
     return false;
   }
   snprintf(advName, sizeof(advName), Gateway_Short_Name "_%02X%02X%02X%02X%02X%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
   NimBLEDevice::init(advName);
   esp_blufi_gatt_svr_init();
   ble_gatts_start();
-  Log.notice(F("BLUFI started" CR));
+  Logger.notice(OMG_LOGID, F("BLUFI started" CR));
   return esp_blufi_profile_init() == ESP_OK;
 }
 
@@ -410,10 +410,10 @@ bool stopBlufi() {
   ble_gap_adv_stop();
   result = esp_blufi_profile_deinit();
   if (result != ESP_OK) {
-    Log.error(F("Failed to deinit blufi profile: %d" CR), result);
+    Logger.error(OMG_LOGID, F("Failed to deinit blufi profile: %d" CR), result);
     return false;
   }
-  Log.notice(F("BLUFI stopped" CR));
+  Logger.notice(OMG_LOGID, F("BLUFI stopped" CR));
   return true;
 }
 

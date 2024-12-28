@@ -34,17 +34,17 @@ void GFSunInverterDataHandler(GfSun2000Data data) {
   JsonObject jdata = jdataBuffer.to<JsonObject>();
 
   jdata["device_id"] = (char*)data.deviceID;
-  Log.trace(F("Device ID     : %s\n" CR), data.deviceID);
+  Logger.debug(OMG_LOGID, F("Device ID     : %s\n" CR), data.deviceID);
   jdata["ac_voltage"] = data.ACVoltage;
-  Log.trace(F("AC Voltage    : %.1f\tV\n" CR), data.ACVoltage);
+  Logger.debug(OMG_LOGID, F("AC Voltage    : %.1f\tV\n" CR), data.ACVoltage);
   jdata["dc_voltage"] = data.DCVoltage;
-  Log.trace(F("DC Voltage    : %.1f\tV\n" CR), data.DCVoltage);
+  Logger.debug(OMG_LOGID, F("DC Voltage    : %.1f\tV\n" CR), data.DCVoltage);
   jdata["power"] = data.averagePower;
-  Log.trace(F("Output Power  : %.1f\tW (5min avg)\n" CR), data.averagePower);
+  Logger.debug(OMG_LOGID, F("Output Power  : %.1f\tW (5min avg)\n" CR), data.averagePower);
   jdata["c_energy"] = data.customEnergyCounter;
-  Log.trace(F("Custom Energy : %.1f\tkW/h (can be reseted)\n" CR), data.customEnergyCounter);
+  Logger.debug(OMG_LOGID, F("Custom Energy : %.1f\tkW/h (can be reseted)\n" CR), data.customEnergyCounter);
   jdata["t_energy"] = data.totalEnergyCounter;
-  Log.trace(F("Total Energy  : %.1f\tkW/h\n" CR), data.totalEnergyCounter);
+  Logger.debug(OMG_LOGID, F("Total Energy  : %.1f\tkW/h\n" CR), data.totalEnergyCounter);
 
 #  ifdef GFSUNINVERTER_DEVEL
   StaticJsonDocument<JSON_MSG_BUFFER> jregisterBuffer;
@@ -52,7 +52,7 @@ void GFSunInverterDataHandler(GfSun2000Data data) {
   char buffer[4];
   std::map<int16_t, int16_t>::iterator itr;
   for (itr = data.modbusRegistry.begin(); itr != data.modbusRegistry.end(); ++itr) {
-    Log.notice("%d: %d\n", itr->first, itr->second);
+    Logger.notice(OMG_LOGID, "%d: %d\n", itr->first, itr->second);
     sprintf(buffer, "%d", itr->first);
     jregister[buffer] = itr->second;
   }
@@ -65,7 +65,7 @@ void GFSunInverterDataHandler(GfSun2000Data data) {
 void GFSunInverterErrorHandler(int errorId, char* errorMessage) {
   char buffer[50];
   sprintf(buffer, "Error response: %02X - %s\n", errorId, errorMessage);
-  Log.error(buffer);
+  Logger.error(OMG_LOGID, buffer);
   StaticJsonDocument<JSON_MSG_BUFFER> jdataBuffer;
   JsonObject jdata = jdataBuffer.to<JsonObject>();
   jdata["status"] = "error";
@@ -79,7 +79,7 @@ void setupGFSunInverter() {
   GF.setup(Serial2);
   GF.setDataHandler(GFSunInverterDataHandler);
   GF.setErrorHandler(GFSunInverterErrorHandler);
-  Log.trace(F("ZgatewayGFSunInverter setup done " CR));
+  Logger.debug(OMG_LOGID, F("ZgatewayGFSunInverter setup done " CR));
 }
 
 void ZgatewayGFSunInverterMQTT() {

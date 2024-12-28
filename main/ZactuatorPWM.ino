@@ -136,7 +136,7 @@ void setupPWM() {
     calibrationGamma[i] = PWM_DEFAULT_GAMMA;
   }
 
-  Log.trace(F("ZactuatorPWM setup done " CR));
+  Logger.debug(OMG_LOGID, F("ZactuatorPWM setup done " CR));
 }
 
 // This applies a power curve to the input to try to make the inputs
@@ -187,7 +187,7 @@ void PWMLoop() {
 #  else
     analogWrite(channelPins[i], dutyCycle);
 #  endif
-    //Log.notice(F("Setting channel %d : %d" CR),i,dutyCycle);
+    //Logger.notice(OMG_LOGID, F("Setting channel %d : %d" CR),i,dutyCycle);
   }
 }
 
@@ -198,7 +198,7 @@ boolean PWMtoX() {
 #  if jsonReceiving
 void XtoPWM(const char* topicOri, JsonObject& jsonData) {
   if (cmpToMainTopic(topicOri, subjectMQTTtoPWMset)) {
-    Log.trace(F("MQTTtoPWM JSON analysis" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoPWM JSON analysis" CR));
     // Parse the target value for each channel
     int modifiedChannelBits = 0;
     for (int i = 0; i < kNumChannels; ++i) {

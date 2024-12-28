@@ -48,11 +48,11 @@ void ONOFFConfig_fromJson(JsonObject& ONOFFdata) {
     preferences.begin(Gateway_Short_Name, false);
     if (preferences.isKey("ONOFFConfig")) {
       int result = preferences.remove("ONOFFConfig");
-      Log.notice(F("ONOFF config erase result: %d" CR), result);
+      Logger.notice(OMG_LOGID, F("ONOFF config erase result: %d" CR), result);
       preferences.end();
       return; // Erase prevails on save, so skipping save
     } else {
-      Log.notice(F("ONOFF config not found" CR));
+      Logger.notice(OMG_LOGID, F("ONOFF config not found" CR));
       preferences.end();
     }
   }
@@ -67,7 +67,7 @@ void ONOFFConfig_fromJson(JsonObject& ONOFFdata) {
     preferences.begin(Gateway_Short_Name, false);
     int result = preferences.putString("ONOFFConfig", conf);
     preferences.end();
-    Log.notice(F("ONOFF Config_save: %s, result: %d" CR), conf.c_str(), result);
+    Logger.notice(OMG_LOGID, F("ONOFF Config_save: %s, result: %d" CR), conf.c_str(), result);
   }
 }
 
@@ -78,19 +78,19 @@ void ONOFFConfig_load() {
     auto error = deserializeJson(jsonBuffer, preferences.getString("ONOFFConfig", "{}"));
     preferences.end();
     if (error) {
-      Log.error(F("ONOFF config deserialization failed: %s, buffer capacity: %u" CR), error.c_str(), jsonBuffer.capacity());
+      Logger.error(OMG_LOGID, F("ONOFF config deserialization failed: %s, buffer capacity: %u" CR), error.c_str(), jsonBuffer.capacity());
       return;
     }
     if (jsonBuffer.isNull()) {
-      Log.warning(F("ONOFF config is null" CR));
+      Logger.warning(OMG_LOGID, F("ONOFF config is null" CR));
       return;
     }
     JsonObject jo = jsonBuffer.as<JsonObject>();
     ONOFFConfig_fromJson(jo);
-    Log.notice(F("ONOFF config loaded" CR));
+    Logger.notice(OMG_LOGID, F("ONOFF config loaded" CR));
   } else {
     preferences.end();
-    Log.notice(F("ONOFF config not found" CR));
+    Logger.notice(OMG_LOGID, F("ONOFF config not found" CR));
   }
 }
 #  else
@@ -116,8 +116,8 @@ void setupONOFF() {
 #  ifdef ESP32
   ONOFFConfig_init();
   ONOFFConfig_load();
-  Log.notice(F("Target state on restart: %T" CR), ONOFFConfig.ONOFFState);
-  Log.notice(F("Use last state on restart: %T" CR), ONOFFConfig.useLastStateOnStart);
+  Logger.notice(OMG_LOGID, F("Target state on restart: %T" CR), ONOFFConfig.ONOFFState);
+  Logger.notice(OMG_LOGID, F("Use last state on restart: %T" CR), ONOFFConfig.useLastStateOnStart);
 #  endif
   pinMode(ACTUATOR_ONOFF_GPIO, OUTPUT);
 #  ifdef ACTUATOR_ONOFF_DEFAULT
@@ -130,18 +130,18 @@ void setupONOFF() {
   }
 #  endif
   updatePowerIndicator();
-  Log.trace(F("ZactuatorONOFF setup done" CR));
+  Logger.debug(OMG_LOGID, F("ZactuatorONOFF setup done" CR));
 }
 
 #  if jsonReceiving
 void XtoONOFF(const char* topicOri, JsonObject& ONOFFdata) {
   if (cmpToMainTopic(topicOri, subjectMQTTtoONOFF)) {
-    Log.trace(F("MQTTtoONOFF json data analysis" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoONOFF json data analysis" CR));
     int boolSWITCHTYPE = ONOFFdata["cmd"] | 99;
     int gpio = ONOFFdata["gpio"] | ACTUATOR_ONOFF_GPIO;
     if (boolSWITCHTYPE != 99) {
-      Log.notice(F("MQTTtoONOFF boolSWITCHTYPE ok: %d" CR), boolSWITCHTYPE);
-      Log.notice(F("GPIO number: %d" CR), gpio);
+      Logger.notice(OMG_LOGID, F("MQTTtoONOFF boolSWITCHTYPE ok: %d" CR), boolSWITCHTYPE);
+      Logger.notice(OMG_LOGID, F("GPIO number: %d" CR), gpio);
       pinMode(gpio, OUTPUT);
       digitalWrite(gpio, boolSWITCHTYPE);
 #    ifdef LED_ACTUATOR_ONOFF
@@ -161,30 +161,30 @@ void XtoONOFF(const char* topicOri, JsonObject& ONOFFdata) {
       stateONOFFMeasures();
     } else {
       if (ONOFFdata["cmd"] == "high_pulse") {
-        Log.notice(F("MQTTtoONOFF high_pulse ok" CR));
-        Log.notice(F("GPIO number: %d" CR), gpio);
+        Logger.notice(OMG_LOGID, F("MQTTtoONOFF high_pulse ok" CR));
+        Logger.notice(OMG_LOGID, F("GPIO number: %d" CR), gpio);
         int pulselength = ONOFFdata["pulse_length"] | 500;
-        Log.notice(F("Pulse length: %d ms" CR), pulselength);
+        Logger.notice(OMG_LOGID, F("Pulse length: %d ms" CR), pulselength);
         pinMode(gpio, OUTPUT);
         digitalWrite(gpio, HIGH);
         delay(pulselength);
         digitalWrite(gpio, LOW);
       } else if (ONOFFdata["cmd"] == "low_pulse") {
-        Log.notice(F("MQTTtoONOFF low_pulse ok" CR));
-        Log.notice(F("GPIO number: %d" CR), gpio);
+        Logger.notice(OMG_LOGID, F("MQTTtoONOFF low_pulse ok" CR));
+        Logger.notice(OMG_LOGID, F("GPIO number: %d" CR), gpio);
         int pulselength = ONOFFdata["pulse_length"] | 500;
-        Log.notice(F("Pulse length: %d ms" CR), pulselength);
+        Logger.notice(OMG_LOGID, F("Pulse length: %d ms" CR), pulselength);
         pinMode(gpio, OUTPUT);
         digitalWrite(gpio, LOW);
         delay(pulselength);
         digitalWrite(gpio, HIGH);
       } else {
-        Log.error(F("MQTTtoONOFF failed json read" CR));
+        Logger.error(OMG_LOGID, F("MQTTtoONOFF failed json read" CR));
       }
     }
   }
   if (cmpToMainTopic(topicOri, subjectMQTTtoONOFFset)) {
-    Log.trace(F("MQTTtoONOFF json set" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoONOFF json set" CR));
     /*
      * Configuration modifications priorities:
      *  First `init=true` and `load=true` commands are executed (if both are present, INIT prevails on LOAD)
@@ -209,13 +209,13 @@ void XtoONOFF(const char* topicOri, JsonObject& ONOFFdata) {
 #  if simpleReceiving
 void XtoONOFF(const char* topicOri, const char* datacallback) {
   if ((cmpToMainTopic(topicOri, subjectMQTTtoONOFF))) {
-    Log.trace(F("MQTTtoONOFF" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoONOFF" CR));
     char* endptr = NULL;
     long gpio = strtol(datacallback, &endptr, 10);
     if (datacallback == endptr)
       gpio = ACTUATOR_ONOFF_GPIO;
 
-    Log.notice(F("GPIO number: %d" CR), gpio);
+    Logger.notice(OMG_LOGID, F("GPIO number: %d" CR), gpio);
     pinMode(gpio, OUTPUT);
 
     bool ON = false;
@@ -246,11 +246,11 @@ void overLimitTemp(void* pvParameters) {
   for (;;) {
     static float previousInternalTempc = 0;
     float internalTempc = intTemperatureRead();
-    Log.trace(F("Internal temperature of the ESP32 %F" CR), internalTempc);
+    Logger.debug(OMG_LOGID, F("Internal temperature of the ESP32 %F" CR), internalTempc);
     // We switch OFF the actuator if the temperature of the ESP32 is more than MAX_TEMP_ACTUATOR two consecutive times, so as to avoid false single readings to trigger the relay OFF.
     if (internalTempc > MAX_TEMP_ACTUATOR && previousInternalTempc > MAX_TEMP_ACTUATOR) {
       if (digitalRead(ACTUATOR_ONOFF_GPIO) == ACTUATOR_ON) { // This could be with the previous condition, but it is better to trigger the digitalRead only if the previous condition is met to avoid the digitalRead
-        Log.error(F("[ActuatorONOFF] OverTemperature detected ( %F > %F ) switching OFF Actuator" CR), internalTempc, MAX_TEMP_ACTUATOR);
+        Logger.error(OMG_LOGID, F("[ActuatorONOFF] OverTemperature detected ( %F > %F ) switching OFF Actuator" CR), internalTempc, MAX_TEMP_ACTUATOR);
         ActuatorTrigger();
 #      ifdef LED_ACTUATOR_ONOFF
         ledManager.setMode(LED_ACTUATOR_ONOFF, 0, LEDManager::Mode::STATIC, LED_ERROR_COLOR, -1);
@@ -268,11 +268,11 @@ void overLimitTemp(void* pvParameters) {
 #  ifdef MAX_CURRENT_ACTUATOR
 void overLimitCurrent(float RN8209current) {
   static float RN8209previousCurrent = 0;
-  Log.trace(F("RN8209 Current %F" CR), RN8209current);
+  Logger.debug(OMG_LOGID, F("RN8209 Current %F" CR), RN8209current);
   // We switch OFF the actuator if the current of the RN8209 is more than MAX_CURRENT_ACTUATOR.
   if (RN8209current > MAX_CURRENT_ACTUATOR && RN8209previousCurrent > MAX_CURRENT_ACTUATOR) {
     if (digitalRead(ACTUATOR_ONOFF_GPIO) == ACTUATOR_ON) { // This could be with the previous condition, but it is better to trigger the digitalRead only if the previous condition is met to avoid the digitalRead
-      Log.error(F("[ActuatorONOFF] OverCurrent detected ( %F > %F ) switching OFF Actuator" CR), RN8209current, MAX_CURRENT_ACTUATOR);
+      Logger.error(OMG_LOGID, F("[ActuatorONOFF] OverCurrent detected ( %F > %F ) switching OFF Actuator" CR), RN8209current, MAX_CURRENT_ACTUATOR);
       ActuatorTrigger();
 #    ifdef LED_ACTUATOR_ONOFF
       ledManager.setMode(LED_ACTUATOR_ONOFF, 0, LEDManager::Mode::STATIC, LED_ERROR_COLOR, -1);
@@ -292,7 +292,7 @@ void overLimitCurrent(float RN8209current) {}
 */
 void ActuatorTrigger() {
   uint8_t level = !digitalRead(ACTUATOR_ONOFF_GPIO);
-  Log.trace(F("Actuator triggered %d" CR), level);
+  Logger.debug(OMG_LOGID, F("Actuator triggered %d" CR), level);
   digitalWrite(ACTUATOR_ONOFF_GPIO, level);
 #  ifdef LED_ACTUATOR_ONOFF
   if (level == ACTUATOR_ON) {

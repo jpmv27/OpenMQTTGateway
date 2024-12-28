@@ -42,9 +42,9 @@ const long fireUpdate = 10;
 CRGBPalette16 gPal;
 
 void setupFASTLED() {
-  Log.notice(F("FASTLED_DATA_GPIO: %d" CR), FASTLED_DATA_GPIO);
-  Log.notice(F("FASTLED_NUM_LEDS: %d" CR), FASTLED_NUM_LEDS);
-  Log.trace(F("ZactuatorFASTLED setup done " CR));
+  Logger.notice(OMG_LOGID, F("FASTLED_DATA_GPIO: %d" CR), FASTLED_DATA_GPIO);
+  Logger.notice(OMG_LOGID, F("FASTLED_NUM_LEDS: %d" CR), FASTLED_NUM_LEDS);
+  Logger.debug(OMG_LOGID, F("ZactuatorFASTLED setup done " CR));
   FastLED.addLeds<FASTLED_TYPE, FASTLED_DATA_GPIO>(leds, FASTLED_NUM_LEDS);
 }
 
@@ -104,16 +104,16 @@ void XtoFASTLED(const char* topicOri, JsonObject& jsonData) {
   //number = (long)strtol(&datacallback[1], NULL, 16);
 
   if (cmpToMainTopic(topicOri, subjectMQTTtoFASTLEDsetled)) {
-    Log.trace(F("MQTTtoFASTLED JSON analysis" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoFASTLED JSON analysis" CR));
     int ledNr = jsonData["led"];
-    Log.notice(F("Led numero: %d" CR), ledNr);
+    Logger.notice(OMG_LOGID, F("Led numero: %d" CR), ledNr);
     const char* color = jsonData["hex"];
-    Log.notice(F("Color hex: %s" CR), color);
+    Logger.notice(OMG_LOGID, F("Color hex: %s" CR), color);
 
     long number = (long)strtol(color, NULL, 16);
     bool blink = jsonData["blink"];
     if (ledNr <= FASTLED_NUM_LEDS) {
-      Log.notice(F("Blink: %d" CR), blink);
+      Logger.notice(OMG_LOGID, F("Blink: %d" CR), blink);
       blinkLED[ledNr] = blink;
       leds[ledNr] = number;
     }
@@ -123,24 +123,24 @@ void XtoFASTLED(const char* topicOri, JsonObject& jsonData) {
 
 #  if simpleReceiving
 void XtoFASTLED(const char* topicOri, const char* datacallback) {
-  Log.trace(F("MQTTtoFASTLED: " CR));
+  Logger.debug(OMG_LOGID, F("MQTTtoFASTLED: " CR));
   currentLEDState = GENERAL;
   long number = 0;
   if (cmpToMainTopic(topicOri, subjectMQTTtoFASTLED)) {
     number = (long)strtol(&datacallback[1], NULL, 16);
-    Log.notice(F("Number: %l" CR), number);
+    Logger.notice(OMG_LOGID, F("Number: %l" CR), number);
     for (int i = 0; i < FASTLED_NUM_LEDS; i++) {
       leds[i] = number;
     }
     FastLED.show();
   } else if (cmpToMainTopic(topicOri, subjectMQTTtoFASTLEDsetbrightness)) {
     number = (long)strtol(&datacallback[1], NULL, 16);
-    Log.notice(F("Number: %l" CR), number);
+    Logger.notice(OMG_LOGID, F("Number: %l" CR), number);
     FastLED.setBrightness(number);
     FastLED.show();
   } else if (cmpToMainTopic(topicOri, subjectMQTTtoFASTLEDsetanimation)) {
     String payload = datacallback;
-    Log.notice(F("Datacallback: %s" CR), datacallback);
+    Logger.notice(OMG_LOGID, F("Datacallback: %s" CR), datacallback);
     if (strstr(datacallback, "fire") != NULL) {
       currentLEDState = FIRE;
       gPal = HeatColors_p;

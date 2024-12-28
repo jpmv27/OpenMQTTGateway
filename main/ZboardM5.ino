@@ -42,7 +42,13 @@
 #    include <M5Tough.h>
 #  endif
 void logToLCD(bool display) {
-  display ? Log.begin(LOG_LEVEL_LCD, &M5.Lcd) : Log.begin(LOG_LEVEL, &Serial); // Log on LCD following LOG_LEVEL_LCD
+#  if LOG_TO_LCD
+  if (display) {
+    Logger.setSerialLogLevel(OMG_LOGID, LOG_LEVEL_LCD, M5.Lcd); // Log on LCD following LOG_LEVEL_LCD
+  } else {
+    Logger.setSerialLogLevel(OMG_LOGID, ELOG_LEVEL_NOLOG, M5.Lcd); // Disable logging to LCD
+  }
+#  endif
 }
 
 void setBrightness(int brightness) {
@@ -55,7 +61,7 @@ void setBrightness(int brightness) {
 }
 
 void setupM5() {
-  Log.notice(F("Setup M5" CR));
+  Logger.notice(OMG_LOGID, F("Setup M5" CR));
   pinMode(SLEEP_BUTTON, INPUT);
   // M5 stack 320*240
   // M5StickC 160*80
@@ -64,14 +70,14 @@ void setupM5() {
   M5.Lcd.fillScreen(WHITE);
   displayIntro(M5.Lcd.width() * 0.25, (M5.Lcd.width() / 2) + M5.Lcd.width() * 0.12, (M5.Lcd.height() / 2) + M5.Lcd.height() * 0.2);
 #  if LOG_TO_LCD
-  Log.begin(LOG_LEVEL_LCD, &M5.Lcd); // Log on LCD following LOG_LEVEL_LCD
+  Logger.registerSerial(OMG_LOGID, LOG_LEVEL_LCD, "OMG", M5.Lcd); // Log on LCD following LOG_LEVEL_LCD
 #  endif
 
-  Log.notice(F("Setup M5 end" CR));
+  Logger.notice(OMG_LOGID, F("Setup M5 end" CR));
 }
 
 void sleepScreen() {
-  Log.trace(F("Screen going to sleep" CR));
+  Logger.debug(OMG_LOGID, F("Screen going to sleep" CR));
 #  if defined(ZboardM5STACK)
   M5.begin(false, false, false); // M5.lcd.sleep() provokes a reset of the ESP
 #  endif
@@ -82,7 +88,7 @@ void sleepScreen() {
 }
 
 void wakeScreen(int brightness) {
-  Log.trace(F("Screen wake up" CR));
+  Logger.debug(OMG_LOGID, F("Screen wake up" CR));
   M5.begin();
   M5.Lcd.setCursor(0, 0, (M5.Lcd.height() > 200) ? 4 : 2);
   M5.Lcd.setTextSize(1);
@@ -92,16 +98,16 @@ void wakeScreen(int brightness) {
 
 void loopM5() {
   static int previousLogLevel;
-  int currentLogLevel = Log.getLastMsgLevel();
+  int currentLogLevel = Logger.getSerialLastMsgLogLevel(OMG_LOGID, M5.Lcd);
   if (previousLogLevel != currentLogLevel) {
     switch (currentLogLevel) {
-      case 1:
-      case 2:
+      case ELOG_LEVEL_EMERGENCY:
+      case ELOG_LEVEL_ERROR:
         wakeScreen(NORMAL_LCD_BRIGHTNESS);
         M5.Lcd.fillScreen(TFT_RED); // FATAL, ERROR
         M5.Lcd.setTextColor(TFT_BLACK, TFT_RED);
         break;
-      case 3:
+      case ELOG_LEVEL_WARNING:
         wakeScreen(NORMAL_LCD_BRIGHTNESS);
         M5.Lcd.fillScreen(TFT_ORANGE); // WARNING
         M5.Lcd.setTextColor(TFT_BLACK, TFT_ORANGE);
@@ -118,18 +124,18 @@ void loopM5() {
 
 void XtoM5(const char* topicOri, JsonObject& M5data) { // json object decoding
   if (cmpToMainTopic(topicOri, subjectMQTTtoM5set)) {
-    Log.trace(F("MQTTtoM5 json set" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoM5 json set" CR));
     // Log display set between M5 lcd (true) and serial monitor (false)
     if (M5data.containsKey("log-lcd")) {
       bool displayOnLCD = M5data["log-lcd"];
-      Log.notice(F("Set lcd log: %T" CR), displayOnLCD);
+      Logger.notice(OMG_LOGID, F("Set lcd log: %T" CR), displayOnLCD);
       logToLCD(displayOnLCD);
     }
   }
 }
 
 void displayIntro(int i, int X, int Y) {
-  Log.trace(F("Intro display on screen" CR));
+  Logger.debug(OMG_LOGID, F("Intro display on screen" CR));
   drawLogo(i, X, Y, false, true, false, false, false, false);
   delay(50);
   drawLogo(i, X, Y, false, false, true, false, false, false);
