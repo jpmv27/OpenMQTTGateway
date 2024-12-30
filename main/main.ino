@@ -2537,7 +2537,7 @@ void loop() {
 #endif
 #endif
       if (!timer_sys_checks) { // Update check at start up only
-#if defined(ESP32) && defined(MQTT_HTTPS_FW_UPDATE)
+#if (defined(ESP32) && defined(MQTT_HTTPS_FW_UPDATE)) || defined(OMG_LOCAL_OTA_FW_UPDATE)
         checkForUpdates();
 #endif
       }
@@ -3088,7 +3088,7 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
   }
 }
 
-#ifdef MQTT_HTTPS_FW_UPDATE
+#if MQTT_HTTPS_FW_UPDATE
 String latestVersion;
 #  ifdef ESP32
 #    include <HTTPClient.h>
@@ -3316,7 +3316,181 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
     }
   }
 }
+#endif // MQTT_HTTPS_FW_UPDATE
+
+#ifdef OMG_LOCAL_OTA_FW_UPDATE
+#ifdef ESP32
+#  include <HTTPClient.h>
+#  include "zzHTTPUpdate.h"
+#else
+#error Platform not supported yet
 #endif
+
+void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
+  if (strstr(topicOri, subjectMQTTtoSYSupdate) == NULL) {
+    return;
+  }
+
+  const char* version = HttpsFwUpdateData["version"];
+  if (!version || (strcmp(version, OMG_VERSION) == 0)) {
+    return;
+  }
+
+  const char* url = HttpsFwUpdateData["url"];
+  String systemUrl;
+  if (!url) {
+    Logger.error(OMG_LOGID, F("No firmware URL specified" CR));
+    gatewayState = GatewayState::ERROR;
+    return;
+  }
+
+  if (!strstr((url + (strlen(url) - 5)), ".bin")) {
+    Logger.error(OMG_LOGID, F("Invalid firmware extension" CR));
+    gatewayState = GatewayState::ERROR;
+    return;
+  }
+
+  ProcessLock = true;
+
+#    ifdef ZgatewayBT
+  stopProcessing();
+#    endif
+
+  Logger.warning(OMG_LOGID, F("Starting firmware update" CR));
+  gatewayState = GatewayState::REMOTE_OTA_IN_PROGRESS;
+
+  StaticJsonDocument<JSON_MSG_BUFFER> jsondata;
+  jsondata["release_summary"] = "Update in progress ...";
+  jsondata["origin"] = subjectRLStoMQTT;
+  enqueueJsonObject(jsondata);
+
+  t_httpUpdate_return result = HTTP_UPDATE_FAILED;
+  WiFiClient update_client;
+  httpUpdate.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+  result = httpUpdate.update(update_client, url);
+
+  switch (result) {
+    case HTTP_UPDATE_FAILED:
+      Logger.error(OMG_LOGID, F("HTTP_UPDATE_FAILED Error (%d): %s\n" CR), httpUpdate.getLastError(), httpUpdate.getLastErrorString().c_str());
+      gatewayState = GatewayState::ERROR;
+      break;
+
+    case HTTP_UPDATE_NO_UPDATES:
+      Logger.notice(OMG_LOGID, F("HTTP_UPDATE_NO_UPDATES" CR));
+      break;
+
+    case HTTP_UPDATE_OK:
+      Logger.notice(OMG_LOGID, F("HTTP_UPDATE_OK" CR));
+      jsondata["release_summary"] = "Update success !";
+      jsondata["installed_version"] = version;
+      jsondata["origin"] = subjectRLStoMQTT;
+      enqueueJsonObject(jsondata);
+
+#  ifndef ESPWifiManualSetup
+      saveConfig();
+#  endif
+
+      ESPRestart(6);
+      break;
+  }
+
+  ESPRestart(6);
+}
+
+/**
+ * Check on a server the latest available version of firmware. If the version
+ * is different from our version, an upgrade is triggered.
+ */
+bool checkForUpdates() {
+  HTTPClient http;
+  int httpResponseCode = -1;
+  const String uri_latest = OMG_LOCAL_OTA_BASE_URI "latest";
+  String payload = "";
+
+  Logger.notice(OMG_LOGID, F("Update check, free heap: %d"), ESP.getFreeHeap());
+  http.setTimeout((GeneralTimeOut - 1) * 1000); // -1 to avoid WDT
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+  http.addHeader("Accept", "text/plain");
+
+  http.begin(uri_latest);
+  httpResponseCode = http.GET();
+  Logger.debug(OMG_LOGID, F("HTTP Response Code: %d" CR), httpResponseCode);
+
+  if (httpResponseCode > 0) {
+    payload = http.getString();
+    Logger.debug(OMG_LOGID, F("Payload: %s" CR), payload.c_str());
+  } else {
+    Logger.error(OMG_LOGID, F("Error %d on GET request for \"%s\""), httpResponseCode, uri_latest.c_str());
+    gatewayState = GatewayState::ERROR;
+  }
+  http.end(); //Free the resources
+  Logger.notice(OMG_LOGID, F("Update check done, free heap: %d"), ESP.getFreeHeap());
+
+  // Firmware filename format: "${PIOENV}-${UNIX_TIME}-firmware.bin"
+
+  int first_dash_ix = -1;
+  int second_dash_ix = -1;
+
+  first_dash_ix = payload.indexOf('-');
+  if (first_dash_ix >= 0) {
+    second_dash_ix = payload.indexOf('-', first_dash_ix + 1);
+  }
+
+  String pioenv = "";
+  String version = "";
+  String suffix = "";
+
+  if ((first_dash_ix >= 0) && (second_dash_ix >= 0)) {
+    pioenv = payload.substring(0, first_dash_ix);
+    version = payload.substring(first_dash_ix + 1, second_dash_ix);
+    suffix = payload.substring(second_dash_ix + 1);
+  }
+  Logger.debug(OMG_LOGID, F("Pioenv: %s" CR), pioenv.c_str());
+  Logger.debug(OMG_LOGID, F("Version: %s" CR), version.c_str());
+  Logger.debug(OMG_LOGID, F("Suffix: %s" CR), suffix.c_str());
+
+  // Check that the filename is valid
+  if ((pioenv != ENV_NAME || suffix != "firmware.bin")) {
+    Logger.warning(OMG_LOGID, F("Invalid update file \"%s\" found on server" CR), payload.c_str());
+    return false;
+  }
+
+  const String url_firmware = OMG_LOCAL_OTA_BASE_URI + payload;
+
+  // Advertise the update we found, if the version is different
+  // from the current version
+  if (version != OMG_VERSION) {
+    StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
+    JsonObject jsondata = jsonBuffer.to<JsonObject>();
+
+    jsondata["origin"] = subjectRLStoMQTT;
+    jsondata["retain"] = true;
+    jsondata["installed_version"] = OMG_VERSION;
+    jsondata["version"] = version;
+    jsondata["url"] = url_firmware;
+    jsondata["release_summary"] = "Update file found on server";
+    enqueueJsonObject(jsondata);
+
+#ifdef OMG_LOCAL_OTA_AUTOMATIC
+
+    Logger.debug(OMG_LOGID, F("Update file found on server, upgrading" CR));
+
+    MQTTHttpsFWUpdate(subjectMQTTtoSYSupdate, jsondata);
+
+#else // OMG_LOCAL_OTA_AUTOMATIC
+
+    Logger.debug(OMG_LOGID, F("Update file found on server" CR));
+
+#endif // OMG_LOCAL_OTA_AUTOMATIC
+
+    return true;
+  } else {
+    Logger.debug(OMG_LOGID, F("No update file found on server" CR));
+    return false;
+  }
+}
+
+#endif // OMG_LOCAL_OTA_FW_UPDATE
 
 #if !MQTT_BROKER_MODE
 /**

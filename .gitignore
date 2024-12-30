@@ -2,6 +2,7 @@
 .vscode
 *_env.ini
 *.pem
+*.py
 **/.DS_Store
 node_modules
 *.ps1
