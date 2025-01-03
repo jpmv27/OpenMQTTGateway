@@ -25,7 +25,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorDS1820
+#ifdef OMG_SENSOR_DS1820
 #  include <DallasTemperature.h>
 #  include <OneWire.h>
 

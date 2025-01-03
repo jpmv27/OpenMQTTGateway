@@ -25,7 +25,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZgatewayGFSunInverter
+#ifdef OMG_GATEWAY_GFSUNINVERTER
 
 GfSun2000 GF = GfSun2000();
 

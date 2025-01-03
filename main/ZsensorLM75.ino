@@ -37,7 +37,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorLM75
+#ifdef OMG_SENSOR_LM75
 #  include <stdint.h>
 
 #  include "Temperature_LM75_Derived.h"

@@ -38,7 +38,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorBH1750
+#ifdef OMG_SENSOR_BH1750
 #  include "Wire.h" // Library for communication with I2C / TWI devices
 #  include "math.h" // Library for trig and exponential functions
 

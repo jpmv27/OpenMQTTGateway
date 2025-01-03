@@ -27,7 +27,7 @@
 */
 #include "User_config.h"
 
-#ifdef Zgateway2G
+#ifdef OMG_GATEWAY_2G
 
 #  include <A6lib.h> // library for controling A6 or A7 module
 #  include <ArduinoJson.h>

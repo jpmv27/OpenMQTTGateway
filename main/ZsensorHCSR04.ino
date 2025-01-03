@@ -29,7 +29,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorHCSR04
+#ifdef OMG_SENSOR_HCSR04
 
 unsigned long timeHCSR04 = 0;
 

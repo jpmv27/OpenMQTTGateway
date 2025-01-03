@@ -29,7 +29,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorDHT
+#ifdef OMG_SENSOR_DHT
 #  include <DHT.h>
 #  include <DHT_U.h>
 

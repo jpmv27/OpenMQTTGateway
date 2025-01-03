@@ -30,7 +30,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZgatewayRFM69
+#ifdef OMG_GATEWAY_RFM69
 
 #  include <EEPROM.h>
 #  include <RFM69.h> //https://www.github.com/lowpowerlab/rfm69

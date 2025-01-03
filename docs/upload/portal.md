@@ -68,7 +68,7 @@ lib_deps =
   ${libraries.ble}
 build_flags =
   ${com-esp.build_flags}
-  '-DZgatewayBT="BT"'
+  '-DOMG_GATEWAY_BT="BT"'
   '-DLED_INFO=33'
   '-DLED_INFO_ON=1'
   '-DESP32_ETHERNET=true'

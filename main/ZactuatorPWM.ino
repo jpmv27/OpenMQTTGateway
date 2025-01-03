@@ -67,7 +67,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZactuatorPWM
+#ifdef OMG_ACTUATOR_PWM
 
 #  include "config_PWM.h"
 

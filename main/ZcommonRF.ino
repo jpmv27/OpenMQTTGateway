@@ -24,14 +24,14 @@
 
 #include "User_config.h"
 
-#if defined(ZgatewayRF) || defined(ZgatewayPilight) || defined(ZgatewayRTL_433) || defined(ZgatewayRF2) || defined(ZactuatorSomfy)
+#if defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_GATEWAY_RTL_433) || defined(OMG_GATEWAY_RF2) || defined(OMG_ACTUATOR_SOMFY)
 
-#  ifdef ZradioCC1101
+#  ifdef OMG_RADIO_CC1101
 #    include <ELECHOUSE_CC1101_SRC_DRV.h>
 #  endif
 
 void initCC1101() {
-#  ifdef ZradioCC1101 //receiving with CC1101
+#  ifdef OMG_RADIO_CC1101 //receiving with CC1101
   // Loop on getCC1101() until it returns true and break after 10 attempts
   int delayMS = 16;
   int delayMaxMS = 500;
@@ -70,23 +70,23 @@ bool validFrequency(float mhz) {
 
 int currentReceiver = ACTIVE_NONE;
 
-#  if !defined(ZgatewayRFM69) && !defined(ZactuatorSomfy)
+#  if !defined(OMG_GATEWAY_RFM69) && !defined(OMG_ACTUATOR_SOMFY)
 // Check if a receiver is available
 bool validReceiver(int receiver) {
   switch (receiver) {
-#    ifdef ZgatewayPilight
+#    ifdef OMG_GATEWAY_PILIGHT
     case ACTIVE_PILIGHT:
       return true;
 #    endif
-#    ifdef ZgatewayRF
+#    ifdef OMG_GATEWAY_RF
     case ACTIVE_RF:
       return true;
 #    endif
-#    ifdef ZgatewayRTL_433
+#    ifdef OMG_GATEWAY_RTL_433
     case ACTIVE_RTL:
       return true;
 #    endif
-#    ifdef ZgatewayRF2
+#    ifdef OMG_GATEWAY_RF2
     case ACTIVE_RF2:
       return true;
 #    endif
@@ -102,22 +102,22 @@ void disableCurrentReceiver() {
   switch (currentReceiver) {
     case ACTIVE_NONE:
       break;
-#  ifdef ZgatewayPilight
+#  ifdef OMG_GATEWAY_PILIGHT
     case ACTIVE_PILIGHT:
       disablePilightReceive();
       break;
 #  endif
-#  ifdef ZgatewayRF
+#  ifdef OMG_GATEWAY_RF
     case ACTIVE_RF:
       disableRFReceive();
       break;
 #  endif
-#  ifdef ZgatewayRTL_433
+#  ifdef OMG_GATEWAY_RTL_433
     case ACTIVE_RTL:
       disableRTLreceive();
       break;
 #  endif
-#  ifdef ZgatewayRF2
+#  ifdef OMG_GATEWAY_RF2
     case ACTIVE_RF2:
       disableRF2Receive();
       break;
@@ -130,28 +130,28 @@ void disableCurrentReceiver() {
 void enableActiveReceiver() {
   Logger.debug(OMG_LOGID, F("enableActiveReceiver: %d" CR), RFConfig.activeReceiver);
   switch (RFConfig.activeReceiver) {
-#  ifdef ZgatewayPilight
+#  ifdef OMG_GATEWAY_PILIGHT
     case ACTIVE_PILIGHT:
       initCC1101();
       enablePilightReceive();
       currentReceiver = ACTIVE_PILIGHT;
       break;
 #  endif
-#  ifdef ZgatewayRF
+#  ifdef OMG_GATEWAY_RF
     case ACTIVE_RF:
       initCC1101();
       enableRFReceive();
       currentReceiver = ACTIVE_RF;
       break;
 #  endif
-#  ifdef ZgatewayRTL_433
+#  ifdef OMG_GATEWAY_RTL_433
     case ACTIVE_RTL:
       initCC1101();
       enableRTLreceive();
       currentReceiver = ACTIVE_RTL;
       break;
 #  endif
-#  ifdef ZgatewayRF2
+#  ifdef OMG_GATEWAY_RF2
     case ACTIVE_RF2:
       initCC1101();
       enableRF2Receive();
@@ -171,10 +171,10 @@ String stateRFMeasures() {
   StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
   JsonObject RFdata = jsonBuffer.to<JsonObject>();
   RFdata["active"] = RFConfig.activeReceiver;
-#  if defined(ZradioCC1101) || defined(ZradioSX127x)
+#  if defined(OMG_RADIO_CC1101) || defined(OMG_RADIO_SX127X)
   RFdata["frequency"] = RFConfig.frequency;
   if (RFConfig.activeReceiver == ACTIVE_RTL) {
-#    ifdef ZgatewayRTL_433
+#    ifdef OMG_GATEWAY_RTL_433
     RFdata["rssithreshold"] = (int)getRTLrssiThreshold();
     RFdata["rssi"] = (int)getRTLCurrentRSSI();
     RFdata["avgrssi"] = (int)getRTLAverageRSSI();
@@ -183,7 +183,7 @@ String stateRFMeasures() {
     extern TaskHandle_t rtl_433_DecoderHandle;
     RFdata["rtl433_stack"] = (int)uxTaskGetStackHighWaterMark(rtl_433_DecoderHandle);
 #    endif
-#    ifdef ZradioSX127x
+#    ifdef OMG_RADIO_SX127X
     RFdata["ookthreshold"] = (int)getOOKThresh();
 #    endif
   }
@@ -208,7 +208,7 @@ void RFConfig_fromJson(JsonObject& RFdata) {
     Config_update(RFdata, "active", RFConfig.activeReceiver);
     success = true;
   }
-#  ifdef ZgatewayRTL_433
+#  ifdef OMG_GATEWAY_RTL_433
   if (RFdata.containsKey("rssithreshold")) {
     Logger.notice(OMG_LOGID, F("RTL_433 RSSI Threshold : %d " CR), RFConfig.rssiThreshold);
     Config_update(RFdata, "rssithreshold", RFConfig.rssiThreshold);
@@ -254,7 +254,7 @@ void RFConfig_fromJson(JsonObject& RFdata) {
     jo["frequency"] = RFConfig.frequency;
     jo["active"] = RFConfig.activeReceiver;
 // Don't save those for now, need to be tested
-#    ifdef ZgatewayRTL_433
+#    ifdef OMG_GATEWAY_RTL_433
 //jo["rssithreshold"] = RFConfig.rssiThreshold;
 //jo["ookthreshold"] = RFConfig.newOokThreshold;
 #    endif

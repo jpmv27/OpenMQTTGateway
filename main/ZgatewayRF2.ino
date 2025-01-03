@@ -35,9 +35,9 @@ sudo mosquitto_pub -t home/commands/MQTTtoRF2/CODE_8233372/UNIT_0/PERIOD_272 -m/
 */
 #include "User_config.h"
 
-#ifdef ZgatewayRF2
+#ifdef OMG_GATEWAY_RF2
 
-#  ifdef ZradioCC1101
+#  ifdef OMG_RADIO_CC1101
 #    include <ELECHOUSE_CC1101_SRC_DRV.h>
 #  endif
 
@@ -233,7 +233,7 @@ void XtoRF2(const char* topicOri, const char* datacallback) {
       pub((char*)MQTTRF2string.c_str(), (char*)MQTTswitchType.c_str());
     }
   }
-#    ifdef ZradioCC1101
+#    ifdef OMG_RADIO_CC1101
   ELECHOUSE_cc1101.SetRx(RFConfig.frequency); // set Receive on
   NewRemoteReceiver::enable();
 #    endif

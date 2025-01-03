@@ -75,7 +75,7 @@ lib_deps =
 build_flags =
   ${env:nodemcuv2-pilight.build_flags}
   '-DOMG_GATEWAY_NAME="OpenMQTTGateway"'
-  '-DZsensorBME280="BME280"'
+  '-DOMG_SENSOR_BME280="BME280"'
   '-DOMG_MQTT_BASE_TOPIC="rf/"'
   '-DESPWifiManualSetup=true'
   '-DOMG_WIFI_SSID="mynetwork"'
@@ -145,7 +145,7 @@ If you want to add more sensors or gateways to one `default_envs` you can add th
 
 Example to add IR to `esp32dev-rf` add the `build_flags` below to the env definition:
 ``` ini
-  '-DZgatewayIR="IR"'
+  '-DOMG_GATEWAY_IR="IR"'
 ```
 
 ``` ini
@@ -157,8 +157,8 @@ lib_deps =
   ${libraries.rc-switch}
 build_flags =
   ${com-esp.build_flags}
-  '-DZgatewayRF="RF"'
-  '-DZgatewayIR="IR"'
+  '-DOMG_GATEWAY_RF="RF"'
+  '-DOMG_GATEWAY_IR="IR"'
   '-DOMG_GATEWAY_NAME="OpenMQTTGateway_ESP32_RF_IR"'
 ```
 
@@ -194,7 +194,7 @@ lib_deps =
   ${libraries.ble}
 build_flags =
   ${com-esp.build_flags}
-  '-DZgatewayBT="BT"'
+  '-DOMG_GATEWAY_BT="BT"'
   '-DOMG_GATEWAY_NAME="OpenMQTTGateway_ESP32"'
 upload_protocol = espota
 upload_port = 192.168.1.22

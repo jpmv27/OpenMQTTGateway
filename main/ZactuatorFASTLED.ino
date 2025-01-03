@@ -22,7 +22,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZactuatorFASTLED
+#ifdef OMG_ACTUATOR_FASTLED
 
 #  include <FastLED.h>
 

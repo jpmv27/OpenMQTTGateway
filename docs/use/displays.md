@@ -143,7 +143,7 @@ This example describes how to do it with the ESP32 board.
       ${com-esp32.build_flags}
       ...
     ; *** Generic SSD1306 OLED Options **
-      '-DZdisplaySSD1306="GenericSSD1306"'
+      '-DOMG_DISPLAY_SSD1306="GenericSSD1306"'
       '-DOLED_SDA=21'               ; SSD1306 pin SDA
       '-DOLED_SCL=22'               ; SSD1306 pin SCL
       '-DGenericSSD1306=true'

@@ -25,7 +25,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorGPIOKeyCode
+#ifdef OMG_SENSOR_GPIOKEYCODE
 
 int InputStateGPIOKeyCode = 0x0f; // Set to 3 so that it reads on startup
 int lastInputStateGPIOKeyCode = 0x0f;

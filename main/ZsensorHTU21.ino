@@ -37,7 +37,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorHTU21
+#ifdef OMG_SENSOR_HTU21
 #  include <stdint.h>
 
 #  include "SparkFunHTU21D.h"

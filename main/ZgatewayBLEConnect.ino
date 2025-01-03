@@ -1,6 +1,6 @@
 #ifdef ESP32
 #  include "User_config.h"
-#  ifdef ZgatewayBT
+#  ifdef OMG_GATEWAY_BT
 #    include "ArduinoJson.h"
 #    include "Elog.h"
 #    include "ZgatewayBLEConnect.h"
@@ -707,5 +707,5 @@ bool SBCU_connect::processActions(std::vector<BLEAction>& actions) {
   return result;
 }
 
-#  endif //ZgatewayBT
+#  endif // OMG_GATEWAY_BT
 #endif //ESP32

@@ -44,7 +44,7 @@ enum GatewayState {
 GatewayState gatewayState = GatewayState::WAITING_ONBOARDING;
 
 // Macros and structure to enable the duplicates removing on the following gateways
-#if defined(ZgatewayRF) || defined(ZgatewayIR) || defined(ZgatewaySRFB) || defined(ZgatewayWeatherStation) || defined(ZgatewayRTL_433)
+#if defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_IR) || defined(OMG_GATEWAY_SRFB) || defined(OMG_GATEWAY_WEATHERSTATION) || defined(OMG_GATEWAY_RTL_433)
 // array to store previous received RFs, IRs codes and their timestamps
 struct ReceivedSignal {
   uint64_t value;
@@ -113,7 +113,7 @@ StaticJsonDocument<JSON_MSG_BUFFER> modulesBuffer;
 JsonArray modules = modulesBuffer.to<JsonArray>();
 bool ethConnected = false;
 
-#ifndef ZgatewayGFSunInverter
+#ifndef OMG_GATEWAY_GFSUNINVERTER
 // Arduino IDE compiles, it automatically creates all the header declarations for all the functions you have in your *.ino file.
 // Unfortunately it ignores #if directives.
 // This is a simple workaround for this problem.
@@ -124,115 +124,115 @@ struct GfSun2000Data {};
 #if defined(ZwebUI) && defined(ESP32)
 #  include "config_WebUI.h"
 #endif
-#if defined(ZgatewayRF) || defined(ZgatewayRF2) || defined(ZgatewayPilight) || defined(ZactuatorSomfy) || defined(ZgatewayRTL_433)
+#if defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_RF2) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_ACTUATOR_SOMFY) || defined(OMG_GATEWAY_RTL_433)
 #  include "config_RF.h"
 #endif
-#ifdef ZgatewayWeatherStation
+#ifdef OMG_GATEWAY_WEATHERSTATION
 #  include "config_WeatherStation.h"
 #endif
-#ifdef ZgatewayGFSunInverter
+#ifdef OMG_GATEWAY_GFSUNINVERTER
 #  include "config_GFSunInverter.h"
 #endif
-#ifdef ZgatewayLORA
+#ifdef OMG_GATEWAY_LORA
 #  include "config_LORA.h"
 #endif
-#ifdef ZgatewaySRFB
+#ifdef OMG_GATEWAY_SRFB
 #  include "config_SRFB.h"
 #endif
-#ifdef ZgatewayBT
+#ifdef OMG_GATEWAY_BT
 #  include "config_BT.h"
 #endif
-#ifdef ZgatewayIR
+#ifdef OMG_GATEWAY_IR
 #  include "config_IR.h"
 #endif
-#ifdef Zgateway2G
+#ifdef OMG_GATEWAY_2G
 #  include "config_2G.h"
 #endif
-#ifdef ZactuatorONOFF
+#ifdef OMG_ACTUATOR_ONOFF
 #  include "config_ONOFF.h"
 #endif
-#ifdef ZsensorINA226
+#ifdef OMG_SENSOR_INA226
 #  include "config_INA226.h"
 #endif
-#ifdef ZsensorHCSR501
+#ifdef OMG_SENSOR_HCSR501
 #  include "config_HCSR501.h"
 #endif
-#ifdef ZsensorADC
+#ifdef OMG_SENSOR_ADC
 #  include "config_ADC.h"
 #endif
-#ifdef ZsensorBH1750
+#ifdef OMG_SENSOR_BH1750
 #  include "config_BH1750.h"
 #endif
-#ifdef ZsensorMQ2
+#ifdef OMG_SENSOR_MQ2
 #  include "config_MQ2.h"
 #endif
-#ifdef ZsensorTEMT6000
+#ifdef OMG_SENSOR_TEMT6000
 #  include "config_TEMT6000.h"
 #endif
-#ifdef ZsensorTSL2561
+#ifdef OMG_SENSOR_TSL2561
 #  include "config_TSL2561.h"
 #endif
-#ifdef ZsensorBME280
+#ifdef OMG_SENSOR_BME280
 #  include "config_BME280.h"
 #endif
-#ifdef ZsensorHTU21
+#ifdef OMG_SENSOR_HTU21
 #  include "config_HTU21.h"
 #endif
-#ifdef ZsensorLM75
+#ifdef OMG_SENSOR_LM75
 #  include "config_LM75.h"
 #endif
-#ifdef ZsensorAHTx0
+#ifdef OMG_SENSOR_AHTX0
 #  include "config_AHTx0.h"
 #endif
-#ifdef ZsensorRN8209
+#ifdef OMG_SENSOR_RN8209
 #  include "config_RN8209.h"
 #endif
-#ifdef ZsensorHCSR04
+#ifdef OMG_SENSOR_HCSR04
 #  include "config_HCSR04.h"
 #endif
-#ifdef ZsensorC37_YL83_HMRD
+#ifdef OMG_SENSOR_C37_YL83_HMRD
 #  include "config_C37_YL83_HMRD.h"
 #endif
-#ifdef ZsensorDHT
+#ifdef OMG_SENSOR_DHT
 #  include "config_DHT.h"
 #endif
-#ifdef ZsensorSHTC3
+#ifdef OMG_SENSOR_SHTC3
 #  include "config_SHTC3.h"
 #endif
-#ifdef ZsensorDS1820
+#ifdef OMG_SENSOR_DS1820
 #  include "config_DS1820.h"
 #endif
-#ifdef ZgatewayRFM69
+#ifdef OMG_GATEWAY_RFM69
 #  include "config_RFM69.h"
 #endif
-#ifdef ZsensorGPIOInput
+#ifdef OMG_SENSOR_GPIOINPUT
 #  include "config_GPIOInput.h"
 #endif
-#ifdef ZsensorGPIOKeyCode
+#ifdef OMG_SENSOR_GPIOKEYCODE
 #  include "config_GPIOKeyCode.h"
 #endif
-#ifdef ZsensorTouch
+#ifdef OMG_SENSOR_TOUCH
 #  include "config_Touch.h"
 #endif
 #ifdef OMG_MQTT_DISCOVERY
 #  include "config_mqttDiscovery.h"
 #endif
-#ifdef ZactuatorFASTLED
+#ifdef OMG_ACTUATOR_FASTLED
 #  include "config_FASTLED.h"
 #endif
-#ifdef ZactuatorPWM
+#ifdef OMG_ACTUATOR_PWM
 #  include "config_PWM.h"
 #endif
-#ifdef ZactuatorSomfy
+#ifdef OMG_ACTUATOR_SOMFY
 #  include "config_Somfy.h"
 #endif
-#if defined(ZboardM5STICKC) || defined(ZboardM5STICKCP) || defined(ZboardM5STACK) || defined(ZboardM5TOUGH)
+#if defined(OMG_BOARD_M5STICKC) || defined(OMG_BOARD_M5STICKCP) || defined(OMG_BOARD_M5STACK) || defined(OMG_BOARD_M5TOUGH)
 #  include "config_M5.h"
 #endif
-#if defined(ZdisplaySSD1306)
+#if defined(OMG_DISPLAY_SSD1306)
 #  include "config_SSD1306.h"
 #endif
-#if defined(ZgatewaySERIAL)
+#if defined(OMG_GATEWAY_SERIAL)
 #  include "config_SERIAL.h"
 #endif
 /*------------------------------------------------------------------------*/
@@ -318,13 +318,13 @@ void handle_autodiscovery() {
 
   if (publishDiscovery) {
     pubMqttDiscovery();
-#  ifdef ZgatewayLORA
+#  ifdef OMG_GATEWAY_LORA
     launchLORADiscovery(true);
 #  endif
-#  ifdef ZgatewayBT
+#  ifdef OMG_GATEWAY_BT
     launchBTDiscovery(true);
 #  endif
-#  ifdef ZgatewayRTL_433
+#  ifdef OMG_GATEWAY_RTL_433
     launchRTL_433Discovery(true);
 #  endif
   }
@@ -400,7 +400,7 @@ bool jsonDispatch(JsonObject& data) {
     if (SYSConfig.mqtt && !SYSConfig.offline) {
       res = pub(data);
     }
-#ifdef ZgatewaySERIAL
+#ifdef OMG_GATEWAY_SERIAL
     if (SYSConfig.serial) {
       char jsonStr[JSON_MSG_BUFFER_MAX];
       serializeJson(data, jsonStr);
@@ -493,7 +493,7 @@ void buildTopicFromId(JsonObject& Jsondata, const char* origin) {
     topic.erase(pos, 1);
     pos = topic.find(":", pos);
   }
-#ifdef ZgatewayBT
+#ifdef OMG_GATEWAY_BT
   if (BTConfig.pubBeaconUuidForTopic && !BTConfig.extDecoderEnable && Jsondata.containsKey("model_id") && Jsondata["model_id"].as<std::string>() == "IBEACON") {
     if (Jsondata.containsKey("uuid")) {
       topic = Jsondata["uuid"].as<std::string>();
@@ -591,7 +591,7 @@ bool pub(JsonObject& data) {
   }
 
 #if OMG_MQTT_VALUE_AS_A_TOPIC
-#  ifdef ZgatewayPilight
+#  ifdef OMG_GATEWAY_PILIGHT
   String value = data["value"];
   String protocol = data["protocol"];
   if (value != "null" && value != 0) {
@@ -1014,7 +1014,7 @@ void setupMQTT() {
       }
     }
 #  endif
-#  ifdef ZgatewayBT
+#  ifdef OMG_GATEWAY_BT
     BTProcessLock = !BTConfig.enabled; // Release BLE processes at start if enabled
 #  endif
     ProcessLock = false; // Release the loop process
@@ -1112,12 +1112,12 @@ void setupMQTT() {
 
   mqtt->subscribe(String(mqtt_topic) + g_gateway_name + subjectMQTTtoX, receivingDATA, mqtt_max_payload_size);
 
-#  ifdef ZgatewayRF
+#  ifdef OMG_GATEWAY_RF
   // subject on which other OMG will publish, this OMG will store these msg and by the way don't republish them if they have been already published
   mqtt->subscribe(subjectMultiGTWRF, receivingDATA, mqtt_max_payload_size);
 #  endif
 
-#  ifdef ZgatewayIR
+#  ifdef OMG_GATEWAY_IR
   // subject on which other OMG will publish, this OMG will store these msg and by the way don't republish them if they have been already published
   mqtt->subscribe(subjectMultiGTWIR, receivingDATA, mqtt_max_payload_size);
 #  endif
@@ -1339,7 +1339,7 @@ void setup() {
 #endif
 
 #ifdef ESP8266
-#  ifndef ZgatewaySRFB // if we are not in sonoff rf bridge case we apply the ESP8266 GPIO optimization
+#  ifndef OMG_GATEWAY_SRFB // if we are not in sonoff rf bridge case we apply the ESP8266 GPIO optimization
   Serial.end();
   Serial.begin(SERIAL_BAUD, SERIAL_8N1, SERIAL_TX_ONLY); // enable on ESP8266 to free some pin
 #  endif
@@ -1347,12 +1347,12 @@ void setup() {
   xTaskCreate(updateAndHandleLEDsTask, "updateAndHandleLEDsTask", 2500, NULL, 1, NULL);
   xQueueMutex = xSemaphoreCreateMutex();
   xMqttMutex = xSemaphoreCreateMutex();
-#  if defined(ZboardM5STICKC) || defined(ZboardM5STICKCP) || defined(ZboardM5STACK) || defined(ZboardM5TOUGH)
+#  if defined(OMG_BOARD_M5STICKC) || defined(OMG_BOARD_M5STICKCP) || defined(OMG_BOARD_M5STACK) || defined(OMG_BOARD_M5TOUGH)
   setupM5();
 #  endif
-#  if defined(ZdisplaySSD1306)
+#  if defined(OMG_DISPLAY_SSD1306)
   setupSSD1306();
-  modules.add(ZdisplaySSD1306);
+  modules.add(OMG_DISPLAY_SSD1306);
 #  endif
 #endif
 
@@ -1378,17 +1378,17 @@ void setup() {
 /*
  Note that the ONOFF module need to start after the RN8209 so that the overCurrent function is launched after the setup of the sensor
 */
-#ifdef ZsensorRN8209
+#ifdef OMG_SENSOR_RN8209
   setupRN8209();
-  modules.add(ZsensorRN8209);
+  modules.add(OMG_SENSOR_RN8209);
 #endif
-#ifdef ZactuatorONOFF
+#ifdef OMG_ACTUATOR_ONOFF
   setupONOFF();
-  modules.add(ZactuatorONOFF);
+  modules.add(OMG_ACTUATOR_ONOFF);
 #endif
-#ifdef ZgatewaySERIAL
+#ifdef OMG_GATEWAY_SERIAL
   setupSERIAL();
-  modules.add(ZgatewaySERIAL);
+  modules.add(OMG_GATEWAY_SERIAL);
 #endif
 
 #if defined(ESP32) && defined(USE_BLUFI)
@@ -1446,157 +1446,157 @@ void setup() {
 #endif
 
   delay(1500);
-#if defined(ZgatewayRF) || defined(ZgatewayPilight) || defined(ZgatewayRTL_433) || defined(ZgatewayRF2) || defined(ZactuatorSomfy)
+#if defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_GATEWAY_RTL_433) || defined(OMG_GATEWAY_RF2) || defined(OMG_ACTUATOR_SOMFY)
   setupCommonRF();
 #endif
-#ifdef ZsensorBME280
+#ifdef OMG_SENSOR_BME280
   setupZsensorBME280();
-  modules.add(ZsensorBME280);
+  modules.add(OMG_SENSOR_BME280);
 #endif
-#ifdef ZsensorHTU21
+#ifdef OMG_SENSOR_HTU21
   setupZsensorHTU21();
-  modules.add(ZsensorHTU21);
+  modules.add(OMG_SENSOR_HTU21);
 #endif
-#ifdef ZsensorLM75
+#ifdef OMG_SENSOR_LM75
   setupZsensorLM75();
-  modules.add(ZsensorLM75);
+  modules.add(OMG_SENSOR_LM75);
 #endif
-#ifdef ZsensorAHTx0
+#ifdef OMG_SENSOR_AHTX0
   setupZsensorAHTx0();
-  modules.add(ZsensorAHTx0);
+  modules.add(OMG_SENSOR_AHTX0);
 #endif
-#ifdef ZsensorBH1750
+#ifdef OMG_SENSOR_BH1750
   setupZsensorBH1750();
-  modules.add(ZsensorBH1750);
+  modules.add(OMG_SENSOR_BH1750);
 #endif
-#ifdef ZsensorMQ2
+#ifdef OMG_SENSOR_MQ2
   setupZsensorMQ2();
-  modules.add(ZsensorMQ2);
+  modules.add(OMG_SENSOR_MQ2);
 #endif
-#ifdef ZsensorTEMT6000
+#ifdef OMG_SENSOR_TEMT6000
   setupZsensorTEMT6000();
-  modules.add(ZsensorTEMT6000);
+  modules.add(OMG_SENSOR_TEMT6000);
 #endif
-#ifdef ZsensorTSL2561
+#ifdef OMG_SENSOR_TSL2561
   setupZsensorTSL2561();
-  modules.add(ZsensorTSL2561);
+  modules.add(OMG_SENSOR_TSL2561);
 #endif
-#ifdef Zgateway2G
+#ifdef OMG_GATEWAY_2G
   setup2G();
-  modules.add(Zgateway2G);
+  modules.add(OMG_GATEWAY_2G);
 #endif
-#ifdef ZgatewayIR
+#ifdef OMG_GATEWAY_IR
   setupIR();
-  modules.add(ZgatewayIR);
+  modules.add(OMG_GATEWAY_IR);
 #endif
-#ifdef ZgatewayLORA
+#ifdef OMG_GATEWAY_LORA
   setupLORA();
-  modules.add(ZgatewayLORA);
+  modules.add(OMG_GATEWAY_LORA);
 #endif
-#ifdef ZgatewayRF
-  modules.add(ZgatewayRF);
+#ifdef OMG_GATEWAY_RF
+  modules.add(OMG_GATEWAY_RF);
 #  define ACTIVE_RECEIVER ACTIVE_RF
 #endif
-#ifdef ZgatewayRF2
-  modules.add(ZgatewayRF2);
+#ifdef OMG_GATEWAY_RF2
+  modules.add(OMG_GATEWAY_RF2);
 #  ifdef ACTIVE_RECEIVER
 #    undef ACTIVE_RECEIVER
 #  endif
 #  define ACTIVE_RECEIVER ACTIVE_RF2
 #endif
-#ifdef ZgatewayPilight
-  modules.add(ZgatewayPilight);
+#ifdef OMG_GATEWAY_PILIGHT
+  modules.add(OMG_GATEWAY_PILIGHT);
 #  ifdef ACTIVE_RECEIVER
 #    undef ACTIVE_RECEIVER
 #  endif
 #  define ACTIVE_RECEIVER ACTIVE_PILIGHT
 #endif
-#ifdef ZgatewayWeatherStation
+#ifdef OMG_GATEWAY_WEATHERSTATION
   setupWeatherStation();
-  modules.add(ZgatewayWeatherStation);
+  modules.add(OMG_GATEWAY_WEATHERSTATION);
 #endif
-#ifdef ZgatewayGFSunInverter
+#ifdef OMG_GATEWAY_GFSUNINVERTER
   setupGFSunInverter();
-  modules.add(ZgatewayGFSunInverter);
+  modules.add(OMG_GATEWAY_GFSUNINVERTER);
 #endif
-#ifdef ZgatewaySRFB
+#ifdef OMG_GATEWAY_SRFB
   setupSRFB();
-  modules.add(ZgatewaySRFB);
+  modules.add(OMG_GATEWAY_SRFB);
 #endif
-#ifdef ZgatewayBT
+#ifdef OMG_GATEWAY_BT
   setupBT();
-  modules.add(ZgatewayBT);
+  modules.add(OMG_GATEWAY_BT);
 #endif
-#ifdef ZgatewayRFM69
+#ifdef OMG_GATEWAY_RFM69
   setupRFM69();
-  modules.add(ZgatewayRFM69);
+  modules.add(OMG_GATEWAY_RFM69);
 #endif
-#ifdef ZsensorINA226
+#ifdef OMG_SENSOR_INA226
   setupINA226();
-  modules.add(ZsensorINA226);
+  modules.add(OMG_SENSOR_INA226);
 #endif
-#ifdef ZsensorHCSR501
+#ifdef OMG_SENSOR_HCSR501
   setupHCSR501();
-  modules.add(ZsensorHCSR501);
+  modules.add(OMG_SENSOR_HCSR501);
 #endif
-#ifdef ZsensorHCSR04
+#ifdef OMG_SENSOR_HCSR04
   setupHCSR04();
-  modules.add(ZsensorHCSR04);
+  modules.add(OMG_SENSOR_HCSR04);
 #endif
-#ifdef ZsensorGPIOInput
+#ifdef OMG_SENSOR_GPIOINPUT
   setupGPIOInput();
-  modules.add(ZsensorGPIOInput);
+  modules.add(OMG_SENSOR_GPIOINPUT);
 #endif
-#ifdef ZsensorGPIOKeyCode
+#ifdef OMG_SENSOR_GPIOKEYCODE
   setupGPIOKeyCode();
-  modules.add(ZsensorGPIOKeyCode);
+  modules.add(OMG_SENSOR_GPIOKEYCODE);
 #endif
-#ifdef ZactuatorFASTLED
+#ifdef OMG_ACTUATOR_FASTLED
   setupFASTLED();
-  modules.add(ZactuatorFASTLED);
+  modules.add(OMG_ACTUATOR_FASTLED);
 #endif
-#ifdef ZactuatorPWM
+#ifdef OMG_ACTUATOR_PWM
   setupPWM();
-  modules.add(ZactuatorPWM);
+  modules.add(OMG_ACTUATOR_PWM);
 #endif
-#ifdef ZactuatorSomfy
+#ifdef OMG_ACTUATOR_SOMFY
 #  ifdef ACTIVE_RECEIVER
 #    undef ACTIVE_RECEIVER
 #  endif
 #  define ACTIVE_RECEIVER ACTIVE_NONE
   setupSomfy();
-  modules.add(ZactuatorSomfy);
+  modules.add(OMG_ACTUATOR_SOMFY);
 #endif
-#ifdef ZsensorDS1820
+#ifdef OMG_SENSOR_DS1820
   setupZsensorDS1820();
-  modules.add(ZsensorDS1820);
+  modules.add(OMG_SENSOR_DS1820);
 #endif
-#ifdef ZsensorADC
+#ifdef OMG_SENSOR_ADC
   setupADC();
-  modules.add(ZsensorADC);
+  modules.add(OMG_SENSOR_ADC);
 #endif
-#ifdef ZsensorTouch
+#ifdef OMG_SENSOR_TOUCH
   setupTouch();
-  modules.add(ZsensorTouch);
+  modules.add(OMG_SENSOR_TOUCH);
 #endif
-#ifdef ZsensorC37_YL83_HMRD
+#ifdef OMG_SENSOR_C37_YL83_HMRD
   setupZsensorC37_YL83_HMRD();
-  modules.add(ZsensorC37_YL83_HMRD);
+  modules.add(OMG_SENSOR_C37_YL83_HMRD);
 #endif
-#ifdef ZsensorDHT
+#ifdef OMG_SENSOR_DHT
   setupDHT();
-  modules.add(ZsensorDHT);
+  modules.add(OMG_SENSOR_DHT);
 #endif
-#ifdef ZsensorSHTC3
+#ifdef OMG_SENSOR_SHTC3
   setupSHTC3();
 #endif
-#ifdef ZgatewayRTL_433
+#ifdef OMG_GATEWAY_RTL_433
 #  ifdef ACTIVE_RECEIVER
 #    undef ACTIVE_RECEIVER
 #  endif
 #  define ACTIVE_RECEIVER ACTIVE_RTL
   setupRTL_433();
-  modules.add(ZgatewayRTL_433);
+  modules.add(OMG_GATEWAY_RTL_433);
 #endif
   Logger.debug(OMG_LOGID, F("mqtt_max_payload_size: %d" CR), mqtt_max_payload_size);
   SYSConfig.offline ? Logger.notice(OMG_LOGID, F("Offline enabled" CR)) : Logger.notice(0, F("Offline disabled" CR));
@@ -1653,7 +1653,7 @@ void setOTA() {
     last_ota_activity_millis = millis();
 #ifdef ESP32
     ProcessLock = true;
-#  ifdef ZgatewayBT
+#  ifdef OMG_GATEWAY_BT
     stopProcessing();
 #  endif
 #endif
@@ -1835,7 +1835,7 @@ void setupWiFiFromBuild() {
     delay(500);
     Logger.debug(OMG_LOGID, F("." CR));
     failure_number_ntwk++;
-#  if defined(ESP32) && defined(ZgatewayBT)
+#  if defined(ESP32) && defined(OMG_GATEWAY_BT)
     if (SYSConfig.powerMode) {
       if (failure_number_ntwk > maxConnectionRetryNetwork) {
         sleep();
@@ -1882,7 +1882,7 @@ void blockingWaitForReset() {
       if (digitalRead(TRIGGER_GPIO) == LOW) {
         Logger.notice(OMG_LOGID, F("Button Held" CR));
 // Switching off the relay during reset or failsafe operations
-#    ifdef ZactuatorONOFF
+#    ifdef OMG_ACTUATOR_ONOFF
         uint8_t level = digitalRead(ACTUATOR_ONOFF_GPIO);
         if (level == ACTUATOR_ON) {
           ActuatorTrigger();
@@ -1919,7 +1919,7 @@ void checkButton() {
   if (timeFromStart < TimeToResetAtStart) {
     blockingWaitForReset();
   } else { // When we are not at start we either check the button as a regular input (ZsensorGPIOInput used) or for a reset
-#    if defined(INPUT_GPIO) && defined(ZsensorGPIOInput) && INPUT_GPIO == TRIGGER_GPIO
+#    if defined(INPUT_GPIO) && defined(OMG_SENSOR_GPIOINPUT) && INPUT_GPIO == TRIGGER_GPIO
     MeasureGPIOInput();
 #    else
     blockingWaitForReset();
@@ -2454,12 +2454,12 @@ void sleep() {
   Logger.notice(OMG_LOGID, F("Entering deep sleep" CR));
   gatewayState = GatewayState::SLEEPING;
   delay(250); // To allow the LEDs to switch off and MQTT message to be sent
-#  if defined(ZboardM5STACK) || defined(ZboardM5STICKC) || defined(ZboardM5STICKCP) || defined(ZboardM5TOUGH)
+#  if defined(OMG_BOARD_M5STACK) || defined(OMG_BOARD_M5STICKC) || defined(OMG_BOARD_M5STICKCP) || defined(OMG_BOARD_M5TOUGH)
   sleepScreen();
   esp_sleep_enable_ext0_wakeup((gpio_num_t)SLEEP_BUTTON, LOW);
 #  endif
   Logger.debug(OMG_LOGID, F("Deactivating ESP32 components" CR));
-#  ifdef ZgatewayBT
+#  ifdef OMG_GATEWAY_BT
   stopProcessing();
   ProcessLock = true;
 #  endif
@@ -2501,9 +2501,9 @@ void loop() {
     // When online the MQTT connection callback release the processes
   }
   if (firstStart) {
-#ifdef ZgatewaySERIAL
+#ifdef OMG_GATEWAY_SERIAL
     if (SYSConfig.serial && isSerialReady()) {
-#  ifdef ZgatewayBT
+#  ifdef OMG_GATEWAY_BT
       BTProcessLock = !BTConfig.enabled;
 #  endif
       ProcessLock = false;
@@ -2516,7 +2516,7 @@ void loop() {
   }
   unsigned long now = millis();
 
-#ifdef ZgatewaySERIAL // Serial is a module and a communication layer so it's always processed
+#ifdef OMG_GATEWAY_SERIAL // Serial is a module and a communication layer so it's always processed
   SERIALtoX();
 #endif
 
@@ -2567,19 +2567,19 @@ void loop() {
     if (now > (timer_sys_measures + (TimeBetweenReadingSYS * 1000)) || !timer_sys_measures) {
       timer_sys_measures = millis();
       stateMeasures();
-#ifdef ZgatewayBT
+#ifdef OMG_GATEWAY_BT
       stateBTMeasures(false);
 #endif
-#ifdef ZactuatorONOFF
+#ifdef OMG_ACTUATOR_ONOFF
       stateONOFFMeasures();
 #endif
-#ifdef ZdisplaySSD1306
+#ifdef OMG_DISPLAY_SSD1306
       stateSSD1306Display();
 #endif
-#ifdef ZgatewayLORA
+#ifdef OMG_GATEWAY_LORA
       stateLORAMeasures();
 #endif
-#if defined(ZgatewayRTL_433) || defined(ZgatewayPilight) || defined(ZgatewayRF) || defined(ZgatewayRF2) || defined(ZactuatorSomfy)
+#if defined(OMG_GATEWAY_RTL_433) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_RF2) || defined(OMG_ACTUATOR_SOMFY)
       stateRFMeasures();
 #endif
 #if defined(ZwebUI) && defined(ESP32)
@@ -2587,118 +2587,118 @@ void loop() {
 #endif
     }
 // Function that doesn't need an active connection
-#if defined(ZboardM5STICKC) || defined(ZboardM5STICKCP) || defined(ZboardM5STACK) || defined(ZboardM5TOUGH)
+#if defined(OMG_BOARD_M5STICKC) || defined(OMG_BOARD_M5STICKCP) || defined(OMG_BOARD_M5STACK) || defined(OMG_BOARD_M5TOUGH)
     loopM5();
 #endif
-#if defined(ZdisplaySSD1306)
+#if defined(OMG_DISPLAY_SSD1306)
     loopSSD1306();
 #endif
-#ifdef ZsensorBME280
+#ifdef OMG_SENSOR_BME280
     MeasureTempHumAndPressure(); //Addon to measure Temperature, Humidity, Pressure and Altitude with a Bosch BME280/BMP280
 #endif
-#ifdef ZsensorHTU21
+#ifdef OMG_SENSOR_HTU21
     MeasureTempHum(); //Addon to measure Temperature, Humidity, of a HTU21 sensor
 #endif
-#ifdef ZsensorLM75
+#ifdef OMG_SENSOR_LM75
     MeasureTemp(); //Addon to measure Temperature of an LM75 sensor
 #endif
-#ifdef ZsensorAHTx0
+#ifdef OMG_SENSOR_AHTX0
     MeasureAHTTempHum(); //Addon to measure Temperature, Humidity, of an 'AHTx0' sensor
 #endif
-#ifdef ZsensorHCSR04
+#ifdef OMG_SENSOR_HCSR04
     MeasureDistance(); //Addon to measure distance with a HC-SR04
 #endif
-#ifdef ZsensorBH1750
+#ifdef OMG_SENSOR_BH1750
     MeasureLightIntensity(); //Addon to measure Light Intensity with a BH1750
 #endif
-#ifdef ZsensorMQ2
+#ifdef OMG_SENSOR_MQ2
     MeasureGasMQ2();
 #endif
-#ifdef ZsensorTEMT6000
+#ifdef OMG_SENSOR_TEMT6000
     MeasureLightIntensityTEMT6000();
 #endif
-#ifdef ZsensorTSL2561
+#ifdef OMG_SENSOR_TSL2561
     MeasureLightIntensityTSL2561();
 #endif
-#ifdef ZsensorC37_YL83_HMRD
+#ifdef OMG_SENSOR_C37_YL83_HMRD
     MeasureC37_YL83_HMRDWater(); //Addon for leak detection with a C-37 YL-83 H-MRD
 #endif
-#ifdef ZsensorDHT
+#ifdef OMG_SENSOR_DHT
     MeasureTempAndHum(); //Addon to measure the temperature with a DHT
 #endif
-#ifdef ZsensorSHTC3
+#ifdef OMG_SENSOR_SHTC3
     MeasureTempAndHum(); //Addon to measure the temperature with a DHT
 #endif
-#ifdef ZsensorDS1820
+#ifdef OMG_SENSOR_DS1820
     MeasureDS1820Temp(); //Addon to measure the temperature with DS1820 sensor(s)
 #endif
-#ifdef ZsensorINA226
+#ifdef OMG_SENSOR_INA226
     MeasureINA226();
 #endif
-#ifdef ZsensorHCSR501
+#ifdef OMG_SENSOR_HCSR501
     MeasureHCSR501();
 #endif
-#ifdef ZsensorGPIOInput
+#ifdef OMG_SENSOR_GPIOINPUT
     MeasureGPIOInput();
 #endif
-#ifdef ZsensorGPIOKeyCode
+#ifdef OMG_SENSOR_GPIOKEYCODE
     MeasureGPIOKeyCode();
 #endif
-#ifdef ZsensorADC
+#ifdef OMG_SENSOR_ADC
     MeasureADC(); //Addon to measure the analog value of analog pin
 #endif
-#ifdef ZsensorTouch
+#ifdef OMG_SENSOR_TOUCH
     MeasureTouch();
 #endif
-#ifdef ZgatewayLORA
+#ifdef OMG_GATEWAY_LORA
     LORAtoX();
 #  ifdef OMG_MQTT_DISCOVERY
     if (SYSConfig.discovery)
       launchLORADiscovery(false);
 #  endif
 #endif
-#ifdef ZgatewayRF
+#ifdef OMG_GATEWAY_RF
     RFtoX();
 #endif
-#ifdef ZgatewayRF2
+#ifdef OMG_GATEWAY_RF2
     RF2toX();
 #endif
-#ifdef ZgatewayWeatherStation
+#ifdef OMG_GATEWAY_WEATHERSTATION
     ZgatewayWeatherStationtoX();
 #endif
-#ifdef ZgatewayGFSunInverter
+#ifdef OMG_GATEWAY_GFSUNINVERTER
     ZgatewayGFSunInverterMQTT();
 #endif
-#ifdef ZgatewayPilight
+#ifdef OMG_GATEWAY_PILIGHT
     PilighttoX();
 #endif
-#ifdef ZgatewayBT
+#ifdef OMG_GATEWAY_BT
 #  ifdef OMG_MQTT_DISCOVERY
     if (SYSConfig.discovery)
       launchBTDiscovery(false);
 #  endif
 #endif
-#ifdef ZgatewaySRFB
+#ifdef OMG_GATEWAY_SRFB
     SRFBtoX();
 #endif
-#ifdef ZgatewayIR
+#ifdef OMG_GATEWAY_IR
     IRtoX();
 #endif
-#ifdef Zgateway2G
+#ifdef OMG_GATEWAY_2G
     if (_2GtoX())
       Logger.debug(OMG_LOGID, F("2GtoMQTT OK" CR));
 #endif
-#ifdef ZgatewayRFM69
+#ifdef OMG_GATEWAY_RFM69
     if (RFM69toX())
       Logger.debug(OMG_LOGID, F("RFM69toMQTT OK" CR));
 #endif
-#ifdef ZactuatorFASTLED
+#ifdef OMG_ACTUATOR_FASTLED
     FASTLEDLoop();
 #endif
-#ifdef ZactuatorPWM
+#ifdef OMG_ACTUATOR_PWM
     PWMLoop();
 #endif
-#ifdef ZgatewayRTL_433
+#ifdef OMG_GATEWAY_RTL_433
     RTL_433Loop();
 #  ifdef OMG_MQTT_DISCOVERY
     if (SYSConfig.discovery)
@@ -2797,7 +2797,7 @@ String stateMeasures() {
   uint32_t freeMem;
   uint32_t minFreeMem;
   freeMem = ESP.getFreeHeap();
-#ifdef ZgatewayRTL_433
+#ifdef OMG_GATEWAY_RTL_433
   // Some RTL_433 decoders have memory leak, this is a temporary workaround
   if (freeMem < MinimumMemory) {
     Logger.error(OMG_LOGID, F("Not enough memory %d, restarting" CR), freeMem);
@@ -2841,13 +2841,13 @@ String stateMeasures() {
     SYSdata["ip"] = TheengsUtils::ip2CharArray(WiFi.localIP());
     SYSdata["mac"] = (char*)WiFi.macAddress().c_str();
   }
-#ifdef ZboardM5STACK
+#ifdef OMG_BOARD_M5STACK
   M5.Power.begin();
   SYSdata["m5battlevel"] = (int8_t)M5.Power.getBatteryLevel();
   SYSdata["m5ischarging"] = (bool)M5.Power.isCharging();
   SYSdata["m5ischargefull"] = (bool)M5.Power.isChargeFull();
 #endif
-#if defined(ZboardM5STICKC) || defined(ZboardM5STICKCP) || defined(ZboardM5TOUGH)
+#if defined(OMG_BOARD_M5STICKC) || defined(OMG_BOARD_M5STICKCP) || defined(OMG_BOARD_M5TOUGH)
   M5.Axp.EnableCoulombcounter();
   SYSdata["m5batvoltage"] = (float)M5.Axp.GetBatVoltage();
   SYSdata["m5batcurrent"] = (float)M5.Axp.GetBatCurrent();
@@ -2883,7 +2883,7 @@ String stateMeasures() {
   return output;
 }
 
-#if defined(ZgatewayRF) || defined(ZgatewayIR) || defined(ZgatewaySRFB) || defined(ZgatewayWeatherStation) || defined(ZgatewayRTL_433)
+#if defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_IR) || defined(OMG_GATEWAY_SRFB) || defined(OMG_GATEWAY_WEATHERSTATION) || defined(OMG_GATEWAY_RTL_433)
 /**
  * Store signal values from RF, IR, SRFB or Weather stations so as to avoid duplicates
  */
@@ -2976,7 +2976,7 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
     Logger.debug(OMG_LOGID, F("MQTT Msg topic: %s" CR), strTopicOri.c_str());
   }
 
-#if defined(ZgatewayRF) || defined(ZgatewayIR) || defined(ZgatewaySRFB) || defined(ZgatewayWeatherStation)
+#if defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_IR) || defined(OMG_GATEWAY_SRFB) || defined(OMG_GATEWAY_WEATHERSTATION)
   if (strstr(strTopicOri.c_str(), subjectMultiGTWKey) != NULL) { // storing received value so as to avoid publishing this value if it has been already sent by this or another OpenMQTTGateway
     uint64_t data = jsondata.isNull() ? strtoull(datacallback, NULL, 10) : jsondata["value"];
     if (data != 0 && !isAduplicateSignal(data)) {
@@ -2991,56 +2991,56 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
     serializeJson(jsondata, buffer);
     //Logger.notice(OMG_LOGID, F("[ MQTT->OMG ]: %s" CR), buffer.c_str());
 
-#ifdef ZgatewayPilight // ZgatewayPilight is only defined with json publishing due to its numerous parameters
+#ifdef OMG_GATEWAY_PILIGHT // OMG_GATEWAY_PILIGHT is only defined with json publishing due to its numerous parameters
     XtoPilight(strTopicOri.c_str(), jsondata);
 #endif
-#if defined(ZgatewayRTL_433) || defined(ZgatewayPilight) || defined(ZgatewayRF) || defined(ZgatewayRF2) || defined(ZactuatorSomfy)
+#if defined(OMG_GATEWAY_RTL_433) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_RF2) || defined(OMG_ACTUATOR_SOMFY)
     XtoRFset(strTopicOri.c_str(), jsondata);
 #endif
 #if jsonReceiving
-#  ifdef ZgatewayLORA
+#  ifdef OMG_GATEWAY_LORA
     XtoLORA(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef ZgatewayRF
+#  ifdef OMG_GATEWAY_RF
     XtoRF(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef ZgatewayRF2
+#  ifdef OMG_GATEWAY_RF2
     XtoRF2(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef Zgateway2G
+#  ifdef OMG_GATEWAY_2G
     Xto2G(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef ZgatewaySRFB
+#  ifdef OMG_GATEWAY_SRFB
     XtoSRFB(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef ZgatewayIR
+#  ifdef OMG_GATEWAY_IR
     XtoIR(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef ZgatewayRFM69
+#  ifdef OMG_GATEWAY_RFM69
     XtoRFM69(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef ZgatewayBT
+#  ifdef OMG_GATEWAY_BT
     XtoBT(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef ZactuatorFASTLED
+#  ifdef OMG_ACTUATOR_FASTLED
     XtoFASTLED(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef ZactuatorPWM
+#  ifdef OMG_ACTUATOR_PWM
     XtoPWM(strTopicOri.c_str(), jsondata);
 #  endif
-#  if defined(ZboardM5STICKC) || defined(ZboardM5STICKCP) || defined(ZboardM5STACK) || defined(ZboardM5TOUGH)
+#  if defined(OMG_BOARD_M5STICKC) || defined(OMG_BOARD_M5STICKCP) || defined(OMG_BOARD_M5STACK) || defined(OMG_BOARD_M5TOUGH)
     XtoM5(strTopicOri.c_str(), jsondata);
 #  endif
-#  if defined(ZdisplaySSD1306)
+#  if defined(OMG_DISPLAY_SSD1306)
     XtoSSD1306(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef ZactuatorONOFF
+#  ifdef OMG_ACTUATOR_ONOFF
     XtoONOFF(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef ZactuatorSomfy
+#  ifdef OMG_ACTUATOR_SOMFY
     XtoSomfy(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef ZgatewaySERIAL
+#  ifdef OMG_GATEWAY_SERIAL
     XtoSERIAL(strTopicOri.c_str(), jsondata);
 #  endif
 #  ifdef OMG_MQTT_HTTPS_FW_UPDATE
@@ -3054,32 +3054,32 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
     XtoSYS(strTopicOri.c_str(), jsondata);
   } else { // not a json object --> simple decoding
 #if simpleReceiving
-#  ifdef ZgatewayLORA
+#  ifdef OMG_GATEWAY_LORA
     XtoLORA(strTopicOri.c_str(), datacallback);
 #  endif
-#  ifdef ZgatewayRF
+#  ifdef OMG_GATEWAY_RF
     XtoRF(strTopicOri.c_str(), datacallback);
 #  endif
-#  ifdef ZgatewayRF315
+#  ifdef OMG_GATEWAY_RF315
     XtoRF315(strTopicOri.c_str(), datacallback);
 #  endif
-#  ifdef ZgatewayRF2
+#  ifdef OMG_GATEWAY_RF2
     XtoRF2(strTopicOri.c_str(), datacallback);
 #  endif
-#  ifdef Zgateway2G
+#  ifdef OMG_GATEWAY_2G
     Xto2G(strTopicOri.c_str(), datacallback);
 #  endif
-#  ifdef ZgatewaySRFB
+#  ifdef OMG_GATEWAY_SRFB
     XtoSRFB(strTopicOri.c_str(), datacallback);
 #  endif
-#  ifdef ZgatewayRFM69
+#  ifdef OMG_GATEWAY_RFM69
     XtoRFM69(strTopicOri.c_str(), datacallback);
 #  endif
-#  ifdef ZactuatorFASTLED
+#  ifdef OMG_ACTUATOR_FASTLED
     XtoFASTLED(strTopicOri.c_str(), datacallback);
 #  endif
 #endif
-#ifdef ZactuatorONOFF
+#ifdef OMG_ACTUATOR_ONOFF
     XtoONOFF(strTopicOri.c_str(), datacallback);
 #endif
   }
@@ -3210,7 +3210,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
       }
 #  ifdef ESP32
       ProcessLock = true;
-#    ifdef ZgatewayBT
+#    ifdef OMG_GATEWAY_BT
       stopProcessing();
 #    endif
 #  endif
@@ -3349,7 +3349,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
 
   ProcessLock = true;
 
-#    ifdef ZgatewayBT
+#    ifdef OMG_GATEWAY_BT
   stopProcessing();
 #    endif
 
@@ -3546,7 +3546,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       if (SYSdata["rgbb"] >= 0 && SYSdata["rgbb"] <= 255) {
         SYSConfig.rgbbrightness = TheengsUtils::round2(SYSdata["rgbb"]);
         ledManager.setBrightness(SYSConfig.rgbbrightness);
-#  ifdef ZactuatorONOFF
+#  ifdef OMG_ACTUATOR_ONOFF
         updatePowerIndicator();
 #  endif
         Logger.notice(OMG_LOGID, F("RGB brightness: %d" CR), SYSConfig.rgbbrightness);
@@ -3566,7 +3566,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
     if (SYSdata.containsKey("wifi_ssid") && SYSdata["wifi_ssid"].is<const char*>() && SYSdata.containsKey("wifi_pass") && SYSdata["wifi_pass"].is<const char*>()) {
 #ifdef ESP32
       ProcessLock = true;
-#  ifdef ZgatewayBT
+#  ifdef OMG_GATEWAY_BT
       stopProcessing();
 #  endif
 #endif
@@ -3726,7 +3726,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       // Stop the processing/disconnect
 #    ifdef ESP32
       ProcessLock = true;
-#      ifdef ZgatewayBT
+#      ifdef OMG_GATEWAY_BT
       stopProcessing();
 #      endif
 #    endif

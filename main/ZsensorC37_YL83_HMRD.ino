@@ -23,7 +23,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorC37_YL83_HMRD
+#ifdef OMG_SENSOR_C37_YL83_HMRD
 
 //Time used to wait for an interval before resending temp and hum
 unsigned long timeC37YL83HMRD = 0;

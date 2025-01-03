@@ -28,7 +28,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZactuatorONOFF
+#ifdef OMG_ACTUATOR_ONOFF
 
 #  ifdef ESP32
 // Global struct to store live ONOFF configuration data

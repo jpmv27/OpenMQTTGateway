@@ -47,7 +47,7 @@ String getUniqueId(String name, String sufix) {
   return String(uniqueId);
 }
 
-#  if defined(ZgatewayBT) || defined(SecondaryModule)
+#  if defined(OMG_GATEWAY_BT) || defined(SecondaryModule)
 /**
  * Create a discover messages form a list of attribute
  * 
@@ -466,7 +466,7 @@ void eraseTopic(const char* sensor_type, const char* unique_id) {
   pubMQTT((char*)topic.c_str(), "", true);
 }
 
-#  if defined(ZgatewayBT) || defined(SecondaryModule)
+#  if defined(OMG_GATEWAY_BT) || defined(SecondaryModule)
 void btPresenceParametersDiscovery() {
   createDiscovery("number", //set Type
                   subjectBTtoMQTT, "BT: Presence/Tracker timeout", (char*)getUniqueId("presenceawaytimer", "").c_str(), //set state_topic,name,uniqueId
@@ -605,7 +605,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifdef ZdisplaySSD1306
+#  ifdef OMG_DISPLAY_SSD1306
   createDiscovery("switch", //set Type
                   subjectSSD1306toMQTT, "SSD1306: Control", (char*)getUniqueId("onstate", "").c_str(), //set state_topic,name,uniqueId
                   will_Topic, "", "{{ value_json.onstate }}", //set availability_topic,device_class,value_template,
@@ -658,7 +658,7 @@ void pubMqttDiscovery() {
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC
                   stateClassMeasurement //State Class
   );
-#    if defined(ZboardM5STICKC) || defined(ZboardM5STICKCP) || defined(ZboardM5TOUGH)
+#    if defined(OMG_BOARD_M5STICKC) || defined(OMG_BOARD_M5STICKCP) || defined(OMG_BOARD_M5TOUGH)
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTT, "SYS: Bat voltage", (char*)getUniqueId("m5batvoltage", "").c_str(), //set state_topic,name,uniqueId
                   will_Topic, "voltage", "{{ value_json.m5batvoltage }}", //set availability_topic,device_class,value_template,
@@ -696,7 +696,7 @@ void pubMqttDiscovery() {
                   stateClassNone //State Class
   );
 #    endif
-#    ifdef ZboardM5STACK
+#    ifdef OMG_BOARD_M5STACK
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTT, "SYS: Batt level", (char*)getUniqueId("m5battlevel", "").c_str(), //set state_topic,name,uniqueId
                   will_Topic, "battery", "{{ value_json.m5battlevel }}", //set availability_topic,device_class,value_template,
@@ -756,7 +756,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifdef ZsensorBME280
+#  ifdef OMG_SENSOR_BME280
 #    define BMEparametersCount 5
   Logger.debug(OMG_LOGID, F("bme280Discovery" CR));
   char* BMEsensor[BMEparametersCount][8] = {
@@ -780,7 +780,7 @@ void pubMqttDiscovery() {
   }
 #  endif
 
-#  ifdef ZsensorHTU21
+#  ifdef OMG_SENSOR_HTU21
 #    define HTUparametersCount 2
   Logger.debug(OMG_LOGID, F("htu21Discovery" CR));
   char* HTUsensor[HTUparametersCount][8] = {
@@ -802,7 +802,7 @@ void pubMqttDiscovery() {
   }
 #  endif
 
-#  ifdef ZsensorLM75
+#  ifdef OMG_SENSOR_LM75
   Logger.debug(OMG_LOGID, F("LM75Discovery" CR));
   char* LM75sensor[8] = {"sensor", "temp", "htu", "temperature", jsonTempc, "", "", "°C"};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
@@ -817,7 +817,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifdef ZsensorAHTx0
+#  ifdef OMG_SENSOR_AHTX0
 #    define AHTparametersCount 2
   Logger.debug(OMG_LOGID, F("AHTx0Discovery" CR));
   char* AHTsensor[AHTparametersCount][8] = {
@@ -838,7 +838,7 @@ void pubMqttDiscovery() {
   }
 #  endif
 
-#  ifdef ZsensorDHT
+#  ifdef OMG_SENSOR_DHT
 #    define DHTparametersCount 2
   Logger.debug(OMG_LOGID, F("DHTDiscovery" CR));
   char* DHTsensor[DHTparametersCount][8] = {
@@ -860,7 +860,7 @@ void pubMqttDiscovery() {
   }
 #  endif
 
-#  ifdef ZsensorADC
+#  ifdef OMG_SENSOR_ADC
   Logger.debug(OMG_LOGID, F("ADCDiscovery" CR));
   char* ADCsensor[8] = {"sensor", "adc", "", "", jsonAdc, "", "", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
@@ -876,7 +876,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifdef ZsensorBH1750
+#  ifdef OMG_SENSOR_BH1750
 #    define BH1750parametersCount 3
   Logger.debug(OMG_LOGID, F("BH1750Discovery" CR));
   char* BH1750sensor[BH1750parametersCount][8] = {
@@ -899,7 +899,7 @@ void pubMqttDiscovery() {
   }
 #  endif
 
-#  ifdef ZsensorMQ2
+#  ifdef OMG_SENSOR_MQ2
 #    define MQ2parametersCount 2
   Logger.debug(OMG_LOGID, F("MQ2Discovery" CR));
   char* MQ2sensor[MQ2parametersCount][8] = {
@@ -920,7 +920,7 @@ void pubMqttDiscovery() {
   }
 #  endif
 
-#  ifdef ZsensorTEMT6000
+#  ifdef OMG_SENSOR_TEMT6000
 #    define TEMT6000parametersCount 3
   Logger.debug(OMG_LOGID, F("TEMT6000Discovery" CR));
   char* TEMT6000sensor[TEMT6000parametersCount][8] = {
@@ -943,7 +943,7 @@ void pubMqttDiscovery() {
   }
 #  endif
 
-#  ifdef ZsensorTSL2561
+#  ifdef OMG_SENSOR_TSL2561
 #    define TSL2561parametersCount 3
   Logger.debug(OMG_LOGID, F("TSL2561Discovery" CR));
   char* TSL2561sensor[TSL2561parametersCount][8] = {
@@ -966,7 +966,7 @@ void pubMqttDiscovery() {
   }
 #  endif
 
-#  ifdef ZsensorHCSR501
+#  ifdef OMG_SENSOR_HCSR501
   Logger.debug(OMG_LOGID, F("HCSR501Discovery" CR));
   char* HCSR501sensor[8] = {"binary_sensor", "hcsr501", "", "motion", jsonPresence, "true", "false", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
@@ -982,7 +982,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifdef ZsensorGPIOInput
+#  ifdef OMG_SENSOR_GPIOINPUT
   Logger.debug(OMG_LOGID, F("GPIOInputDiscovery" CR));
   char* GPIOInputsensor[8] = {"binary_sensor", "GPIOInput", "", "", jsonGpio, INPUT_GPIO_ON_VALUE, INPUT_GPIO_OFF_VALUE, ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
@@ -998,7 +998,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifdef ZsensorINA226
+#  ifdef OMG_SENSOR_INA226
 #    define INA226parametersCount 3
   Logger.debug(OMG_LOGID, F("INA226Discovery" CR));
   char* INA226sensor[INA226parametersCount][8] = {
@@ -1021,12 +1021,12 @@ void pubMqttDiscovery() {
   }
 #  endif
 
-#  ifdef ZsensorDS1820
+#  ifdef OMG_SENSOR_DS1820
   // Publish any DS1820 sensors found on the OneWire bus
   pubOneWire_HADiscovery();
 #  endif
 
-#  ifdef ZactuatorONOFF
+#  ifdef OMG_ACTUATOR_ONOFF
   Logger.debug(OMG_LOGID, F("actuatorONOFFDiscovery" CR));
   char* actuatorONOFF[8] = {"switch", "actuatorONOFF", "", "", "{{ value_json.cmd }}", "{\"cmd\":1}", "{\"cmd\":0}", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
@@ -1043,7 +1043,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifdef ZsensorRN8209
+#  ifdef OMG_SENSOR_RN8209
 #    define RN8209parametersCount 4
   Logger.debug(OMG_LOGID, F("RN8209Discovery" CR));
   char* RN8209sensor[RN8209parametersCount][8] = {
@@ -1067,7 +1067,7 @@ void pubMqttDiscovery() {
   }
 #  endif
 
-#  ifdef ZgatewayRF
+#  ifdef OMG_GATEWAY_RF
   // Sensor to display RF received value
   Logger.debug(OMG_LOGID, F("gatewayRFDiscovery" CR));
   char* gatewayRF[8] = {"sensor", "gatewayRF", "", "", jsonVal, "", "", ""};
@@ -1085,7 +1085,7 @@ void pubMqttDiscovery() {
 
 #  endif
 
-#  ifdef ZgatewayRF2
+#  ifdef OMG_GATEWAY_RF2
   // Sensor to display RF received value
   Logger.debug(OMG_LOGID, F("gatewayRF2Discovery" CR));
   char* gatewayRF2[8] = {"sensor", "gatewayRF2", "", "", jsonAddress, "", "", ""};
@@ -1102,7 +1102,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifdef ZgatewayRFM69
+#  ifdef OMG_GATEWAY_RFM69
   // Sensor to display RF received value
   Logger.debug(OMG_LOGID, F("gatewayRFM69Discovery" CR));
   char* gatewayRFM69[8] = {"sensor", "gatewayRFM69", "", "", jsonVal, "", "", ""};
@@ -1119,7 +1119,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifdef ZgatewayLORA
+#  ifdef OMG_GATEWAY_LORA
   // Sensor to display RF received value
   Logger.debug(OMG_LOGID, F("gatewayLORADiscovery" CR));
   char* gatewayLORA[8] = {"sensor", "gatewayLORA", "", "", jsonMsg, "", "", ""};
@@ -1169,7 +1169,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifdef ZgatewaySRFB
+#  ifdef OMG_GATEWAY_SRFB
   // Sensor to display RF received value
   Logger.debug(OMG_LOGID, F("gatewaySRFBDiscovery" CR));
   char* gatewaySRFB[8] = {"sensor", "gatewaySRFB", "", "", jsonVal, "", "", ""};
@@ -1186,7 +1186,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifdef ZgatewayPilight
+#  ifdef OMG_GATEWAY_PILIGHT
   // Sensor to display RF received value
   Logger.debug(OMG_LOGID, F("gatewayPilightDiscovery" CR));
   char* gatewayPilight[8] = {"sensor", "gatewayPilight", "", "", jsonMsg, "", "", ""};
@@ -1203,7 +1203,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifdef ZgatewayIR
+#  ifdef OMG_GATEWAY_IR
   // Sensor to display IR received value
   Logger.debug(OMG_LOGID, F("gatewayIRDiscovery" CR));
   char* gatewayIR[8] = {"sensor", "gatewayIR", "", "", jsonVal, "", "", ""};
@@ -1220,7 +1220,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifdef Zgateway2G
+#  ifdef OMG_GATEWAY_2G
   // Sensor to display 2G received value
   Logger.debug(OMG_LOGID, F("gateway2GDiscovery" CR));
   char* gateway2G[8] = {"sensor", "gateway2G", "", "", jsonMsg, "", "", ""};
@@ -1237,7 +1237,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  if defined(ZgatewayBT) || defined(SecondaryModule)
+#  if defined(OMG_GATEWAY_BT) || defined(SecondaryModule)
 #    ifdef ESP32
 
   createDiscovery("number", //set Type

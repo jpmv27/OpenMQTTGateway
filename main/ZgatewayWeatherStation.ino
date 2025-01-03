@@ -25,7 +25,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZgatewayWeatherStation
+#ifdef OMG_GATEWAY_WEATHERSTATION
 #  include <WeatherStationDataRx.h>
 WeatherStationDataRx wsdr(RF_WS_RECEIVER_GPIO, true);
 
