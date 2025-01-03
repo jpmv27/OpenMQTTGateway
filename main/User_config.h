@@ -200,22 +200,22 @@
 #  define NTP_SERVER "pool.ntp.org"
 #endif
 
-#ifndef LOG_TO_SYSLOG
-#  define LOG_TO_SYSLOG false
+#ifndef OMG_LOG_TO_SYSLOG
+#  define OMG_LOG_TO_SYSLOG false
 #endif
 
-#if LOG_TO_SYSLOG
+#if OMG_LOG_TO_SYSLOG
 #  ifndef ELOG_SYSLOG_ENABLE
 #    error ELOG_SYSLOG_ENABLE must be defined
 #  endif
-#  ifndef SYSLOG_SERVER
-#    error SYSLOG_SERVER must be defined
+#  ifndef OMG_SYSLOG_SERVER
+#    error OMG_SYSLOG_SERVER must be defined
 #  endif
-#  ifndef SYSLOG_PORT
-#    define SYSLOG_PORT "514"
+#  ifndef OMG_SYSLOG_PORT
+#    define OMG_SYSLOG_PORT "514"
 #  endif
-#  ifndef SYSLOG_FACILITY
-#    define SYSLOG_FACILITY FAC_USER
+#  ifndef OMG_SYSLOG_FACILITY
+#    define OMG_SYSLOG_FACILITY ELOG_FAC_USER
 #  endif
 #endif
 
@@ -620,9 +620,9 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #ifndef LOG_LEVEL
 #  define LOG_LEVEL ELOG_LEVEL_NOTICE
 #endif
-#if LOG_TO_SYSLOG
-#  ifndef LOG_LEVEL_SYSLOG
-#    define LOG_LEVEL_SYSLOG LOG_LEVEL
+#if OMG_LOG_TO_SYSLOG
+#  ifndef OMG_LOG_LEVEL_SYSLOG
+#    define OMG_LOG_LEVEL_SYSLOG LOG_LEVEL
 #  endif
 #endif
 
@@ -652,9 +652,9 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 char mqtt_topic[parameters_size + 1] = Base_Topic;
 char g_gateway_name[parameters_size + 1] = OMG_GATEWAY_NAME;
 
-#if LOG_TO_SYSLOG
-char syslogServer[parameters_size + 1] = SYSLOG_SERVER;
-char syslogPort[parameters_size + 1] = SYSLOG_PORT;
+#if OMG_LOG_TO_SYSLOG
+char g_syslog_server[parameters_size + 1] = OMG_SYSLOG_SERVER;
+char g_syslog_port[parameters_size + 1] = OMG_SYSLOG_PORT;
 #endif
 
 void connectMQTT();

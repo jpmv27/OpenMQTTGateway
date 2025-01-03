@@ -1303,10 +1303,10 @@ void setup() {
   //Launch serial for debugging purposes
   Serial.begin(SERIAL_BAUD);
   Logger.registerSerial(OMG_LOGID, LOG_LEVEL, "OMG");
-#if LOG_TO_SYSLOG
-  if (strcmp(syslogServer, "") != 0 && strcmp(syslogPort, "") != 0) {
-    Logger.configureSyslog(syslogServer, String(syslogPort).toInt(), g_gateway_name);
-    Logger.registerSyslog(OMG_LOGID, LOG_LEVEL_SYSLOG, SYSLOG_FACILITY, "OMG");
+#if OMG_LOG_TO_SYSLOG
+  if (strcmp(g_syslog_server, "") != 0 && strcmp(g_syslog_port, "") != 0) {
+    Logger.configureSyslog(g_syslog_server, String(g_syslog_port).toInt(), g_gateway_name);
+    Logger.registerSyslog(OMG_LOGID, OMG_LOG_LEVEL_SYSLOG, OMG_SYSLOG_FACILITY, "OMG");
   } else {
     Logger.error(OMG_LOGID, F("Invalid syslog configuration, skipping registration" CR));
   }
@@ -2018,9 +2018,9 @@ void saveConfig() {
 #  endif
   json["gateway_name"] = g_gateway_name;
   json["ota_pass"] = ota_pass;
-#  if LOG_TO_SYSLOG
-  json["syslog_server"] = syslogServer;
-  json["syslog_port"] = syslogPort;
+#  if OMG_LOG_TO_SYSLOG
+  json["syslog_server"] = g_syslog_server;
+  json["syslog_port"] = g_syslog_port;
 #  endif
 
   File configFile = SPIFFS.open("/config.json", "w");
@@ -2169,11 +2169,11 @@ bool loadConfigFromFlash() {
           }
 #  endif
         }
-#  if LOG_TO_SYSLOG
+#  if OMG_LOG_TO_SYSLOG
         if (json.containsKey("syslog_server"))
-          strcpy(syslogServer, json["syslog_server"]);
+          strcpy(g_syslog_server, json["syslog_server"]);
         if (json.containsKey("syslog_port"))
-          strcpy(syslogPort, json["syslog_port"]);
+          strcpy(g_syslog_port, json["syslog_port"]);
 #  endif
         result = true;
       } else {
@@ -3600,7 +3600,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
 #ifdef ZmqttDiscovery
         (SYSdata.containsKey("discovery_prefix") && SYSdata["discovery_prefix"].is<const char*>()) ||
 #endif
-#if LOG_TO_SYSLOG
+#if OMG_LOG_TO_SYSLOG
         (SYSdata.containsKey("syslog_server") && SYSdata["syslog_server"].is<const char*>()) ||
         (SYSdata.containsKey("syslog_port") && SYSdata["syslog_port"].is<const char*>()) ||
 #endif
@@ -3621,13 +3621,13 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
         strncpy(ota_pass, SYSdata["gw_pass"], parameters_size);
         restartESP = true;
       }
-#if LOG_TO_SYSLOG
+#if OMG_LOG_TO_SYSLOG
       if (SYSdata.containsKey("syslog_server")) {
-        strncpy(syslogServer, SYSdata["syslog_server"], parameters_size);
+        strncpy(g_syslog_server, SYSdata["syslog_server"], parameters_size);
         restartESP = true;
       }
       if (SYSdata.containsKey("syslog_port")) {
-        strncpy(syslogPort, SYSdata["syslog_port"], parameters_size);
+        strncpy(g_syslog_port, SYSdata["syslog_port"], parameters_size);
         restartESP = true;
       }
 #endif

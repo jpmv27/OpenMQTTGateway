@@ -529,7 +529,7 @@ void handleWU() {
   server.send(200, "text/html", response);
 }
 
-#if LOG_TO_SYSLOG
+#if OMG_LOG_TO_SYSLOG
 /**
  * @brief /SY - Configure Syslog Page
  * T: handleSY: uri: /sy, args: 4, method: 1
@@ -551,19 +551,19 @@ void handleSY() {
       bool update = false;
       if (server.hasArg("s1")) {
         WEBtoSYS["syslog_server"] = server.arg("s1");
-        if (strncmp(syslogServer, server.arg("s1").c_str(), parameters_size)) {
+        if (strncmp(g_syslog_server, server.arg("s1").c_str(), parameters_size)) {
           update = true;
         }
       }
       if (server.hasArg("p1")) {
         WEBtoSYS["syslog_port"] = server.arg("p1");
-        if (strncmp(syslogPort, server.arg("p1").c_str(), parameters_size)) {
+        if (strncmp(g_syslog_port, server.arg("p1").c_str(), parameters_size)) {
           update = true;
         }
       }
-      if (server.hasArg("l1") && server.arg("l1").toInt() != Logger.getSyslogLogLevel(OMG_LOGID, FAC_USER)) {
+      if (server.hasArg("l1") && server.arg("l1").toInt() != Logger.getSyslogLogLevel(OMG_LOGID, ELOG_FAC_USER)) {
         Logger.emergency(OMG_LOGID, F("[WebUI] Syslog log level changed to: %d" CR), server.arg("l1").toInt());
-        Logger.setSyslogLogLevel(OMG_LOGID, server.arg("l1").toInt(), FAC_USER);
+        Logger.setSyslogLogLevel(OMG_LOGID, server.arg("l1").toInt(), ELOG_FAC_USER);
       }
       if (update) {
         String topic = String(mqtt_topic) + String(g_gateway_name) + String(subjectMQTTtoSYSset);
@@ -601,8 +601,8 @@ void handleSY() {
   String response = String(buffer);
   response += String(script);
   response += String(style);
-  int logLevel = Logger.getSyslogLogLevel(OMG_LOGID, FAC_USER);
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_syslog_body, jsonChar, g_gateway_name, syslogServer, syslogPort, (logLevel == ELOG_LEVEL_NOLOG ? "selected" : ""), (logLevel == ELOG_LEVEL_EMERGENCY ? "selected" : ""), (logLevel == ELOG_LEVEL_ALERT ? "selected" : ""), (logLevel == ELOG_LEVEL_CRITICAL ? "selected" : ""), (logLevel == ELOG_LEVEL_ERROR ? "selected" : ""), (logLevel == ELOG_LEVEL_WARNING ? "selected" : ""), (logLevel == ELOG_LEVEL_NOTICE ? "selected" : ""), (logLevel == ELOG_LEVEL_INFO ? "selected" : ""), (logLevel == ELOG_LEVEL_DEBUG ? "selected" : ""));
+  int logLevel = Logger.getSyslogLogLevel(OMG_LOGID, ELOG_FAC_USER);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_syslog_body, jsonChar, g_gateway_name, g_syslog_server, g_syslog_port, (logLevel == ELOG_LEVEL_NOLOG ? "selected" : ""), (logLevel == ELOG_LEVEL_EMERGENCY ? "selected" : ""), (logLevel == ELOG_LEVEL_ALERT ? "selected" : ""), (logLevel == ELOG_LEVEL_CRITICAL ? "selected" : ""), (logLevel == ELOG_LEVEL_ERROR ? "selected" : ""), (logLevel == ELOG_LEVEL_WARNING ? "selected" : ""), (logLevel == ELOG_LEVEL_NOTICE ? "selected" : ""), (logLevel == ELOG_LEVEL_INFO ? "selected" : ""), (logLevel == ELOG_LEVEL_DEBUG ? "selected" : ""));
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);
@@ -1733,7 +1733,7 @@ void WebUISetup() {
   server.on("/tk", handleTK); // Store Device Token
 #  endif
   server.on("/lo", handleLO); // Configure Logging
-#  if LOG_TO_SYSLOG
+#  if OMG_LOG_TO_SYSLOG
   server.on("/sy", handleSY); // Configure Syslog
 #  endif
 
