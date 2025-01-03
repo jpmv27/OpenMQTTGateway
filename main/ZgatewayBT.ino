@@ -182,7 +182,7 @@ void BTConfig_fromJson(JsonObject& BTdata, bool startup = false) {
   }
   // Home Assistant presence message
   Config_update(BTdata, "hasspresence", BTConfig.presenceEnable);
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
   // Create discovery entities
   btScanParametersDiscovery();
   btPresenceParametersDiscovery();
@@ -472,7 +472,7 @@ void strupp(char* beg) {
     ++beg;
 }
 
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
 void DT24Discovery(const char* mac, const char* sensorModel_id) {
 #    define DT24parametersCount 7
   Logger.debug(OMG_LOGID, F("DT24Discovery" CR));
@@ -913,7 +913,7 @@ boolean valid_service_data(const char* data, int size) {
   return false;
 }
 
-#  if defined(ZmqttDiscovery) && BLEDecoder == true
+#  if defined(OMG_MQTT_DISCOVERY) && BLEDecoder == true
 // This function always should be called from the main core as it generates direct mqtt messages
 // When overrideDiscovery=true, we publish discovery messages of known devices (even if no new)
 void launchBTDiscovery(bool overrideDiscovery) {

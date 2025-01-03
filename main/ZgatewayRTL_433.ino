@@ -34,13 +34,13 @@
 
 #  include "Elog.h"
 #  include "User_config.h"
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
 #    include "config_mqttDiscovery.h"
 #  endif
 
 char messageBuffer[JSON_MSG_BUFFER];
 
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
 SemaphoreHandle_t semaphorecreateOrUpdateDeviceRTL_433;
 std::vector<RTL_433device*> RTL_433devices;
 int newRTL_433Devices = 0;
@@ -142,7 +142,7 @@ void launchRTL_433Discovery(bool overrideDiscovery) {
             value_template = "{{ value_json." + String(parameters[i][0]) + " | is_defined }}";
           }
           String topic = subjectRTL_433toMQTT;
-#    if valueAsATopic
+#    if OMG_MQTT_VALUE_AS_A_TOPIC
           // Remove the key from the unique id to extract the device id
           String idWoKeyAndModel = idWoKey;
           if (strcmp(pdevice->type, "null")) {
@@ -295,7 +295,7 @@ void rtl_433_Callback(char* message) {
     }
   }
 
-#  if valueAsATopic
+#  if OMG_MQTT_VALUE_AS_A_TOPIC
   topic = topic + "/" + uniqueid;
 #  endif
 
@@ -303,7 +303,7 @@ void rtl_433_Callback(char* message) {
 
   DISCOVERY_TRACE_LOG(F("uniqueid: %s" CR), uniqueid.c_str());
   if (!isAduplicateSignal(MQTTvalue)) {
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
     if (SYSConfig.discovery)
       storeRTL_433Discovery(RFrtl_433_ESPdata, (char*)model.c_str(), (char*)type.c_str(), (char*)uniqueid.c_str());
 #  endif
@@ -318,7 +318,7 @@ void rtl_433_Callback(char* message) {
 
 void setupRTL_433() {
   rtl_433.setCallback(rtl_433_Callback, messageBuffer, JSON_MSG_BUFFER);
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
   semaphorecreateOrUpdateDeviceRTL_433 = xSemaphoreCreateBinary();
   xSemaphoreGive(semaphorecreateOrUpdateDeviceRTL_433);
 #  endif

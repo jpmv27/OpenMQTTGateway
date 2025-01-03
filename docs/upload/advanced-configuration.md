@@ -13,8 +13,8 @@ The MQTT broker is configured for TLS and you have access to the CA certificate 
 You are using ESP8266 or ESP32.
 
 ### Configure secure connection in the gateway
-To enable the secure connection and use TLS set the `#define MQTT_DEFAULT_SECURE` to true at build time, or the `mqtt secure` parameter with WiFi Manager or `mqtt_secure` with MQTT.
-Set `MQTT_SERVER` to the Common Name (CN) of the certificate of the broker.
+To enable the secure connection and use TLS set the `#define OMG_MQTT_DEFAULT_SECURE` to true at build time, or the `mqtt secure` parameter with WiFi Manager or `mqtt_secure` with MQTT.
+Set `OMG_MQTT_SERVER` to the Common Name (CN) of the certificate of the broker.
 
 The server identity can be verified against a certificate or not, if you don't want to use a certicate to verify the server you can uncheck the option `validate cert` with WiFi Manager or set `mqtt_validate` to `false` with MQTT
 
@@ -40,11 +40,11 @@ This process can also be used for the other certificates, OTA, client key, clien
 
 ## Add the received "value" at the end of the topic
 For the gateways that publish a "value" parameter on the json (RF, IR...), it is possible to concatenate this parameter at the end of the topic.
-So as to activate this function you need to set `valueAsATopic` to true in User_config.h
+So as to activate this function you need to set `OMG_MQTT_VALUE_AS_A_TOPIC` to true in User_config.h
 
 ``` cpp
-#ifndef valueAsATopic
-#  define valueAsATopic false // define true to integrate msg value into the subject when receiving
+#ifndef OMG_MQTT_VALUE_AS_A_TOPIC
+#  define OMG_MQTT_VALUE_AS_A_TOPIC false // define true to integrate msg value into the subject when receiving
 #endif
 ```
 
@@ -68,7 +68,7 @@ To have a working discovery setup you need to enable it on your MQTT integration
 ::: tip
 With platformio you can deactivate discovery by adding:
 ``` ini
-'-UZmqttDiscovery="HADiscovery"'
+'-UOMG_MQTT_DISCOVERY'
 ```
 To your environment definition.
 :::

@@ -66,7 +66,7 @@ extern int getRTLMessageCount();
 extern int getRTLAverageRSSI();
 extern int getOOKThresh();
 
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
 extern void launchRTL_433Discovery(bool overrideDiscovery);
 // This structure stores the entities of the RTL 433 devices and is they have been discovered or not
 // The uniqueId is composed of the device id + the key

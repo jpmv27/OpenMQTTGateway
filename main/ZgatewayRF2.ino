@@ -55,7 +55,7 @@ struct RF2rxd {
 
 RF2rxd rf2rd;
 
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
 //Register for autodiscover in Home Assistant
 void RF2toMQTTdiscovery(JsonObject& data) {
   Logger.debug(OMG_LOGID, F("switchRF2Discovery" CR));
@@ -113,7 +113,7 @@ void RF2toX() {
     RF2data["period"] = (int)rf2rd.period;
     RF2data["address"] = (unsigned long)rf2rd.address;
     RF2data["switchType"] = (int)rf2rd.switchType;
-#  ifdef ZmqttDiscovery //component creation for HA
+#  ifdef OMG_MQTT_DISCOVERY //component creation for HA
     if (SYSConfig.discovery)
       RF2toMQTTdiscovery(RF2data);
 #  endif

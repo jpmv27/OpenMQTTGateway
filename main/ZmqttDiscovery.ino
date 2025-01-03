@@ -25,7 +25,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZmqttDiscovery
+#ifdef OMG_MQTT_DISCOVERY
 
 String getMacAddress() {
   uint8_t baseMac[6];
@@ -744,7 +744,7 @@ void pubMqttDiscovery() {
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
-#  ifdef MQTT_HTTPS_FW_UPDATE
+#  ifdef OMG_MQTT_HTTPS_FW_UPDATE
   createDiscovery("update", //set Type
                   subjectRLStoMQTT, "SYS: Firmware Update", (char*)getUniqueId("update", "").c_str(), //set state_topic,name,uniqueId
                   will_Topic, "firmware", "", //set availability_topic,device_class,value_template,
