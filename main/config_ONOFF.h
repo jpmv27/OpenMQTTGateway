@@ -23,8 +23,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_ONOFF_h
-#define config_ONOFF_h
+#ifndef OMG_CONFIG_ONOFF_H
+#define OMG_CONFIG_ONOFF_H
 
 extern void setupONOFF();
 extern void XtoONOFF(const char* topicOri, const char* datacallback);
@@ -88,4 +88,4 @@ struct ONOFFConfig_s {
 extern ONOFFConfig_s ONOFFConfig;
 #endif
 
-#endif
+#endif // OMG_CONFIG_ONOFF_H

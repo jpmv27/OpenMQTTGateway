@@ -24,8 +24,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-#ifndef config_mqttDiscovery_h
-#define config_mqttDiscovery_h
+#ifndef OMG_CONFIG_MQTTDISCOVERY_H
+#define OMG_CONFIG_MQTTDISCOVERY_H
 
 extern String getUniqueId(String name, String sufix);
 extern void pubMqttDiscovery();
@@ -274,4 +274,4 @@ const char* availableHASSUnits[] = {"W",
 #else
 #  define LATEST_OR_DEV "{\"version\":\"latest\"}"
 #endif
-#endif
+#endif // OMG_CONFIG_MQTTDISCOVERY_H

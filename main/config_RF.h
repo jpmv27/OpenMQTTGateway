@@ -23,8 +23,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_RF_h
-#define config_RF_h
+#ifndef OMG_CONFIG_RF_H
+#define OMG_CONFIG_RF_H
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
@@ -243,4 +243,4 @@ RFConfig_s RFConfig;
 #  endif
 #endif
 
-#endif
+#endif // OMG_CONFIG_RF_H

@@ -36,8 +36,8 @@
    ADD ---------> N/C (Not Connected)
 
 */
-#ifndef config_TSL2561_h
-#define config_TSL2561_h
+#ifndef OMG_CONFIG_TSL2561_H
+#define OMG_CONFIG_TSL2561_H
 
 extern void setupZsensorTSL2561();
 extern void MeasureLightIntensityTSL2561();
@@ -52,4 +52,4 @@ extern void MeasureLightIntensityTSL2561();
 unsigned long timetsl2561 = 0;
 //int TSL2561_i2c_addr = 0x37; // Light Sensor I2C Address (Set in Adafruit library)
 
-#endif
+#endif // OMG_CONFIG_TSL2561_H

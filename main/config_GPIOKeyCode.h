@@ -23,8 +23,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_GPIOKeyCode_h
-#define config_GPIOKeyCode_h
+#ifndef OMG_CONFIG_GPIOKEYCODE_H
+#define OMG_CONFIG_GPIOKEYCODE_H
 
 extern void setupGPIOKeyCode();
 extern void GPIOKeyCodetoX();
@@ -57,4 +57,4 @@ extern void MeasureGPIOKeyCode();
 // must define !!!
 #endif
 
-#endif
+#endif // OMG_CONFIG_GPIOKEYCODE_H

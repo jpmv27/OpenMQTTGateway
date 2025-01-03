@@ -31,8 +31,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef config_SSD1306_h
-#define config_SSD1306_h
+#ifndef OMG_CONFIG_SSD1306_H
+#define OMG_CONFIG_SSD1306_H
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
@@ -189,4 +189,4 @@ protected:
 
 extern OledSerial Oled;
 
-#endif
+#endif // OMG_CONFIG_SSD1306_H

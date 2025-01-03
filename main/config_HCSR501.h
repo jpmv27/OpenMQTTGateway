@@ -23,8 +23,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_HCSR501_h
-#define config_HCSR501_h
+#ifndef OMG_CONFIG_HCSR501_H
+#define OMG_CONFIG_HCSR501_H
 
 extern void setupHCSR501();
 extern void HCSR501toX();
@@ -53,4 +53,4 @@ extern void MeasureHCSR501();
 #  endif
 #endif
 
-#endif
+#endif // OMG_CONFIG_HCSR501_H

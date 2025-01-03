@@ -25,8 +25,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef user_config_h
-#define user_config_h
+#ifndef OMG_USER_CONFIG_H
+#define OMG_USER_CONFIG_H
 /*-------------------VERSION----------------------*/
 #ifndef OMG_VERSION
 #  define OMG_VERSION "version_tag"
@@ -729,4 +729,4 @@ void storeSignalValue(uint64_t);
 #define convertTemp_CtoF(c) ((c * 1.8) + 32)
 #define convertTemp_FtoC(f) ((f - 32) * 5 / 9)
 
-#endif
+#endif // OMG_USER_CONFIG

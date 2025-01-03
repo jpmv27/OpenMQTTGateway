@@ -21,6 +21,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef OMG_CONFIG_PWM_H
+#define OMG_CONFIG_PWM_H
+
 /*-------------------PWM topics & parameters----------------------*/
 
 // PWM MQTT Subjects
@@ -55,3 +58,5 @@ extern void XtoPWM(const char*, JsonObject&);
 #ifndef PWM_DEFAULT_GAMMA
 #  define PWM_DEFAULT_GAMMA 2.2f
 #endif
+
+#endif // OMG_CONFIG_PWM_H

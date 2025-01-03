@@ -35,8 +35,8 @@
    ADD ---------> N/C (Not Connected)
 
 */
-#ifndef config_BH1750_h
-#define config_BH1750_h
+#ifndef OMG_CONFIG_BH1750_H
+#define OMG_CONFIG_BH1750_H
 
 extern void setupZsensorBH1750();
 extern void MeasureLightIntensity();
@@ -51,4 +51,4 @@ extern void MeasureLightIntensity();
 unsigned long timebh1750 = 0;
 int BH1750_i2c_addr = 0x23; // Light Sensor I2C Address
 
-#endif
+#endif // OMG_CONFIG_BH1750_H

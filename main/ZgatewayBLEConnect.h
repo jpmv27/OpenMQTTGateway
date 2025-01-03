@@ -1,5 +1,5 @@
-#ifndef zBLEConnect_h
-#define zBLEConnect_h
+#ifndef OMG_ZBLECONNECT_H
+#define OMG_ZBLECONNECT_H
 
 #ifdef ESP32
 #  include "ArduinoJson.h"
@@ -100,5 +100,5 @@ public:
   bool processActions(std::vector<BLEAction>& actions) override;
 };
 
-#endif //ESP32
-#endif //zBLEConnect_h
+#endif // ESP32
+#endif // OMG_ZBLECONNECT_H

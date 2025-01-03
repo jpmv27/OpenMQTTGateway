@@ -23,8 +23,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_INA226_h
-#define config_INA226_h
+#ifndef OMG_CONFIG_INA226_H
+#define OMG_CONFIG_INA226_H
 
 extern void setupINA226();
 extern void INA226toX();
@@ -35,4 +35,4 @@ extern void MeasureINA226();
 #define subjectINA226toMQTT      "/INA226toMQTT"
 #define TimeBetweenReadingINA226 30000 // time between 2 INA226 readings
 
-#endif
+#endif // OMG_CONFIG_INA226_H

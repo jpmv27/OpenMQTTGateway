@@ -35,8 +35,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_TEMT6000_h
-#define config_TEMT6000_h
+#ifndef OMG_CONFIG_TEMT6000_H
+#define OMG_CONFIG_TEMT6000_H
 
 extern void setupZsensorTEMT6000();
 extern void MeasureLightIntensityTEMT6000();
@@ -52,4 +52,4 @@ extern void MeasureLightIntensityTEMT6000();
 //Time used to wait for an interval before resending measured values
 unsigned long timetemt6000 = 0;
 
-#endif
+#endif // OMG_CONFIG_TEMT6000_H

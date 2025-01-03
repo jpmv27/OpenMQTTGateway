@@ -23,8 +23,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_LORA_h
-#define config_LORA_h
+#ifndef OMG_CONFIG_LORA_H
+#define OMG_CONFIG_LORA_H
 
 extern void setupLORA();
 extern void LORAtoX();
@@ -135,4 +135,4 @@ const char LORAparameters[5][4][12] = {
 
 #endif
 
-#endif
+#endif // OMG_CONFIG_LORA_H

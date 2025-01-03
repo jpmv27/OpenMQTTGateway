@@ -33,8 +33,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_MQ2_h
-#define config_MQ2_h
+#ifndef OMG_CONFIG_MQ2_H
+#define OMG_CONFIG_MQ2_H
 
 extern void setupZsensorMQ2();
 extern void MQ2toX();
@@ -65,4 +65,4 @@ extern void MQ2toX();
 //Time used to wait for an interval before resending measured values
 unsigned long timemq2 = 0;
 
-#endif
+#endif // OMG_CONFIG_MQ2_H

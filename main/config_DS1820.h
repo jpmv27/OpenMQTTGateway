@@ -23,8 +23,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_DS1820_h
-#define config_DS1820_h
+#ifndef OMG_CONFIG_DS1820_H
+#define OMG_CONFIG_DS1820_H
 
 extern void setupZsensorDS1820();
 extern void DS1820toX();
@@ -56,4 +56,4 @@ extern void pubOneWire_HADiscovery();
 #  endif
 #endif
 
-#endif
+#endif // OMG_CONFIG_DS1820_H

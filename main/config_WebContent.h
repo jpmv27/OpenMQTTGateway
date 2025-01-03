@@ -23,8 +23,8 @@
  You should have received a copy of the GNU General Public License
  along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_WebContent_h
-#define config_WebContent_h
+#ifndef OMG_CONFIG_WEBCONTENT_H
+#define OMG_CONFIG_WEBCONTENT_H
 
 /*------------------- ----------------------*/
 
@@ -330,4 +330,4 @@ const unsigned char Openmqttgateway_logo_mini_ico[] = {
     0x00, 0x00, 0xff, 0x07, 0x00, 0x00, 0xff, 0x07, 0x00, 0x00};
 unsigned int Openmqttgateway_logo_mini_ico_len = 1150;
 
-#endif
+#endif // OMG_CONFIG_WEBCONTENT_H

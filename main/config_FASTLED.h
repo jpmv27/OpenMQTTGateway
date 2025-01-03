@@ -21,8 +21,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef config_FASTLED_h
-#define config_FASTLED_h
+#ifndef OMG_CONFIG_FASTLED_H
+#define OMG_CONFIG_FASTLED_H
 
 extern void setupFASTLED();
 extern void FASTLEDLoop();
@@ -98,4 +98,4 @@ extern void XtoFASTLED(const char*, JsonObject&);
 #  endif
 #endif
 
-#endif
+#endif // OMG_CONFIG_FASTLED_H

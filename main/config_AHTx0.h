@@ -35,8 +35,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_AHTx0_h
-#define config_AHTx0_h
+#ifndef OMG_CONFIG_AHTX0_H
+#define OMG_CONFIG_AHTX0_H
 
 extern void setupZsensorAHTx0();
 extern void MeasureAHTTempHum();
@@ -55,4 +55,4 @@ extern void MeasureAHTTempHum();
 #  endif
 #endif
 
-#endif
+#endif // OMG_CONFIG_AHTX0_H

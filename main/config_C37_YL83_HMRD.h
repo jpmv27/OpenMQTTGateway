@@ -21,8 +21,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_C37_YL83_HMRD_h
-#define config_C37_YL83_HMRD_h
+#ifndef OMG_CONFIG_C37_YL83_HMRD_H
+#define OMG_CONFIG_C37_YL83_HMRD_H
 
 extern void setupZsensorC37_YL83_HMRD();
 extern void C37_YL83_HMRDtoX();
@@ -60,4 +60,4 @@ extern void MeasureC37_YL83_HMRDWater();
 #  endif
 #endif
 
-#endif
+#endif // OMG_CONFIG_C37_YL83_HMRD_H

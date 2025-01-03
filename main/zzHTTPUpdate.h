@@ -22,9 +22,10 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef OMG_ZZUPDATE_H
+#define OMZ_ZZUPDATE_H
+
 #ifdef ESP32
-#  ifndef ___zzHTTP_UPDATE_H___
-#    define ___zzHTTP_UPDATE_H___
 
 #    include <Arduino.h>
 #    include <HTTPClient.h>
@@ -109,5 +110,5 @@ private:
 extern HTTPUpdate httpUpdate;
 #    endif
 
-#  endif /* ___HTTP_UPDATE_H___ */
 #endif
+#endif // OMZ_ZZUPDATE_H

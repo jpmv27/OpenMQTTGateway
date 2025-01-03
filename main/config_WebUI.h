@@ -23,8 +23,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_WebUI_h
-#define config_WebUI_h
+#ifndef OMG_CONFIG_WEBUI_H
+#define OMG_CONFIG_WEBUI_H
 
 #include <ArduinoJson.h>
 #include <Wire.h>
@@ -183,4 +183,4 @@ extern SerialWeb WebLog;
 
 /*------------------- Take over serial output and split to  ----------------------*/
 
-#endif
+#endif // OMG_CONFIG_WEBUI_H

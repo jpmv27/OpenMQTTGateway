@@ -34,8 +34,8 @@
    SDA ----------------> D2
 
 */
-#ifndef config_BME280_h
-#define config_BME280_h
+#ifndef OMG_CONFIG_BME280_H
+#define OMG_CONFIG_BME280_H
 
 extern void setupZsensorBME280();
 extern void MeasureTempHumAndPressure();
@@ -101,4 +101,4 @@ int BME280_i2c_addr = 0x76; // Bosch BME280 I2C Address
 #  define BME280Correction 0
 #endif
 
-#endif
+#endif // OMG_CONFIG_BME280_H

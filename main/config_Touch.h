@@ -24,8 +24,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_Touch_h
-#define config_Touch_h
+#ifndef OMG_CONFIG_TOUCH_H
+#define OMG_CONFIG_TOUCH_H
 
 extern void setupTouch();
 extern void touchtoX();
@@ -98,4 +98,4 @@ extern void touchtoX();
 #  define TOUCH_SENSORS 1
 #endif
 
-#endif
+#endif // OMG_CONFIG_TOUCH_H

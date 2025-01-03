@@ -34,8 +34,8 @@
    ECH ---------> D7
    
 */
-#ifndef config_HCSR04_h
-#define config_HCSR04_h
+#ifndef OMG_CONFIG_HCSR04_H
+#define OMG_CONFIG_HCSR04_H
 
 extern void setupHCSR04();
 extern void MeasureDistance();
@@ -59,4 +59,4 @@ extern void MeasureDistance();
 #  define HCSR04_ECH_GPIO 5 // NOT TESTED
 #endif
 
-#endif
+#endif // OMG_CONFIG_HCSR04_H

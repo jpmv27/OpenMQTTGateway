@@ -21,8 +21,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_Somfy_h
-#define config_Somfy_h
+#ifndef OMG_CONFIG_SOMFY_H
+#define OMG_CONFIG_SOMFY_H
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
@@ -39,4 +39,4 @@ const uint32_t somfyRemotes[SOMFY_REMOTE_NUM] = {0x5184c8};
 /*-------------DEFINE YOUR MQTT PARAMETERS BELOW----------------*/
 #define subjectMQTTtoSomfy "/commands/MQTTtoSomfy"
 
-#endif
+#endif // OMG_CONFIG_SOMFY_H

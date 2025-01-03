@@ -23,8 +23,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_RN8209_h
-#define config_RN8209_h
+#ifndef OMG_CONFIG_RN8209_H
+#define OMG_CONFIG_RN8209_H
 
 extern void setupRN8209();
 extern void RN8209toX();
@@ -60,4 +60,4 @@ extern void RN8209toX();
 #ifndef MinVoltageThreshold
 #  define MinVoltageThreshold 2 // (V) Minimum voltage change that will trigger the publishing of the RN8209 measurements
 #endif
-#endif
+#endif // OMG_CONFIG_RN8209_H

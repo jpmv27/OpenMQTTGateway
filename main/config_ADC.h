@@ -23,8 +23,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_ADC_h
-#define config_ADC_h
+#ifndef OMG_CONFIG_ADC_H
+#define OMG_CONFIG_ADC_H
 
 extern void setupADC();
 extern void ADCtoX();
@@ -54,4 +54,4 @@ extern void MeasureADC();
 #  define ADC_GPIO A0 //on nodeMCU this is D3 pin
 #endif
 
-#endif
+#endif // OMG_CONFIG_ADC_H

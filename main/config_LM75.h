@@ -35,8 +35,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_LM75_h
-#define config_LM75_h
+#ifndef OMG_CONFIG_LM75_H
+#define OMG_CONFIG_LM75_H
 
 extern void setupLM75();
 extern void LM75toX();
@@ -55,4 +55,4 @@ extern void LM75toX();
 #  endif
 #endif
 
-#endif
+#endif // OMG_CONFIG_LM75_H

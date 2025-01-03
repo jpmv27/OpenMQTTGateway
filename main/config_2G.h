@@ -23,8 +23,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef config_2G_h
-#define config_2G_h
+#ifndef OMG_CONFIG_2G_H
+#define OMG_CONFIG_2G_H
 
 extern void setup2G();
 extern bool _2GtoX();
@@ -58,4 +58,4 @@ extern void Xto2G(const char* topicOri, JsonObject& SMSdata);
 #  endif
 #endif
 
-#endif
+#endif // OMG_CONFIG_2G_H
