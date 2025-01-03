@@ -932,9 +932,9 @@ void handleCG() {
     for (uint8_t i = 0; i < server.args(); i++) {
       WEBUI_TRACE_LOG(F("handleCG Arg: %d, %s=%s" CR), i, server.argName(i).c_str(), server.arg(i).c_str());
     }
-    if (server.hasArg("save") && server.hasArg("gp") && strcmp(ota_pass, server.arg("gp").c_str())) {
-      strncpy(ota_pass, server.arg("gp").c_str(), parameters_size);
-      WEBtoSYS["gw_pass"] = ota_pass;
+    if (server.hasArg("save") && server.hasArg("gp") && strcmp(g_ota_pass, server.arg("gp").c_str())) {
+      strncpy(g_ota_pass, server.arg("gp").c_str(), parameters_size);
+      WEBtoSYS["gw_pass"] = g_ota_pass;
       update = true;
     }
   }
@@ -973,7 +973,7 @@ void handleCG() {
   String response = String(buffer);
   response += String(script);
   response += String(style);
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_gateway_body, jsonChar, g_gateway_name, ota_pass);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_gateway_body, jsonChar, g_gateway_name, g_ota_pass);
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);
@@ -1528,7 +1528,7 @@ void handleUP() {
     if (server.hasArg("o")) {
       WEBtoSYS["url"] = server.arg("o");
       WEBtoSYS["version"] = "test";
-      WEBtoSYS["password"] = ota_pass;
+      WEBtoSYS["password"] = g_ota_pass;
 
       {
         sendRestartPage();
@@ -1545,7 +1545,7 @@ void handleUP() {
       uint32_t le = server.arg("le").toInt();
       if (le != 0) {
         WEBtoSYS["version"] = (le == 1 ? "latest" : (le == 2 ? "dev" : "unknown"));
-        WEBtoSYS["password"] = ota_pass;
+        WEBtoSYS["password"] = g_ota_pass;
         {
           sendRestartPage();
 

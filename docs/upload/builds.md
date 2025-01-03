@@ -40,7 +40,7 @@ build_flags =
 ```
 Here, build flags starting with "-D" let us set configuration values you would normally find in `User_config.h` and `config_xx.h` files by specifying them here, overriding the default values set in those files. To include special characters, you can triple escape them with a backslash like so:
 ```ini
-  '-Dwifi_password="Cato\\\'sYounger\\\$on"' ; Cato'sYounger$on
+  '-DOMG_WIFI_PASSWORD="Cato\\\'sYounger\\\$on"' ; Cato'sYounger$on
 ```
 
 The different listed configurations in `platformio.ini` represent some standard environments and boards. For example, the environment
@@ -78,12 +78,12 @@ build_flags =
   '-DZsensorBME280="BME280"'
   '-DBase_Topic="rf/"'
   '-DESPWifiManualSetup=true'
-  '-Dwifi_ssid="mynetwork"'
-  '-Dwifi_password="Cato\\\'sYounger\\\$on"' ; Cato'sYounger$on
+  '-DOMG_WIFI_SSID="mynetwork"'
+  '-DOMG_WIFI_PASSWORD="Cato\\\'sYounger\\\$on"' ; Cato'sYounger$on
   '-DMQTT_USER="mqttusername"'
   '-DMQTT_PASS="mqttpassword"'
   '-DMQTT_SERVER="mqttserver.local"'
-  '-Dgw_password="12345678"'
+  '-DOMG_GW_PASSWORD="12345678"'
   '-DLED_RECEIVE=LED_BUILTIN'        ; Comment 1
   '-DLED_RECEIVE_ON=LOW'             ; Comment 2
   '-DRF_RECEIVER_GPIO=13'

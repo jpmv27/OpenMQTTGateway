@@ -107,17 +107,17 @@
 #endif
 
 #if defined(ESPWifiManualSetup) // for nodemcu, weemos and esp8266
-#  ifndef wifi_ssid
-#    define wifi_ssid "wifi ssid"
+#  ifndef OMG_WIFI_SSID
+#    define OMG_WIFI_SSID "wifi ssid"
 #  endif
-#  ifndef wifi_password
-#    define wifi_password "wifi password"
+#  ifndef OMG_WIFI_PASSWORD
+#    define OMG_WIFI_PASSWORD "wifi password"
 #  endif
 #endif
 
 //#define WM_PWD_FROM_MAC true // enable to set the password from the last 8 digits of the ESP MAC address for enhanced security, enabling this option requires to have access to the MAC address, either through a sticker or with serial monitoring
-#ifndef WifiManager_ssid
-#  define WifiManager_ssid OMG_GATEWAY_NAME //this is the network name of the initial setup access point
+#ifndef OMG_WIFIMANAGER_SSID
+#  define OMG_WIFIMANAGER_SSID OMG_GATEWAY_NAME //this is the network name of the initial setup access point
 #endif
 #ifndef WifiManager_ConfigPortalTimeOut
 #  define WifiManager_ConfigPortalTimeOut 240 //time in seconds for the setup portal to stay open, default 240s
@@ -436,8 +436,8 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #endif
 
 /*-------------DEFINE YOUR OTA PARAMETERS BELOW----------------*/
-#ifndef gw_password
-#  define gw_password ""
+#ifndef OMG_GW_PASSWORD
+#  define OMG_GW_PASSWORD ""
 #endif
 #ifndef ota_port
 #  define ota_port 8266
