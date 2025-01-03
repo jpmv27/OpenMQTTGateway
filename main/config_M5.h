@@ -60,8 +60,8 @@ extern void loopM5();
 #  define SLEEP_BUTTON 33
 #endif
 /*-------------------DEFINE LOG LEVEL----------------------*/
-#ifndef LOG_LEVEL_LCD
-#  define LOG_LEVEL_LCD LOG_LEVEL_WARNING // Default to only display Warning level messages, if we go down below warning the size of the text to display can make the M5 restarting
+#ifndef OMG_LOG_LEVEL_LCD
+#  define OMG_LOG_LEVEL_LCD ELOG_LEVEL_WARNING // Default to only display Warning level messages, if we go down below warning the size of the text to display can make the M5 restarting
 #endif
 #ifndef LOG_TO_LCD
 #  define LOG_TO_LCD true // Default to display log messages on display

@@ -125,8 +125,8 @@
 #ifndef WiFi_TimeOut
 #  define WiFi_TimeOut 30
 #endif
-#ifndef WM_DEBUG // WiFi Manager debug
-#  define WM_DEBUG 1
+#ifndef OMG_WM_DEBUG // WiFi Manager debug
+#  define OMG_WM_DEBUG 1
 #endif
 //#define WIFIMNG_HIDE_MQTT_CONFIG //Uncomment so as to hide MQTT setting from Wifi manager page
 
@@ -617,12 +617,12 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #ifndef OMG_LOGID
 #  define OMG_LOGID 0
 #endif
-#ifndef LOG_LEVEL
-#  define LOG_LEVEL ELOG_LEVEL_NOTICE
+#ifndef OMG_LOG_LEVEL
+#  define OMG_LOG_LEVEL ELOG_LEVEL_NOTICE
 #endif
 #if OMG_LOG_TO_SYSLOG
 #  ifndef OMG_LOG_LEVEL_SYSLOG
-#    define OMG_LOG_LEVEL_SYSLOG LOG_LEVEL
+#    define OMG_LOG_LEVEL_SYSLOG OMG_LOG_LEVEL
 #  endif
 #endif
 

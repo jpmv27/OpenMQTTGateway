@@ -150,7 +150,7 @@ This example describes how to do it with the ESP32 board.
       '-DJSON_TO_OLED=true'
       '-DDISPLAY_PAGE_INTERVAL=30'
     ;  '-DLOG_TO_OLED=true'         ; Enable log to OLED
-    ;  '-DLOG_LEVEL_OLED=LOG_LEVEL_NOTICE'
+    ;  '-DOMG_LOG_LEVEL_OLED=ELOG_LOG_LEVEL_NOTICE'
     ;  '-DDISPLAY_IDLE_LOGO=false'
     ;  '-DDISPLAY_BRIGHTNESS=80'
     ;  '-DDISPLAY_METRIC=false'

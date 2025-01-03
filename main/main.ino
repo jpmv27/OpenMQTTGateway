@@ -1299,7 +1299,7 @@ void updateAndHandleLEDsTask() {
 void setup() {
   //Launch serial for debugging purposes
   Serial.begin(SERIAL_BAUD);
-  Logger.registerSerial(OMG_LOGID, LOG_LEVEL, "OMG");
+  Logger.registerSerial(OMG_LOGID, OMG_LOG_LEVEL, "OMG");
 #if OMG_LOG_TO_SYSLOG
   if (strcmp(g_syslog_server, "") != 0 && strcmp(g_syslog_port, "") != 0) {
     Logger.configureSyslog(g_syslog_server, String(g_syslog_port).toInt(), g_gateway_name);
@@ -2206,7 +2206,7 @@ void setupWiFiManager() {
   snprintf(g_WifiManager_ssid, MAC_NAME_MAX_LEN, "%s_%.2s%.2s", Gateway_Short_Name, s.c_str(), s.c_str() + 3);
 #  endif
 
-  wifiManager.setDebugOutput(WM_DEBUG);
+  wifiManager.setDebugOutput(OMG_WM_DEBUG);
 
   // The extra parameters to be configured (can be either global or just in the setup)
   // After connecting, parameter.getValue() will get you the configured value

@@ -452,7 +452,7 @@ void updateDevicesStatus() {
 }
 
 void dumpDevices() {
-#  if LOG_LEVEL > ELOG_LEVEL_NOTICE
+#  if OMG_LOG_LEVEL > ELOG_LEVEL_NOTICE
   for (vector<BLEdevice*>::iterator it = devices.begin(); it != devices.end(); ++it) {
     BLEdevice* p = *it;
     Logger.debug(OMG_LOGID, F("macAdr %s" CR), p->macAdr);

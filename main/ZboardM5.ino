@@ -44,7 +44,7 @@
 void logToLCD(bool display) {
 #  if LOG_TO_LCD
   if (display) {
-    Logger.setSerialLogLevel(OMG_LOGID, LOG_LEVEL_LCD, M5.Lcd); // Log on LCD following LOG_LEVEL_LCD
+    Logger.setSerialLogLevel(OMG_LOGID, OMG_LOG_LEVEL_LCD, M5.Lcd); // Log on LCD following LOG_LEVEL_LCD
   } else {
     Logger.setSerialLogLevel(OMG_LOGID, ELOG_LEVEL_NOLOG, M5.Lcd); // Disable logging to LCD
   }
@@ -70,7 +70,7 @@ void setupM5() {
   M5.Lcd.fillScreen(WHITE);
   displayIntro(M5.Lcd.width() * 0.25, (M5.Lcd.width() / 2) + M5.Lcd.width() * 0.12, (M5.Lcd.height() / 2) + M5.Lcd.height() * 0.2);
 #  if LOG_TO_LCD
-  Logger.registerSerial(OMG_LOGID, LOG_LEVEL_LCD, "OMG", M5.Lcd); // Log on LCD following LOG_LEVEL_LCD
+  Logger.registerSerial(OMG_LOGID, OMG_LOG_LEVEL_LCD, "OMG", M5.Lcd); // Log on LCD following LOG_LEVEL_LCD
 #  endif
 
   Logger.notice(OMG_LOGID, F("Setup M5 end" CR));
