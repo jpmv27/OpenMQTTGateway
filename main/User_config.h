@@ -107,17 +107,17 @@
 #endif
 
 #if defined(ESPWifiManualSetup) // for nodemcu, weemos and esp8266
-#  ifndef wifi_ssid
-#    define wifi_ssid "wifi ssid"
+#  ifndef OMG_WIFI_SSID
+#    define OMG_WIFI_SSID "wifi ssid"
 #  endif
-#  ifndef wifi_password
-#    define wifi_password "wifi password"
+#  ifndef OMG_WIFI_PASSWORD
+#    define OMG_WIFI_PASSWORD "wifi password"
 #  endif
 #endif
 
 //#define WM_PWD_FROM_MAC true // enable to set the password from the last 8 digits of the ESP MAC address for enhanced security, enabling this option requires to have access to the MAC address, either through a sticker or with serial monitoring
-#ifndef WifiManager_ssid
-#  define WifiManager_ssid OMG_GATEWAY_NAME //this is the network name of the initial setup access point
+#ifndef OMG_WIFIMANAGER_SSID
+#  define OMG_WIFIMANAGER_SSID OMG_GATEWAY_NAME //this is the network name of the initial setup access point
 #endif
 #ifndef WifiManager_ConfigPortalTimeOut
 #  define WifiManager_ConfigPortalTimeOut 240 //time in seconds for the setup portal to stay open, default 240s
@@ -200,22 +200,22 @@
 #  define NTP_SERVER "pool.ntp.org"
 #endif
 
-#ifndef LOG_TO_SYSLOG
-#  define LOG_TO_SYSLOG false
+#ifndef OMG_LOG_TO_SYSLOG
+#  define OMG_LOG_TO_SYSLOG false
 #endif
 
-#if LOG_TO_SYSLOG
+#if OMG_LOG_TO_SYSLOG
 #  ifndef ELOG_SYSLOG_ENABLE
 #    error ELOG_SYSLOG_ENABLE must be defined
 #  endif
-#  ifndef SYSLOG_SERVER
-#    error SYSLOG_SERVER must be defined
+#  ifndef OMG_SYSLOG_SERVER
+#    error OMG_SYSLOG_SERVER must be defined
 #  endif
-#  ifndef SYSLOG_PORT
-#    define SYSLOG_PORT "514"
+#  ifndef OMG_SYSLOG_PORT
+#    define OMG_SYSLOG_PORT "514"
 #  endif
-#  ifndef SYSLOG_FACILITY
-#    define SYSLOG_FACILITY FAC_USER
+#  ifndef OMG_SYSLOG_FACILITY
+#    define OMG_SYSLOG_FACILITY ELOG_FAC_USER
 #  endif
 #endif
 
@@ -436,8 +436,8 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #endif
 
 /*-------------DEFINE YOUR OTA PARAMETERS BELOW----------------*/
-#ifndef gw_password
-#  define gw_password ""
+#ifndef OMG_GW_PASSWORD
+#  define OMG_GW_PASSWORD ""
 #endif
 #ifndef ota_port
 #  define ota_port 8266
@@ -620,9 +620,9 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #ifndef LOG_LEVEL
 #  define LOG_LEVEL ELOG_LEVEL_NOTICE
 #endif
-#if LOG_TO_SYSLOG
-#  ifndef LOG_LEVEL_SYSLOG
-#    define LOG_LEVEL_SYSLOG LOG_LEVEL
+#if OMG_LOG_TO_SYSLOG
+#  ifndef OMG_LOG_LEVEL_SYSLOG
+#    define OMG_LOG_LEVEL_SYSLOG LOG_LEVEL
 #  endif
 #endif
 
@@ -652,9 +652,9 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 char mqtt_topic[parameters_size + 1] = Base_Topic;
 char g_gateway_name[parameters_size + 1] = OMG_GATEWAY_NAME;
 
-#if LOG_TO_SYSLOG
-char syslogServer[parameters_size + 1] = SYSLOG_SERVER;
-char syslogPort[parameters_size + 1] = SYSLOG_PORT;
+#if OMG_LOG_TO_SYSLOG
+char g_syslog_server[parameters_size + 1] = OMG_SYSLOG_SERVER;
+char g_syslog_port[parameters_size + 1] = OMG_SYSLOG_PORT;
 #endif
 
 void connectMQTT();

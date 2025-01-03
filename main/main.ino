@@ -239,12 +239,9 @@ struct GfSun2000Data {};
 
 void setupTLS(int index = CNT_DEFAULT_INDEX);
 
-char ota_pass[parameters_size] = gw_password;
-#ifdef OMG_USE_MAC_AS_GATEWAY_NAME
-#  undef WifiManager_ssid
+char g_ota_pass[parameters_size] = OMG_GW_PASSWORD;
 #  define MAC_NAME_MAX_LEN 30
-char WifiManager_ssid[MAC_NAME_MAX_LEN];
-#endif
+char g_WifiManager_ssid[MAC_NAME_MAX_LEN] = OMG_WIFIMANAGER_SSID;
 int failure_number_ntwk = 0; // number of failure connecting to network
 int failure_number_mqtt = 0; // number of failure connecting to MQTT
 
@@ -1303,10 +1300,10 @@ void setup() {
   //Launch serial for debugging purposes
   Serial.begin(SERIAL_BAUD);
   Logger.registerSerial(OMG_LOGID, LOG_LEVEL, "OMG");
-#if LOG_TO_SYSLOG
-  if (strcmp(syslogServer, "") != 0 && strcmp(syslogPort, "") != 0) {
-    Logger.configureSyslog(syslogServer, String(syslogPort).toInt(), g_gateway_name);
-    Logger.registerSyslog(OMG_LOGID, LOG_LEVEL_SYSLOG, SYSLOG_FACILITY, "OMG");
+#if OMG_LOG_TO_SYSLOG
+  if (strcmp(g_syslog_server, "") != 0 && strcmp(g_syslog_port, "") != 0) {
+    Logger.configureSyslog(g_syslog_server, String(g_syslog_port).toInt(), g_gateway_name);
+    Logger.registerSyslog(OMG_LOGID, OMG_LOG_LEVEL_SYSLOG, OMG_SYSLOG_FACILITY, "OMG");
   } else {
     Logger.error(OMG_LOGID, F("Invalid syslog configuration, skipping registration" CR));
   }
@@ -1649,7 +1646,7 @@ void setOTA() {
   ArduinoOTA.setHostname(g_gateway_name);
 
   // No authentication by default
-  ArduinoOTA.setPassword(ota_pass);
+  ArduinoOTA.setPassword(g_ota_pass);
 
   ArduinoOTA.onStart([]() {
     Logger.debug(OMG_LOGID, F("Start OTA, lock other functions" CR));
@@ -1807,11 +1804,11 @@ void setupWiFiFromBuild() {
   // Must set hostname before mode. See https://github.com/espressif/arduino-esp32/issues/6700
   WiFi.setHostname(g_gateway_name);
   WiFi.mode(WIFI_STA);
-  wifiMulti.addAP(wifi_ssid, wifi_password);
-  Logger.debug(OMG_LOGID, F("Connecting to %s" CR), wifi_ssid);
-#  ifdef wifi_ssid1
-  wifiMulti.addAP(wifi_ssid1, wifi_password1);
-  Logger.debug(OMG_LOGID, F("Connecting to %s" CR), wifi_ssid1);
+  wifiMulti.addAP(OMG_WIFI_SSID, OMG_WIFI_PASSWORD);
+  Logger.debug(OMG_LOGID, F("Connecting to %s" CR), OMG_WIFI_SSID);
+#  ifdef OMG_WIFI_SSID1
+  wifiMulti.addAP(OMG_WIFI_SSID1, OMG_WIFI_PASSWORD1);
+  Logger.debug(OMG_LOGID, F("Connecting to %s" CR), OMG_WIFI_SSID1);
 #  endif
   delay(10);
 
@@ -2017,10 +2014,10 @@ void saveConfig() {
   json["discovery_prefix"] = discovery_prefix;
 #  endif
   json["gateway_name"] = g_gateway_name;
-  json["ota_pass"] = ota_pass;
-#  if LOG_TO_SYSLOG
-  json["syslog_server"] = syslogServer;
-  json["syslog_port"] = syslogPort;
+  json["ota_pass"] = g_ota_pass;
+#  if OMG_LOG_TO_SYSLOG
+  json["syslog_server"] = g_syslog_server;
+  json["syslog_port"] = g_syslog_port;
 #  endif
 
   File configFile = SPIFFS.open("/config.json", "w");
@@ -2158,22 +2155,22 @@ bool loadConfigFromFlash() {
         if (json.containsKey("gateway_name"))
           strcpy(g_gateway_name, json["gateway_name"]);
         if (json.containsKey("ota_pass")) {
-          strcpy(ota_pass, json["ota_pass"]);
+          strcpy(g_ota_pass, json["ota_pass"]);
 #  ifdef WM_PWD_FROM_MAC // From ESP Mac Address, last 8 digits as the password
-          // Compare the existing ota_pass if ota_pass = OTAPASSWORD then replace with the last 8 digits of the mac address
+          // Compare the existing g_ota_pass if g_ota_pass = OTAPASSWORD then replace with the last 8 digits of the mac address
           // This enable user migrating from previous version to have the same WiFi portal password as previously unless they changed it
-          if (strcmp(ota_pass, "OTAPASSWORD") == 0) {
+          if (strcmp(g_ota_pass, "OTAPASSWORD") == 0) {
             String s = WiFi.macAddress();
-            sprintf(ota_pass, "%.2s%.2s%.2s%.2s",
+            sprintf(g_ota_pass, "%.2s%.2s%.2s%.2s",
                     s.c_str() + 6, s.c_str() + 9, s.c_str() + 12, s.c_str() + 15);
           }
 #  endif
         }
-#  if LOG_TO_SYSLOG
+#  if OMG_LOG_TO_SYSLOG
         if (json.containsKey("syslog_server"))
-          strcpy(syslogServer, json["syslog_server"]);
+          strcpy(g_syslog_server, json["syslog_server"]);
         if (json.containsKey("syslog_port"))
-          strcpy(syslogPort, json["syslog_port"]);
+          strcpy(g_syslog_port, json["syslog_port"]);
 #  endif
         result = true;
       } else {
@@ -2190,7 +2187,7 @@ bool loadConfigFromFlash() {
     Log.notice(F("Gateway Name: %s.local" CR), g_gateway_name);
 #  endif
 #  ifdef WM_PWD_FROM_MAC // From ESP Mac Address, last 8 digits as the password
-    sprintf(ota_pass, "%.2s%.2s%.2s%.2s",
+    sprintf(g_ota_pass, "%.2s%.2s%.2s%.2s",
             s.c_str() + 6, s.c_str() + 9, s.c_str() + 12, s.c_str() + 15);
 #  endif
   }
@@ -2206,7 +2203,7 @@ void setupWiFiManager() {
 
 #  ifdef OMG_USE_MAC_AS_GATEWAY_NAME
   String s = WiFi.macAddress();
-  snprintf(WifiManager_ssid, MAC_NAME_MAX_LEN, "%s_%.2s%.2s", Gateway_Short_Name, s.c_str(), s.c_str() + 3);
+  snprintf(g_WifiManager_ssid, MAC_NAME_MAX_LEN, "%s_%.2s%.2s", Gateway_Short_Name, s.c_str(), s.c_str() + 3);
 #  endif
 
   wifiManager.setDebugOutput(WM_DEBUG);
@@ -2231,7 +2228,7 @@ void setupWiFiManager() {
 #    endif
   WiFiManagerParameter custom_mqtt_topic("topic", "mqtt base topic", mqtt_topic, mqtt_topic_max_size, " minlength='1' maxlength='64' required");
   WiFiManagerParameter custom_gateway_name("name", "gateway name", g_gateway_name, parameters_size, " minlength='1' maxlength='64' required");
-  WiFiManagerParameter custom_ota_pass("ota", "gateway password", ota_pass, parameters_size, " input type='password' minlength='8' maxlength='64' required");
+  WiFiManagerParameter custom_ota_pass("ota", "gateway password", g_ota_pass, parameters_size, " input type='password' minlength='8' maxlength='64' required");
 #  endif
   //WiFiManager
   //Local intialization. Once its business is done, there is no need to keep it around
@@ -2296,12 +2293,12 @@ void setupWiFiManager() {
 
   if (!SYSConfig.offline && !wifi_reconnect_bypass()) // if we didn't connect with saved credential we start Wifimanager web portal
   {
-    Logger.notice(OMG_LOGID, F("Connect your phone to WIFI AP: %s with PWD: %s" CR), WifiManager_ssid, ota_pass);
+    Logger.notice(OMG_LOGID, F("Connect your phone to WIFI AP: %s with PWD: %s" CR), g_WifiManager_ssid, g_ota_pass);
     gatewayState = GatewayState::ONBOARDING;
     //fetches ssid and pass and tries to connect
     //if it does not connect it starts an access point with the specified name
     //and goes into a blocking loop awaiting configuration
-    if (!wifiManager.autoConnect(WifiManager_ssid, ota_pass)) {
+    if (!wifiManager.autoConnect(g_WifiManager_ssid, g_ota_pass)) {
       Logger.warning(OMG_LOGID, F("failed to connect and hit timeout" CR));
       delay(3000);
 
@@ -2369,7 +2366,7 @@ void setupWiFiManager() {
 #      endif
 #    endif
     strcpy(g_gateway_name, custom_gateway_name.getValue());
-    strcpy(ota_pass, custom_ota_pass.getValue());
+    strcpy(g_ota_pass, custom_ota_pass.getValue());
 #  endif
 
 #  if !MQTT_BROKER_MODE
@@ -3181,7 +3178,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
 #  if MQTT_HTTPS_FW_UPDATE_USE_PASSWORD > 0
         const char* pwd = HttpsFwUpdateData["password"];
         if (pwd) {
-          if (strcmp(pwd, ota_pass) != 0) {
+          if (strcmp(pwd, g_ota_pass) != 0) {
             Logger.error(OMG_LOGID, F("Invalid OTA password" CR));
             gatewayState = GatewayState::ERROR;
             return;
@@ -3600,7 +3597,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
 #ifdef ZmqttDiscovery
         (SYSdata.containsKey("discovery_prefix") && SYSdata["discovery_prefix"].is<const char*>()) ||
 #endif
-#if LOG_TO_SYSLOG
+#if OMG_LOG_TO_SYSLOG
         (SYSdata.containsKey("syslog_server") && SYSdata["syslog_server"].is<const char*>()) ||
         (SYSdata.containsKey("syslog_port") && SYSdata["syslog_port"].is<const char*>()) ||
 #endif
@@ -3618,16 +3615,16 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
         strncpy(g_gateway_name, SYSdata["gateway_name"], parameters_size);
       }
       if (SYSdata.containsKey("gw_pass")) {
-        strncpy(ota_pass, SYSdata["gw_pass"], parameters_size);
+        strncpy(g_ota_pass, SYSdata["gw_pass"], parameters_size);
         restartESP = true;
       }
-#if LOG_TO_SYSLOG
+#if OMG_LOG_TO_SYSLOG
       if (SYSdata.containsKey("syslog_server")) {
-        strncpy(syslogServer, SYSdata["syslog_server"], parameters_size);
+        strncpy(g_syslog_server, SYSdata["syslog_server"], parameters_size);
         restartESP = true;
       }
       if (SYSdata.containsKey("syslog_port")) {
-        strncpy(syslogPort, SYSdata["syslog_port"], parameters_size);
+        strncpy(g_syslog_port, SYSdata["syslog_port"], parameters_size);
         restartESP = true;
       }
 #endif
