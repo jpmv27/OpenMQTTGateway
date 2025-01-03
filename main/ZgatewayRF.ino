@@ -80,7 +80,7 @@ static char* dec2binWzerofill(unsigned long Dec, unsigned int bitLength) {
   return bin;
 }
 
-#  if defined(ZmqttDiscovery) && !defined(RF_DISABLE_TRANSMIT) && defined(RFmqttDiscovery)
+#  if defined(OMG_MQTT_DISCOVERY) && !defined(RF_DISABLE_TRANSMIT) && defined(RFmqttDiscovery)
 
 void RFtoMQTTdiscovery(uint64_t MQTTvalue) {
   //on the fly switch creation from received RF values
@@ -89,7 +89,7 @@ void RFtoMQTTdiscovery(uint64_t MQTTvalue) {
   Logger.debug(OMG_LOGID, F("RF Entity Discovered, create HA Discovery CFG" CR));
   char* switchRF[2] = {val, "RF"};
   Logger.debug(OMG_LOGID, F("CreateDiscoverySwitch: %s" CR), switchRF[1]);
-#    if valueAsATopic
+#    if OMG_MQTT_VALUE_AS_A_TOPIC
   String discovery_topic = String(subjectRFtoMQTT) + "/" + String(switchRF[0]);
 #    else
   String discovery_topic = String(subjectRFtoMQTT);
@@ -141,7 +141,7 @@ void RFtoX() {
     mySwitch.resetAvailable();
 
     if (!isAduplicateSignal(MQTTvalue) && MQTTvalue != 0) { // conditions to avoid duplications of RF -->MQTT
-#  if defined(ZmqttDiscovery) && !defined(RF_DISABLE_TRANSMIT) && defined(RFmqttDiscovery) //component creation for HA
+#  if defined(OMG_MQTT_DISCOVERY) && !defined(RF_DISABLE_TRANSMIT) && defined(RFmqttDiscovery) //component creation for HA
       if (SYSConfig.discovery)
         RFtoMQTTdiscovery(MQTTvalue);
 #  endif

@@ -111,7 +111,7 @@ struct LORAConfig_s {
   bool onlyKnown;
 };
 
-#ifdef ZmqttDiscovery
+#ifdef OMG_MQTT_DISCOVERY
 extern void launchLORADiscovery(bool overrideDiscovery);
 // This structure stores the entities of the devices and is they have been discovered or not
 // The uniqueId is composed of the device id + the key

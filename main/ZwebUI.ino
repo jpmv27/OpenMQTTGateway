@@ -773,7 +773,7 @@ void handleWI() {
  * T: handleMQ Arg: 4, sc=on
  * T: handleMQ Arg: 5, h=
  * T: handleMQ Arg: 6, mt=home/
- * T: handleMQ Arg: 7 dp=homeassistant (#ifdef ZmqttDiscovery)
+ * T: handleMQ Arg: 7 dp=homeassistant (#ifdef OMG_MQTT_DISCOVERY)
  * T: handleMQ Arg: 8, save=
  */
 void handleMQ() {
@@ -788,7 +788,7 @@ void handleMQ() {
       JsonObject WEBtoSYS = WEBtoSYSBuffer.to<JsonObject>();
       bool update = false;
 
-#  if !MQTT_BROKER_MODE
+#  if !OMG_MQTT_BROKER_MODE
       if (server.hasArg("mh")) {
         WEBtoSYS["mqtt_server"] = server.arg("mh");
         if (strncmp(cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_server, server.arg("mh").c_str(), parameters_size)) {
@@ -844,7 +844,7 @@ void handleMQ() {
           update = true;
         }
       }
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
       if (server.hasArg("dp")) {
         WEBtoSYS["discovery_prefix"] = server.arg("dp");
         if (strncmp(discovery_prefix, server.arg("dp").c_str(), parameters_size)) {
@@ -893,15 +893,15 @@ void handleMQ() {
   String response = String(buffer);
   response += String(script);
   response += String(style);
-  // mqtt server (mh), mqtt port (ml), mqtt username (mu), mqtt password (mp), secure connection (sc), server certificate (msc), mqtt topic (mt), discovery prefix (dp) (last one only #ifdef ZmqttDiscovery)
-#  if MQTT_BROKER_MODE
-#    ifdef ZmqttDiscovery
+  // mqtt server (mh), mqtt port (ml), mqtt username (mu), mqtt password (mp), secure connection (sc), server certificate (msc), mqtt topic (mt), discovery prefix (dp) (last one only #ifdef OMG_MQTT_DISCOVERY)
+#  if OMG_MQTT_BROKER_MODE
+#    ifdef OMG_MQTT_DISCOVERY
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, g_gateway_name, "", "1883", "", "", g_gateway_name, mqtt_topic, discovery_prefix);
 #    else
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, g_gateway_name, "", "1883", "", "", g_gateway_name, mqtt_topic);
 #    endif
 #  else
-#    ifdef ZmqttDiscovery
+#    ifdef OMG_MQTT_DISCOVERY
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, g_gateway_name, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_server, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_port, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_user, (cnt_parameters_array[CNT_DEFAULT_INDEX].isConnectionSecure ? "checked" : ""), g_gateway_name, mqtt_topic, discovery_prefix);
 #    else
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, g_gateway_name, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_server, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_port, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_user, (cnt_parameters_array[CNT_DEFAULT_INDEX].isConnectionSecure ? "checked" : ""), g_gateway_name, mqtt_topic);
@@ -1510,7 +1510,7 @@ void handleFavicon() {
   server.send_P(200, "image/x-icon", reinterpret_cast<const char*>(Openmqttgateway_logo_mini_ico), sizeof(Openmqttgateway_logo_mini_ico));
 }
 
-#  if defined(ESP32) && defined(MQTT_HTTPS_FW_UPDATE)
+#  if defined(ESP32) && defined(OMG_MQTT_HTTPS_FW_UPDATE)
 /**
  * @brief /UP - Firmware Upgrade Page
  * 
@@ -1713,7 +1713,7 @@ void WebUISetup() {
 
   server.on("/in", handleIN); // Information
   server.on("/cs", handleCS); // Console
-#  if defined(ESP32) && defined(MQTT_HTTPS_FW_UPDATE)
+#  if defined(ESP32) && defined(OMG_MQTT_HTTPS_FW_UPDATE)
   server.on("/up", handleUP); // Firmware Upgrade
 #  endif
   server.on("/cn", handleCN); // Configuration

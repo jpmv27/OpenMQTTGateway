@@ -214,7 +214,7 @@ struct GfSun2000Data {};
 #ifdef ZsensorTouch
 #  include "config_Touch.h"
 #endif
-#ifdef ZmqttDiscovery
+#ifdef OMG_MQTT_DISCOVERY
 #  include "config_mqttDiscovery.h"
 #endif
 #ifdef ZactuatorFASTLED
@@ -294,7 +294,7 @@ WiFiMulti wifiMulti;
 #  include <FS.h>
 #  include <WiFiManager.h>
 X509List caCert;
-#  if MQTT_SECURE_SIGNED_CLIENT
+#  if OMG_MQTT_SECURE_SIGNED_CLIENT
 X509List* pClCert = nullptr;
 PrivateKey* pClKey = nullptr;
 #  endif
@@ -308,7 +308,7 @@ ESP8266WiFiMulti wifiMulti;
 #endif
 
 void handle_autodiscovery() {
-#ifdef ZmqttDiscovery
+#ifdef OMG_MQTT_DISCOVERY
   static bool connectedOnce = false;
   const unsigned long now = millis();
 
@@ -333,7 +333,7 @@ void handle_autodiscovery() {
 #endif
 }
 
-#if MQTT_BROKER_MODE
+#if OMG_MQTT_BROKER_MODE
 
 class MQTTServer : public PicoMQTT::Server {
 public:
@@ -385,13 +385,13 @@ bool jsonDispatch(JsonObject& data) {
   if (data.containsKey("origin") || data.containsKey("topic")) {
     GatewayState previousGatewayState = gatewayState;
     gatewayState = GatewayState::PROCESSING;
-#if message_UTCtimestamp == true
+#if OMG_MQTT_MESSAGE_UTC_TIMESTAMP == true
     data["UTCtime"] = TheengsUtils::UTCtimestamp();
 #endif
-#if message_localtimestamp == true
+#if OMG_MQTT_MESSAGE_LOCAL_TIMESTAMP == true
     data["time"] = TheengsUtils::localtimestamp();
 #endif
-#if message_unixtimestamp == true
+#if OMG_MQTT_MESSAGE_UNIX_TIMESTAMP == true
     data["unixtime"] = TheengsUtils::unixtimestamp();
 #endif
     if (data.containsKey("origin")) {
@@ -590,7 +590,7 @@ bool pub(JsonObject& data) {
     return res;
   }
 
-#if valueAsATopic
+#if OMG_MQTT_VALUE_AS_A_TOPIC
 #  ifdef ZgatewayPilight
   String value = data["value"];
   String protocol = data["protocol"];
@@ -605,13 +605,13 @@ bool pub(JsonObject& data) {
 #  endif
 #endif
 
-#if jsonPublishing
+#if OMG_MQTT_JSON_PUBLISHING
   String dataAsString = "";
   serializeJson(data, dataAsString);
   res = pubMQTT(topic.c_str(), dataAsString.c_str(), ret);
 #endif
 
-#if simplePublishing
+#if OMG_MQTT_SIMPLE_PUBLISHING
   Logger.debug(OMG_LOGID, F("simplePub - ON" CR));
   // Loop through all the key-value pairs in obj
   for (JsonPair p : data) {
@@ -791,7 +791,7 @@ void SYSConfig_init() {
 #if USE_BLUFI
   SYSConfig.blufi = DEFAULT_BLUFI;
 #endif
-#ifdef ZmqttDiscovery
+#ifdef OMG_MQTT_DISCOVERY
   SYSConfig.discovery = DEFAULT_DISCOVERY;
   SYSConfig.ohdiscovery = OpenHABDiscovery;
 #endif
@@ -808,7 +808,7 @@ void SYSConfig_fromJson(JsonObject& SYSdata) {
 #if USE_BLUFI
   Config_update(SYSdata, "blufi", SYSConfig.blufi);
 #endif
-#ifdef ZmqttDiscovery
+#ifdef OMG_MQTT_DISCOVERY
   Config_update(SYSdata, "disc", SYSConfig.discovery);
   Config_update(SYSdata, "ohdisc", SYSConfig.ohdiscovery);
 #endif
@@ -829,7 +829,7 @@ void SYSConfig_save() {
 #  if USE_BLUFI
   SYSdata["blufi"] = SYSConfig.blufi;
 #  endif
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
   SYSdata["disc"] = SYSConfig.discovery;
   SYSdata["ohdisc"] = SYSConfig.ohdiscovery;
 #  endif
@@ -916,7 +916,7 @@ std::pair<String, uint16_t> discoverMQTTbroker() {
 }
 #endif
 
-#if MQTT_BROKER_MODE
+#if OMG_MQTT_BROKER_MODE
 void setupMQTT() {
   Logger.notice(OMG_LOGID, F("Reconfiguring MQTT broker..." CR));
 
@@ -1426,11 +1426,11 @@ void setup() {
   Logger.debug(OMG_LOGID, F("OpenMQTTGateway ip: %s" CR), WiFi.localIP().toString().c_str());
   Logger.debug(OMG_LOGID, F("OpenMQTTGateway index %d" CR), cnt_index);
   Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt topic: %s" CR), mqtt_topic);
-#ifdef ZmqttDiscovery
+#ifdef OMG_MQTT_DISCOVERY
   Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt discovery prefix: %s" CR), discovery_prefix);
 #endif
   Logger.debug(OMG_LOGID, F("OpenMQTTGateway gateway name: %s" CR), g_gateway_name);
-#if !MQTT_BROKER_MODE
+#if !OMG_MQTT_BROKER_MODE
   Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt server: %s" CR), cnt_parameters_array[cnt_index].mqtt_server);
   Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt port: %s" CR), cnt_parameters_array[cnt_index].mqtt_port);
   Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt user: %s" CR), cnt_parameters_array[cnt_index].mqtt_user);
@@ -1689,7 +1689,7 @@ void setOTA() {
   ArduinoOTA.begin();
 }
 
-#if !MQTT_BROKER_MODE
+#if !OMG_MQTT_BROKER_MODE
 void setupTLS(int index) {
   configTime(0, 0, NTP_SERVER);
   WiFiClientSecure* sClient = static_cast<WiFiClientSecure*>(eClient.get());
@@ -1717,7 +1717,7 @@ void setupTLS(int index) {
       sClient->setAlpnProtocols(alpnProtocols);
     }
 #    endif
-#    if MQTT_SECURE_SIGNED_CLIENT
+#    if OMG_MQTT_SECURE_SIGNED_CLIENT
     if (cnt_parameters_array[index].client_cert.length() > MIN_CERT_LENGTH) {
       sClient->setCertificate(cnt_parameters_array[index].client_cert.c_str());
       Logger.notice(OMG_LOGID, F("Client cert found from cert array" CR));
@@ -1743,7 +1743,7 @@ void setupTLS(int index) {
     caCert.append(cnt_parameters_array[index].server_cert.c_str());
     sClient->setTrustAnchors(&caCert);
     sClient->setBufferSizes(512, 512);
-#    if MQTT_SECURE_SIGNED_CLIENT
+#    if OMG_MQTT_SECURE_SIGNED_CLIENT
     if (pClCert != nullptr) {
       delete pClCert;
     }
@@ -1934,7 +1934,7 @@ void saveConfig() {
   Logger.debug(OMG_LOGID, F("saving configs" CR));
 
   int totalSize = 512;
-#  if !MQTT_BROKER_MODE
+#  if !OMG_MQTT_BROKER_MODE
   for (int i = 0; i < 3; ++i) { // index 0 contains the default values from the build, these values can't be changed at runtime
     if (cnt_parameters_array[i].validConnection) {
       totalSize += cnt_parameters_array[i].server_cert.length();
@@ -1949,7 +1949,7 @@ void saveConfig() {
 
   DynamicJsonDocument json(512 + totalSize);
 
-#  if !MQTT_BROKER_MODE
+#  if !OMG_MQTT_BROKER_MODE
   for (int i = 0; i < 3; ++i) {
     if (cnt_parameters_array[i].validConnection) {
       char index_suffix[2];
@@ -2010,7 +2010,7 @@ void saveConfig() {
 #  endif
 
   json["mqtt_topic"] = mqtt_topic;
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
   json["discovery_prefix"] = discovery_prefix;
 #  endif
   json["gateway_name"] = g_gateway_name;
@@ -2059,7 +2059,7 @@ bool loadConfigFromFlash() {
         // Print json to serial port
         //serializeJsonPretty(json, Serial);
 
-#  if !MQTT_BROKER_MODE
+#  if !OMG_MQTT_BROKER_MODE
         for (int i = 0; i < 3; ++i) {
           char index_suffix[2]; // Large enough for 0, 1, or 2 and the null terminator
           if (i == 0) {
@@ -2148,7 +2148,7 @@ bool loadConfigFromFlash() {
 #  endif
         if (json.containsKey("mqtt_topic"))
           strcpy(mqtt_topic, json["mqtt_topic"]);
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
         if (json.containsKey("discovery_prefix"))
           strcpy(discovery_prefix, json["discovery_prefix"]);
 #  endif
@@ -2212,16 +2212,16 @@ void setupWiFiManager() {
   // After connecting, parameter.getValue() will get you the configured value
   // id/name placeholder/prompt default
 #  ifndef WIFIMNG_HIDE_MQTT_CONFIG
-#    if !MQTT_BROKER_MODE
+#    if !OMG_MQTT_BROKER_MODE
   WiFiManagerParameter custom_mqtt_server("server", "mqtt server", cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_server, parameters_size, " minlength='1' maxlength='64' required");
   WiFiManagerParameter custom_mqtt_port("port", "mqtt port", cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_port, 6, " minlength='1' maxlength='5' required");
   WiFiManagerParameter custom_mqtt_user("user", "mqtt user", cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_user, parameters_size, " maxlength='64'");
-  WiFiManagerParameter custom_mqtt_pass("pass", "mqtt pass", MQTT_PASS, parameters_size, " input type='password' maxlength='64'");
+  WiFiManagerParameter custom_mqtt_pass("pass", "mqtt pass", OMG_MQTT_PASS, parameters_size, " input type='password' maxlength='64'");
   WiFiManagerParameter custom_mqtt_secure("secure", "<br/>mqtt secure", "1", 2, cnt_parameters_array[CNT_DEFAULT_INDEX].isConnectionSecure ? "type=\"checkbox\" checked" : "type=\"checkbox\"");
   WiFiManagerParameter custom_validate_cert("validate", "<br/>validate cert", "1", 2, cnt_parameters_array[CNT_DEFAULT_INDEX].isCertValidate ? "type=\"checkbox\" checked" : "type=\"checkbox\"");
   WiFiManagerParameter custom_mqtt_cert("cert", "<br/>mqtt server cert", "", 4096);
   WiFiManagerParameter custom_ota_server_cert("ota_cert", "<br/>ota server cert", "", 4096);
-#      if MQTT_SECURE_SIGNED_CLIENT
+#      if OMG_MQTT_SECURE_SIGNED_CLIENT
   WiFiManagerParameter custom_client_cert("client_cert", "<br/>mqtt client cert", "", 4096);
   WiFiManagerParameter custom_client_key("client_key", "<br/>mqtt client key", "", 4096);
 #      endif
@@ -2256,7 +2256,7 @@ void setupWiFiManager() {
 
 #  ifndef WIFIMNG_HIDE_MQTT_CONFIG
   //add all your parameters here
-#    if !MQTT_BROKER_MODE
+#    if !OMG_MQTT_BROKER_MODE
   wifiManager.addParameter(&custom_mqtt_server);
   wifiManager.addParameter(&custom_mqtt_port);
   wifiManager.addParameter(&custom_mqtt_user);
@@ -2265,7 +2265,7 @@ void setupWiFiManager() {
   wifiManager.addParameter(&custom_mqtt_cert);
   wifiManager.addParameter(&custom_validate_cert);
   wifiManager.addParameter(&custom_ota_server_cert);
-#      if MQTT_SECURE_SIGNED_CLIENT
+#      if OMG_MQTT_SECURE_SIGNED_CLIENT
   wifiManager.addParameter(&custom_client_cert);
   wifiManager.addParameter(&custom_client_key);
 #      endif
@@ -2334,12 +2334,12 @@ void setupWiFiManager() {
     //read updated parameters
     cnt_index = CNT_DEFAULT_INDEX;
 #  ifndef WIFIMNG_HIDE_MQTT_CONFIG
-#    if !MQTT_BROKER_MODE
+#    if !OMG_MQTT_BROKER_MODE
     strcpy(cnt_parameters_array[cnt_index].mqtt_server, custom_mqtt_server.getValue());
     strcpy(cnt_parameters_array[cnt_index].mqtt_port, custom_mqtt_port.getValue());
     strcpy(cnt_parameters_array[cnt_index].mqtt_user, custom_mqtt_user.getValue());
     // Check if the MQTT password field contains the default value
-    if (strcmp(custom_mqtt_pass.getValue(), MQTT_PASS) != 0) {
+    if (strcmp(custom_mqtt_pass.getValue(), OMG_MQTT_PASS) != 0) {
       // If it's not the default password, update the MQTT password
       strcpy(cnt_parameters_array[cnt_index].mqtt_pass, custom_mqtt_pass.getValue());
     }
@@ -2356,7 +2356,7 @@ void setupWiFiManager() {
     if (strlen(custom_ota_server_cert.getValue()) > MIN_CERT_LENGTH) {
       cnt_parameters_array[cnt_index].ota_server_cert = TheengsUtils::processCert(custom_ota_server_cert.getValue());
     }
-#      if MQTT_SECURE_SIGNED_CLIENT
+#      if OMG_MQTT_SECURE_SIGNED_CLIENT
     if (strlen(custom_client_cert.getValue()) > MIN_CERT_LENGTH) {
       cnt_parameters_array[cnt_index].client_cert = TheengsUtils::processCert(custom_client_cert.getValue());
     }
@@ -2369,7 +2369,7 @@ void setupWiFiManager() {
     strcpy(g_ota_pass, custom_ota_pass.getValue());
 #  endif
 
-#  if !MQTT_BROKER_MODE
+#  if !OMG_MQTT_BROKER_MODE
     // We suppose the connection is valid (could be tested before)
     cnt_parameters_array[cnt_index].validConnection = true;
 #  endif
@@ -2527,14 +2527,14 @@ void loop() {
     ArduinoOTA.handle();
     failure_number_ntwk = 0;
     if (now > (timer_sys_checks + (TimeBetweenCheckingSYS * 1000)) || !timer_sys_checks) {
-#if message_UTCtimestamp || message_unixtimestamp || message_localtimestamp
+#if OMG_MQTT_MESSAGE_UTC_TIMESTAMP || OMG_MQTT_MESSAGE_UNIX_TIMESTAMP || OMG_MQTT_MESSAGE_LOCAL_TIMESTAMP
       TheengsUtils::syncNTP();
-#if message_localtimestamp
+#if OMG_MQTT_MESSAGE_LOCAL_TIMESTAMP
       TheengsUtils::setTimezone(TIMEZONE);
 #endif
 #endif
       if (!timer_sys_checks) { // Update check at start up only
-#if (defined(ESP32) && defined(MQTT_HTTPS_FW_UPDATE)) || defined(OMG_LOCAL_OTA_FW_UPDATE)
+#if (defined(ESP32) && defined(OMG_MQTT_HTTPS_FW_UPDATE)) || defined(OMG_LOCAL_OTA_FW_UPDATE)
         checkForUpdates();
 #endif
       }
@@ -2547,7 +2547,7 @@ void loop() {
     if (mqtt->connected()) { // MQTT client is still connected
       failure_number_ntwk = 0;
 
-#ifdef ZmqttDiscovery
+#ifdef OMG_MQTT_DISCOVERY
       // Deactivate autodiscovery after DiscoveryAutoOffTimer.
       // Exception: when discovery_republish_on_reconnect is enabled, we never never automatically disable discovery
       if (!discovery_republish_on_reconnect && SYSConfig.discovery && (now > lastDiscovery + DiscoveryAutoOffTimer))
@@ -2652,7 +2652,7 @@ void loop() {
 #endif
 #ifdef ZgatewayLORA
     LORAtoX();
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
     if (SYSConfig.discovery)
       launchLORADiscovery(false);
 #  endif
@@ -2673,7 +2673,7 @@ void loop() {
     PilighttoX();
 #endif
 #ifdef ZgatewayBT
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
     if (SYSConfig.discovery)
       launchBTDiscovery(false);
 #  endif
@@ -2700,7 +2700,7 @@ void loop() {
 #endif
 #ifdef ZgatewayRTL_433
     RTL_433Loop();
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
     if (SYSConfig.discovery)
       launchRTL_433Discovery(false);
 #  endif
@@ -2789,7 +2789,7 @@ String stateMeasures() {
 #endif
   SYSdata["mqtt"] = SYSConfig.mqtt;
   SYSdata["serial"] = SYSConfig.serial;
-#ifdef ZmqttDiscovery
+#ifdef OMG_MQTT_DISCOVERY
   SYSdata["disc"] = SYSConfig.discovery;
   SYSdata["ohdisc"] = SYSConfig.ohdiscovery;
 #endif
@@ -2806,7 +2806,7 @@ String stateMeasures() {
   }
 #endif
   SYSdata["freemem"] = freeMem;
-#if !MQTT_BROKER_MODE
+#if !OMG_MQTT_BROKER_MODE
   SYSdata["mqttp"] = cnt_parameters_array[cnt_index].mqtt_port;
   SYSdata["mqtts"] = cnt_parameters_array[cnt_index].isConnectionSecure;
   SYSdata["mqttv"] = cnt_parameters_array[cnt_index].isCertValidate;
@@ -3043,7 +3043,7 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
 #  ifdef ZgatewaySERIAL
     XtoSERIAL(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef MQTT_HTTPS_FW_UPDATE
+#  ifdef OMG_MQTT_HTTPS_FW_UPDATE
     MQTTHttpsFWUpdate(strTopicOri.c_str(), jsondata);
 #  endif
 #  if defined(ZwebUI) && defined(ESP32)
@@ -3085,7 +3085,7 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
   }
 }
 
-#if MQTT_HTTPS_FW_UPDATE
+#if OMG_MQTT_HTTPS_FW_UPDATE
 String latestVersion;
 #  ifdef ESP32
 #    include <HTTPClient.h>
@@ -3105,7 +3105,7 @@ bool checkForUpdates() {
   http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
 
   std::string ota_cert;
-#      if !MQTT_BROKER_MODE
+#      if !OMG_MQTT_BROKER_MODE
   if (cnt_parameters_array[cnt_index].ota_server_cert.length() > MIN_CERT_LENGTH) {
     Logger.notice(OMG_LOGID, F("Using memory cert" CR));
     ota_cert = cnt_parameters_array[cnt_index].ota_server_cert;
@@ -3175,7 +3175,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
           gatewayState = GatewayState::ERROR;
           return;
         }
-#  if MQTT_HTTPS_FW_UPDATE_USE_PASSWORD > 0
+#  if OMG_MQTT_HTTPS_FW_UPDATE_USE_PASSWORD > 0
         const char* pwd = HttpsFwUpdateData["password"];
         if (pwd) {
           if (strcmp(pwd, g_ota_pass) != 0) {
@@ -3225,7 +3225,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
       std::string ota_cert = TheengsUtils::processCert(HttpsFwUpdateData["ota_server_cert"] | "");
       Logger.notice(OMG_LOGID, F("OTA cert: %s" CR), ota_cert.c_str());
       if (ota_cert.length() < MIN_CERT_LENGTH && !strstr(url, "http:")) {
-#  if !MQTT_BROKER_MODE
+#  if !OMG_MQTT_BROKER_MODE
         if (cnt_parameters_array[cnt_index].ota_server_cert.length() > MIN_CERT_LENGTH) {
           Logger.notice(OMG_LOGID, F("Using memory cert" CR));
           ota_cert = cnt_parameters_array[cnt_index].ota_server_cert.c_str();
@@ -3251,7 +3251,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
 
       } else {
         WiFiClientSecure update_client;
-#  if !MQTT_BROKER_MODE
+#  if !OMG_MQTT_BROKER_MODE
         if (cnt_parameters_array[cnt_index].isConnectionSecure) {
           mqtt.reset();
           mqttSetupPending = true;
@@ -3298,7 +3298,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
           jsondata["installed_version"] = latestVersion;
           jsondata["origin"] = subjectRLStoMQTT;
           enqueueJsonObject(jsondata);
-#  if !MQTT_BROKER_MODE
+#  if !OMG_MQTT_BROKER_MODE
           if (cnt_index != 0) // We don't enable the change of cert provided at build time
             cnt_parameters_array[cnt_index].ota_server_cert = ota_cert;
 #  endif
@@ -3313,7 +3313,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
     }
   }
 }
-#endif // MQTT_HTTPS_FW_UPDATE
+#endif // OMG_MQTT_HTTPS_FW_UPDATE
 
 #ifdef OMG_LOCAL_OTA_FW_UPDATE
 #ifdef ESP32
@@ -3489,7 +3489,7 @@ bool checkForUpdates() {
 
 #endif // OMG_LOCAL_OTA_FW_UPDATE
 
-#if !MQTT_BROKER_MODE
+#if !OMG_MQTT_BROKER_MODE
 /**
  * Read the certificates from the memory and publish a hash of the cert to the broker for identification purposes
 */
@@ -3556,7 +3556,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       }
     }
 #endif
-#ifdef ZmqttDiscovery
+#ifdef OMG_MQTT_DISCOVERY
     if (SYSdata.containsKey("ohdisc") && SYSdata["ohdisc"].is<bool>()) {
       SYSConfig.ohdiscovery = SYSdata["ohdisc"];
       Logger.notice(OMG_LOGID, F("OpenHAB discovery: %T" CR), SYSConfig.ohdiscovery);
@@ -3594,7 +3594,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
     }
 
     if ((SYSdata.containsKey("mqtt_topic") && SYSdata["mqtt_topic"].is<const char*>()) ||
-#ifdef ZmqttDiscovery
+#ifdef OMG_MQTT_DISCOVERY
         (SYSdata.containsKey("discovery_prefix") && SYSdata["discovery_prefix"].is<const char*>()) ||
 #endif
 #if OMG_LOG_TO_SYSLOG
@@ -3606,7 +3606,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       if (SYSdata.containsKey("mqtt_topic")) {
         strncpy(mqtt_topic, SYSdata["mqtt_topic"], parameters_size);
       }
-#ifdef ZmqttDiscovery
+#ifdef OMG_MQTT_DISCOVERY
       if (SYSdata.containsKey("discovery_prefix")) {
         strncpy(discovery_prefix, SYSdata["discovery_prefix"], parameters_size);
       }
@@ -3634,7 +3634,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       mqttSetupPending = true; // trigger reconnect in loop using the new topic/name
     }
 
-#if !MQTT_BROKER_MODE
+#if !OMG_MQTT_BROKER_MODE
 #  ifdef MQTTsetMQTT
 
     bool save_cnt = false;
@@ -3753,7 +3753,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       if (SYSConfig.offline) {
         gatewayState = GatewayState::OFFLINE;
 // Disconnect MQTT
-#if !MQTT_BROKER_MODE
+#if !OMG_MQTT_BROKER_MODE
         mqtt->disconnect();
 #else
         mqtt->stop();

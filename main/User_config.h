@@ -143,7 +143,7 @@
 #define parameters_size     65
 #define mqtt_topic_max_size 150
 #define mqtt_key_max_size   20
-#ifdef MQTT_HTTPS_FW_UPDATE
+#ifdef OMG_MQTT_HTTPS_FW_UPDATE
 #  ifndef CHECK_OTA_UPDATE
 #    define CHECK_OTA_UPDATE true // enable to check for the presence of a new version for your environment on Github
 #  endif
@@ -155,7 +155,7 @@
 #  elif defined(ESP8266)
 #    define JSON_MSG_BUFFER 512 // Json message max buffer size, don't put 768 or higher it is causing unexpected behaviour on ESP8266, certificates handling with ESP8266 is not tested
 #  endif
-#  if MQTT_SECURE_DEFAULT
+#  if OMG_MQTT_SECURE_DEFAULT
 #    define JSON_MSG_BUFFER_MAX 2048 // Json message buffer size increased to handle certificate changes through MQTT, used for the queue and the coming MQTT messages
 #  else
 #    define JSON_MSG_BUFFER_MAX 1024 // Minimum size for the cover MQTT discovery message
@@ -166,17 +166,17 @@
 #  define mqtt_max_payload_size JSON_MSG_BUFFER_MAX + mqtt_topic_max_size + 10 // maximum size of the MQTT payload
 #endif
 
-#ifndef MQTT_USER
-#  define MQTT_USER "your_username"
+#ifndef OMG_MQTT_USER
+#  define OMG_MQTT_USER "your_username"
 #endif
-#ifndef MQTT_PASS
-#  define MQTT_PASS "your_password"
+#ifndef OMG_MQTT_PASS
+#  define OMG_MQTT_PASS "your_password"
 #endif
-#ifndef MQTT_SERVER
-#  define MQTT_SERVER "192.168.1.17"
+#ifndef OMG_MQTT_SERVER
+#  define OMG_MQTT_SERVER "192.168.1.17"
 #endif
-#ifndef MQTT_PORT
-#  define MQTT_PORT "1883"
+#ifndef OMG_MQTT_PORT
+#  define OMG_MQTT_PORT "1883"
 #endif
 
 #ifndef GeneralTimeOut
@@ -219,23 +219,23 @@
 #  endif
 #endif
 
-#ifndef MQTT_SECURE_DEFAULT
-#  define MQTT_SECURE_DEFAULT false
+#ifndef OMG_MQTT_SECURE_DEFAULT
+#  define OMG_MQTT_SECURE_DEFAULT false
 #endif
 
-#ifndef MQTT_CERT_VALIDATE_DEFAULT
-#  define MQTT_CERT_VALIDATE_DEFAULT false
+#ifndef OMG_MQTT_CERT_VALIDATE_DEFAULT
+#  define OMG_MQTT_CERT_VALIDATE_DEFAULT false
 #endif
 
 #ifndef AWS_IOT
 #  define AWS_IOT false
 #endif
 
-#ifndef MQTT_BROKER_MODE
-#  define MQTT_BROKER_MODE false
+#ifndef OMG_MQTT_BROKER_MODE
+#  define OMG_MQTT_BROKER_MODE false
 #endif
 
-#if MQTT_BROKER_MODE
+#if OMG_MQTT_BROKER_MODE
 // In MQTT broker mode the MQTT web config is not needed
 #  define WIFIMNG_HIDE_MQTT_CONFIG true
 #endif
@@ -247,9 +247,9 @@
 const char* alpnProtocols[] = {"x-amzn-mqtt-ca", NULL};
 #endif
 
-//#  define MQTT_HTTPS_FW_UPDATE //uncomment to enable updating via MQTT message.
+//#  define OMG_MQTT_HTTPS_FW_UPDATE //uncomment to enable updating via MQTT message.
 
-#ifdef MQTT_HTTPS_FW_UPDATE
+#ifdef OMG_MQTT_HTTPS_FW_UPDATE
 // If used, this should be set to the root CA certificate of the server hosting the firmware.
 #  ifdef PRIVATE_CERTS
 #    include "certs/private_ota_cert.h"
@@ -257,8 +257,8 @@ const char* alpnProtocols[] = {"x-amzn-mqtt-ca", NULL};
 #    include "certs/default_ota_cert.h"
 #  endif
 
-#  ifndef MQTT_HTTPS_FW_UPDATE_USE_PASSWORD
-#    define MQTT_HTTPS_FW_UPDATE_USE_PASSWORD 1 // Set this to 0 if not using TLS connection to MQTT broker to prevent clear text passwords being sent.
+#  ifndef OMG_MQTT_HTTPS_FW_UPDATE_USE_PASSWORD
+#    define OMG_MQTT_HTTPS_FW_UPDATE_USE_PASSWORD 1 // Set this to 0 if not using TLS connection to MQTT broker to prevent clear text passwords being sent.
 #  endif
 #  if DEVELOPMENTOTA
 #    define OTA_JSON_URL "https://ota.openmqttgateway.com/binaries/dev/latest_version_dev.json" //OTA url used to discover new versions of the firmware from development nightly builds
@@ -272,8 +272,8 @@ const char* alpnProtocols[] = {"x-amzn-mqtt-ca", NULL};
 const char* OTAserver_cert = "";
 #endif
 
-#ifndef MQTT_SECURE_SIGNED_CLIENT
-#  define MQTT_SECURE_SIGNED_CLIENT 0 // If using a signed certificate for the broker and using client certificate/key set this to true or 1
+#ifndef OMG_MQTT_SECURE_SIGNED_CLIENT
+#  define OMG_MQTT_SECURE_SIGNED_CLIENT 0 // If using a signed certificate for the broker and using client certificate/key set this to true or 1
 #endif
 
 #ifdef PRIVATE_CERTS
@@ -292,7 +292,7 @@ const char* OTAserver_cert = "";
 #  define CNT_DEFAULT_INDEX 0 // Default set of connection parameters
 #endif
 
-#if !MQTT_BROKER_MODE
+#if !OMG_MQTT_BROKER_MODE
 struct ss_cnt_parameters {
   std::string server_cert;
   std::string client_cert;
@@ -310,9 +310,9 @@ struct ss_cnt_parameters {
 #  define cnt_parameters_array_size 3
 
 ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
-    {ss_server_cert, ss_client_cert, ss_client_key, OTAserver_cert, MQTT_SERVER, MQTT_PORT, MQTT_USER, MQTT_PASS, MQTT_SECURE_DEFAULT, MQTT_CERT_VALIDATE_DEFAULT, false},
-    {"", "", "", "", MQTT_SERVER, MQTT_PORT, MQTT_USER, MQTT_PASS, MQTT_SECURE_DEFAULT, MQTT_CERT_VALIDATE_DEFAULT, false},
-    {"", "", "", "", MQTT_SERVER, MQTT_PORT, MQTT_USER, MQTT_PASS, MQTT_SECURE_DEFAULT, MQTT_CERT_VALIDATE_DEFAULT, false}};
+    {ss_server_cert, ss_client_cert, ss_client_key, OTAserver_cert, OMG_MQTT_SERVER, OMG_MQTT_PORT, OMG_MQTT_USER, OMG_MQTT_PASS, OMG_MQTT_SECURE_DEFAULT, OMG_MQTT_CERT_VALIDATE_DEFAULT, false},
+    {"", "", "", "", OMG_MQTT_SERVER, OMG_MQTT_PORT, OMG_MQTT_USER, OMG_MQTT_PASS, OMG_MQTT_SECURE_DEFAULT, OMG_MQTT_CERT_VALIDATE_DEFAULT, false},
+    {"", "", "", "", OMG_MQTT_SERVER, OMG_MQTT_PORT, OMG_MQTT_USER, OMG_MQTT_PASS, OMG_MQTT_SECURE_DEFAULT, OMG_MQTT_CERT_VALIDATE_DEFAULT, false}};
 #endif
 
 #define MIN_CERT_LENGTH 200 // Minimum length of a certificate to be considered valid
@@ -376,7 +376,7 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 //#define ZsensorDS1820  "DS1820"   //ESP8266, Arduino, ESP32
 //#define ZsensorGPIOKeyCode "GPIOKeyCode" //ESP8266, Arduino, ESP32
 //#define ZsensorGPIOInput "GPIOInput" //ESP8266, Arduino, ESP32
-//#define ZmqttDiscovery "HADiscovery"//ESP8266, Arduino, ESP32, Sonoff RF Bridge
+//#define OMG_MQTT_DISCOVERY "HADiscovery"//ESP8266, Arduino, ESP32, Sonoff RF Bridge
 //#define ZactuatorFASTLED "FASTLED" //ESP8266, Arduino, ESP32, Sonoff RF Bridge
 //#define ZboardM5STICKC "M5StickC"
 //#define ZboardM5STICKCP "M5StickCP"
@@ -408,16 +408,16 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #  define Gateway_AnnouncementMsg "online"
 #endif
 
-#ifndef jsonPublishing
-#  define jsonPublishing true //define false if you don't want to use Json publishing (one topic for all the parameters)
+#ifndef OMG_MQTT_JSON_PUBLISHING
+#  define OMG_MQTT_JSON_PUBLISHING true //define false if you don't want to use Json publishing (one topic for all the parameters)
 #endif
 //example home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4 {"rssi":-63,"servicedata":"fe0000000000000000000000000000000000000000"}
 #ifndef jsonReceiving
 #  define jsonReceiving true //define false if you don't want to use Json  reception analysis
 #endif
 
-#ifndef simplePublishing
-#  define simplePublishing false //define true if you want to use simple publishing (one topic for one parameter)
+#ifndef OMG_MQTT_SIMPLE_PUBLISHING
+#  define OMG_MQTT_SIMPLE_PUBLISHING false //define true if you want to use simple publishing (one topic for one parameter)
 #endif
 //example
 // home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4/rssi -63.0
@@ -425,14 +425,14 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #ifndef simpleReceiving
 #  define simpleReceiving true //define false if you don't want to use old way reception analysis
 #endif
-#ifndef message_UTCtimestamp
-#  define message_UTCtimestamp false //define true if you want messages to be timestamped in ISO8601 UTC format (e.g.: "UTCtime"="2023-12-26T19:10:20Z")
+#ifndef OMG_MQTT_MESSAGE_UTC_TIMESTAMP
+#  define OMG_MQTT_MESSAGE_UTC_TIMESTAMP false //define true if you want messages to be timestamped in ISO8601 UTC format (e.g.: "UTCtime"="2023-12-26T19:10:20Z")
 #endif
-#ifndef message_localtimestamp
-#  define message_localtimestamp false //define true if you want messages to be timestamped in ISO8601 UTC format with time zone (e.g.: "UTCtime"="2023-12-26T19:10:20-05:00")
+#ifndef OMG_MQTT_MESSAGE_LOCAL_TIMESTAMP
+#  define OMG_MQTT_MESSAGE_LOCAL_TIMESTAMP false //define true if you want messages to be timestamped in ISO8601 UTC format with time zone (e.g.: "UTCtime"="2023-12-26T19:10:20-05:00")
 #endif
-#ifndef message_unixtimestamp
-#  define message_unixtimestamp false //define true if you want messages to have an unix timestamp (e.g.: "unixtime"=1679015107)
+#ifndef OMG_MQTT_MESSAGE_UNIX_TIMESTAMP
+#  define OMG_MQTT_MESSAGE_UNIX_TIMESTAMP false //define true if you want messages to have an unix timestamp (e.g.: "unixtime"=1679015107)
 #endif
 
 /*-------------DEFINE YOUR OTA PARAMETERS BELOW----------------*/
@@ -580,8 +580,8 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #define eraseCmd   "erase"
 #define statusCmd  "status"
 
-#ifndef valueAsATopic
-#  define valueAsATopic false // define true to integrate msg value into the subject when receiving
+#ifndef OMG_MQTT_VALUE_AS_A_TOPIC
+#  define OMG_MQTT_VALUE_AS_A_TOPIC false // define true to integrate msg value into the subject when receiving
 #endif
 
 #if defined(ZgatewayRF) || defined(ZgatewayIR) || defined(ZgatewaySRFB) || defined(ZgatewayWeatherStation) || defined(ZgatewayRTL_433)

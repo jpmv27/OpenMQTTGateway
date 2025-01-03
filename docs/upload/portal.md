@@ -72,8 +72,8 @@ build_flags =
   '-DLED_INFO=33'
   '-DLED_INFO_ON=1'
   '-DESP32_ETHERNET=true'
-  '-DMQTT_SERVER="11.22.33.44"'
-  '-DMQTT_USER="salut"'
-  '-DMQTT_PASS="atoi"'
+  '-DOMG_MQTT_SERVER="11.22.33.44"'
+  '-DOMG_MQTT_USER="salut"'
+  '-DOMG_MQTT_PASS="atoi"'
   '-DOMG_GATEWAY_NAME="OpenMQTTGateway_ESP32_OLM_GTW"'
 ```

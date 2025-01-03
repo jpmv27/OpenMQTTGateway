@@ -39,7 +39,7 @@
 
 LORAConfig_s LORAConfig;
 
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
 SemaphoreHandle_t semaphorecreateOrUpdateDeviceLORA;
 std::vector<LORAdevice*> LORAdevices;
 int newLORADevices = 0;
@@ -375,7 +375,7 @@ void LORAConfig_fromJson(JsonObject& LORAdata) {
 void setupLORA() {
   LORAConfig_init();
   LORAConfig_load();
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
   semaphorecreateOrUpdateDeviceLORA = xSemaphoreCreateBinary();
   xSemaphoreGive(semaphorecreateOrUpdateDeviceLORA);
 #  endif
@@ -461,7 +461,7 @@ void LORAtoX() {
     if (LORAdata.containsKey("id")) {
       std::string id = LORAdata["id"];
       id.erase(std::remove(id.begin(), id.end(), ':'), id.end());
-#  ifdef ZmqttDiscovery
+#  ifdef OMG_MQTT_DISCOVERY
       if (SYSConfig.discovery) {
         if (!LORAdata.containsKey("model"))
           LORAdataBuffer["model"] = "LORA_NODE";

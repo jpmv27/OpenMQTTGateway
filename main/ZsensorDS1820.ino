@@ -98,9 +98,8 @@ void setupZsensorDS1820() {
 }
 
 void pubOneWire_HADiscovery() {
-  // If zmqttDiscovery is enabled, create a sensor topic for each DS18b20 sensor found on the bus, using addr as uniqueID
-#  ifdef ZmqttDiscovery
-  // If zmqtt discovery is enabled, create a sensor topic for each DS18b20 sensor found on the bus, using addr as uniqueID
+  // If OMG_MQTT_DISCOVERY is enabled, create a sensor topic for each DS18b20 sensor found on the bus, using addr as uniqueID
+#  ifdef OMG_MQTT_DISCOVERY
   if (SYSConfig.discovery) {
     for (int index = 0; index < ds1820_count; index++) {
       createDiscovery("sensor",

@@ -241,7 +241,7 @@ void SERIALtoX() {
         } else {
           // Process normal messages
           Logger.notice(OMG_LOGID, F("SERIAL msg received: %s" CR), jsonString.c_str());
-#    if jsonPublishing
+#    if OMG_MQTT_JSON_PUBLISHING
           if (SERIALdata.containsKey("target")) {
             receivingDATA("", jsonString.c_str());
           } else {
@@ -260,7 +260,7 @@ void SERIALtoX() {
             }
           }
 #    endif
-#    if simplePublishing
+#    if OMG_MQTT_SIMPLE_PUBLISHING
           // send as MQTT topics
           char topic[mqtt_topic_max_size + 1] = subjectSERIALtoMQTT;
           sendMQTTfromNestedJson(SERIALBuffer.as<JsonVariant>(), topic, 0, SERIALmaxJSONlevel);

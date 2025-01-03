@@ -74,9 +74,9 @@ build_flags =
   '-DESPWifiManualSetup=true'
   '-DOMG_WIFI_SSID="MyWiFiAP"'
   '-DOMG_WIFI_PASSWORD="MyWiFiAPPassword"'
-  '-DMQTT_USER="lolin-esp32"'
-  '-DMQTT_PASS="abcdefghi"'
-  '-DMQTT_SERVER="192.168.1.17"'
+  '-DOMG_MQTT_USER="lolin-esp32"'
+  '-DOMG_MQTT_PASS="abcdefghi"'
+  '-DOMG_MQTT_SERVER="192.168.1.17"'
   '-DDEFAULT_LOW_POWER_MODE=INTERVAL'
 
 ;hacked Sonoff RF-Bridge
@@ -136,9 +136,8 @@ lib_deps =
   ${libraries.esp8266_mdns}
 build_flags =
   ${com-esp.build_flags}
-  '-UZmqttDiscovery'          ; disables MQTT Discovery
-;  '-UZmqttDiscovery="HADiscovery"'
-  '-DvalueAsATopic=true'       ; MQTT topic includes model and device
+  '-UOMG_MQTT_DISCOVERY'          ; disables MQTT Discovery
+  '-DOMG_MQTT_VALUE_AS_A_TOPIC=true'       ; MQTT topic includes model and device
   '-DOMG_GATEWAY_NAME="OpenMQTTGateway_MQ2_GAS"'
   '-DZsensorMQ2="MQ2"'
   '-DTimeBetweenReadingmq2=8000'
@@ -186,9 +185,8 @@ lib_deps =
   ${libraries.dallastemperature}
 build_flags =
   ${com-esp.build_flags}
-  '-UZmqttDiscovery'          ; disables MQTT Discovery
-;  '-UZmqttDiscovery="HADiscovery"'
-  '-DvalueAsATopic=true'       ; MQTT topic includes model and device
+  '-UOMG_MQTT_DISCOVERY'          ; disables MQTT Discovery
+  '-DOMG_MQTT_VALUE_AS_A_TOPIC=true'       ; MQTT topic includes model and device
   '-DOMG_GATEWAY_NAME="OpenMQTTGatewayDS1820Pool"'
   '-DZsensorDS1820="DS1820"'
   '-DDS1820_OWBUS_GPIO=D2'
@@ -208,9 +206,8 @@ lib_deps =
   ${libraries.wifimanager32}
 build_flags =
   ${com-esp.build_flags}
-  '-UZmqttDiscovery'              ; disables MQTT Discovery
-;  '-UZmqttDiscovery="HADiscovery"'
-  '-DvalueAsATopic=true'          ; MQTT topic includes model and device
+  '-UOMG_MQTT_DISCOVERY'              ; disables MQTT Discovery
+  '-DOMG_MQTT_VALUE_AS_A_TOPIC=true'          ; MQTT topic includes model and device
   '-DOMG_GATEWAY_NAME="OpenMQTTGatewayMHRDWaterLeak"'
   '-DZsensorC37_YL83_HMRD="HMRD"' ;Which type of sensor
   '-DC37_YL83_HMRD_Digital_GPIO=GPIO_NUM_14'

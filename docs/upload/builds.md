@@ -35,7 +35,7 @@ lib_deps =
 build_flags =
   ${env.build_flags}        ; Inherit all the build flags from [env]
   '-DsimpleReceiving=true'  ; Add some of our own build flags
-  '-DZmqttDiscovery="HADiscovery"'
+  '-DOMG_MQTT_DISCOVERY="HADiscovery"'
   ;'-DCORE_DEBUG_LEVEL=4'
 ```
 Here, build flags starting with "-D" let us set configuration values you would normally find in `User_config.h` and `config_xx.h` files by specifying them here, overriding the default values set in those files. To include special characters, you can triple escape them with a backslash like so:
@@ -76,20 +76,20 @@ build_flags =
   ${env:nodemcuv2-pilight.build_flags}
   '-DOMG_GATEWAY_NAME="OpenMQTTGateway"'
   '-DZsensorBME280="BME280"'
-  '-DBase_Topic="rf/"'
+  '-DOMG_MQTT_BASE_TOPIC="rf/"'
   '-DESPWifiManualSetup=true'
   '-DOMG_WIFI_SSID="mynetwork"'
   '-DOMG_WIFI_PASSWORD="Cato\\\'sYounger\\\$on"' ; Cato'sYounger$on
-  '-DMQTT_USER="mqttusername"'
-  '-DMQTT_PASS="mqttpassword"'
-  '-DMQTT_SERVER="mqttserver.local"'
+  '-DOMG_MQTT_USER="mqttusername"'
+  '-DOMG_MQTT_PASS="mqttpassword"'
+  '-DOMG_MQTT_SERVER="mqttserver.local"'
   '-DOMG_GW_PASSWORD="12345678"'
   '-DLED_RECEIVE=LED_BUILTIN'        ; Comment 1
   '-DLED_RECEIVE_ON=LOW'             ; Comment 2
   '-DRF_RECEIVER_GPIO=13'
   '-DRF_EMITTER_GPIO=15'
   '-DsimpleReceiving=false'
-  '-UZmqttDiscovery'                 ; Disable HA discovery
+  '-UOMG_MQTT_DISCOVERY'                 ; Disable HA discovery
 monitor_speed = 115200
 
 [env:nodemcuv2-pilight-bme280-ota]
@@ -119,7 +119,7 @@ and related network parameters, e.g.:
 ```
 :::
 
-The first new environment we create, `nodemcuv2-pilight-bme280`, inherits the default `nodemcuv2-pilight` environment in `platformio.ini` with the `extends = env:nodemcuv2-pilight` line. In the `lib_deps` section, it imports all the `lib_deps` of `nodemcuv2-pilight` with the `${env:nodemcuv2-pilight.lib_deps}` line, and adds BME280 on top of it. (Since the environment we're extending already has this `lib_deps` attribute, specifying it again would normally replace it completely with our new attribute; instead, to keep its value but simply append to it, we import the original in the beginning of our `lib_deps` attribute.) In the `build_flags` section, it again imports all the `build_flags` of `nodemcuv2-pilight` and many of its own overrides, e.g. changing `Base_Topic` found in `User_config.h` from the default to "rf/" by using the `'-DBase_Topic="rf/"'` line. It also unsets previously set configurations (i.e. `mqttDiscovery`) by using `'-UZmqttDiscovery'`. This environment will work over serial upload.
+The first new environment we create, `nodemcuv2-pilight-bme280`, inherits the default `nodemcuv2-pilight` environment in `platformio.ini` with the `extends = env:nodemcuv2-pilight` line. In the `lib_deps` section, it imports all the `lib_deps` of `nodemcuv2-pilight` with the `${env:nodemcuv2-pilight.lib_deps}` line, and adds BME280 on top of it. (Since the environment we're extending already has this `lib_deps` attribute, specifying it again would normally replace it completely with our new attribute; instead, to keep its value but simply append to it, we import the original in the beginning of our `lib_deps` attribute.) In the `build_flags` section, it again imports all the `build_flags` of `nodemcuv2-pilight` and many of its own overrides, e.g. changing `OMG_MQTT_BASE_TOPIC` found in `User_config.h` from the default to "rf/" by using the `'-DOMG_MQTT_BASE_TOPIC="rf/"'` line. It also unsets previously set configurations (i.e. `mqttDiscovery`) by using `'-UOMG_MQTT_DISCOVERY'`. This environment will work over serial upload.
 
 The second new environment, `nodemcuv2-pilight-bme280-ota`, inherits everything we specified in the first environment (with the line `extends = env:nodemcuv2-pilight-bme280`), but modifies it to upload over OTA (Wi-Fi). We also specified this as the `default_env` in the beginning of the file, so PlatformIO will choose this environment to build and upload if we don't specify otherwise.
 
@@ -209,9 +209,9 @@ Per default Json reception and Json publication is activated, the previous simpl
 
 You can deactivate Json or simple mode following theses instructions:
 ```cpp
-#define jsonPublishing true //define false if you don't want to use Json publishing (one topic for all the parameters)
+#define OMG_MQTT_JSON_PUBLISHING true //define false if you don't want to use Json publishing (one topic for all the parameters)
 //example home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4 {"rssi":-63,"servicedata":"fe0000000000000000000000000000000000000000"}
-#define simplePublishing false //define true if you want to use simple publishing (one topic for one parameter)
+#define OMG_MQTT_SIMPLE_PUBLISHING false //define true if you want to use simple publishing (one topic for one parameter)
 //example
 // home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4/rssi -63.0
 // home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4/servicedata fe0000000000000000000000000000000000000000
@@ -221,10 +221,10 @@ You can deactivate Json or simple mode following theses instructions:
 
 If you are using platformio you can also comment the definitions above and define your parameters into platformio.ini file by setting the following `build_flags`:
 ```cpp
-  '-DjsonPublishing=true'
+  '-DOMG_MQTT_JSON_PUBLISHING=true'
   '-DjsonReceiving=true'
   '-DsimpleReceiving=true'
-  '-DsimplePublishing=true'
+  '-DOMG_MQTT_SIMPLE_PUBLISHING=true'
 ```
 
 Note that depending on the environment the default platformio.ini has common option defined see sections:
@@ -234,9 +234,9 @@ Note that depending on the environment the default platformio.ini has common opt
 ```
 
 If you want to use HASS MQTT discovery you need to have
-`#define jsonPublishing true`
+`#define OMG_MQTT_JSON_PUBLISHING true`
 &
-`#define ZmqttDiscovery "HADiscovery"`
+`#define OMG_MQTT_DISCOVERY "HADiscovery"`
 uncommented.
 Added to that auto discovery box should be selected into your Home Assistant MQTT integration configuration.
 
