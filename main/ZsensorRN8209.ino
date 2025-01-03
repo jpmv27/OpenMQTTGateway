@@ -24,7 +24,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifdef ZsensorRN8209
+#ifdef OMG_SENSOR_RN8209
 
 #  include "ArduinoJson.h"
 #  include "driver/uart.h"
@@ -115,4 +115,4 @@ void setupRN8209() {
   Logger.debug(OMG_LOGID, F("ZsensorRN8209 setup done " CR));
 }
 
-#endif // ZsensorRN8209
+#endif // OMG_SENSOR_RN8209

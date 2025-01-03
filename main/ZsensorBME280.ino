@@ -39,7 +39,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorBME280
+#ifdef OMG_SENSOR_BME280
 #  include <stdint.h>
 
 #  include "SparkFunBME280.h"

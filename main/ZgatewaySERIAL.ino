@@ -27,7 +27,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZgatewaySERIAL
+#ifdef OMG_GATEWAY_SERIAL
 
 #  ifndef SERIAL_UART // software serial mode
 #    include <SoftwareSerial.h>

@@ -28,7 +28,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorHCSR501
+#ifdef OMG_SENSOR_HCSR501
 
 void setupHCSR501() {
   Logger.notice(OMG_LOGID, F("HCSR501 pin: %d" CR), HCSR501_GPIO);

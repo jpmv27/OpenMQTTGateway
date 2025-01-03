@@ -37,7 +37,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorTEMT6000
+#ifdef OMG_SENSOR_TEMT6000
 
 #  include "Wire.h"
 #  include "math.h"

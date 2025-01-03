@@ -27,9 +27,9 @@
 */
 #include "User_config.h"
 
-#ifdef ZgatewayRF
+#ifdef OMG_GATEWAY_RF
 
-#  ifdef ZradioCC1101
+#  ifdef OMG_RADIO_CC1101
 #    include <ELECHOUSE_CC1101_SRC_DRV.h>
 #  endif
 
@@ -135,7 +135,7 @@ void RFtoX() {
     }
     RFdata["raw"] = rawDump;
 #  endif
-#  ifdef ZradioCC1101 // set Receive off and Transmitt on
+#  ifdef OMG_RADIO_CC1101 // set Receive off and Transmitt on
     RFdata["frequency"] = RFConfig.frequency;
 #  endif
     mySwitch.resetAvailable();
@@ -161,7 +161,7 @@ void RFtoX() {
 
 #  if simpleReceiving
 void XtoRF(const char* topicOri, const char* datacallback) {
-#    ifdef ZradioCC1101 // set Receive off and Transmitt on
+#    ifdef OMG_RADIO_CC1101 // set Receive off and Transmitt on
   disableCurrentReceiver();
   ELECHOUSE_cc1101.SetTx(RFConfig.frequency);
   Logger.notice(OMG_LOGID, F("Transmit frequency: %F" CR), RFConfig.frequency);
@@ -215,7 +215,7 @@ void XtoRF(const char* topicOri, const char* datacallback) {
     // Acknowledgement to the GTWRF topic
     pub(subjectGTWRFtoMQTT, datacallback); // we acknowledge the sending by publishing the value to an acknowledgement topic, for the moment even if it is a signal repetition we acknowledge also
   }
-#    ifdef ZradioCC1101 // set Receive on and Transmitt off
+#    ifdef OMG_RADIO_CC1101 // set Receive on and Transmitt off
   ELECHOUSE_cc1101.SetRx(RFConfig.frequency);
   mySwitch.disableTransmit();
   mySwitch.enableReceive(RF_RECEIVER_GPIO);
@@ -236,7 +236,7 @@ void XtoRF(const char* topicOri, JsonObject& RFdata) { // json object decoding
       Logger.notice(OMG_LOGID, F("RF Protocol:%d" CR), valuePRT);
       Logger.notice(OMG_LOGID, F("RF Pulse Lgth: %d" CR), valuePLSL);
       Logger.notice(OMG_LOGID, F("Bits nb: %d" CR), valueBITS);
-#    ifdef ZradioCC1101
+#    ifdef OMG_RADIO_CC1101
       disableCurrentReceiver();
       initCC1101();
       int txPower = RFdata["txpower"] | RF_CC1101_TXPOWER;

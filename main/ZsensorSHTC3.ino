@@ -1,6 +1,6 @@
 #include "User_config.h"
 
-#ifdef ZsensorSHTC3
+#ifdef OMG_SENSOR_SHTC3
 #  include <SparkFun_SHTC3.h>
 
 SHTC3 mySHTC3;

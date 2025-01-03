@@ -43,7 +43,7 @@
 
 #define configure_1 "<p><form action='wi' method='post'><button>Configure WiFi</button></form></p>"
 #define configure_2 "<p><form action='mq' method='post'><button>Configure MQTT</button></form></p>"
-/*#if defined(ZgatewayCloud)
+/*#if defined(OMG_GATEWAY_CLOUD)
 #  define configure_3 "<p><form action='cl' method='get'><button>Configure Cloud</button></form></p>"
 #else
 #  define configure_3
@@ -55,9 +55,9 @@
 #endif
 #define configure_4 "<p><form action='wu' method='get'><button>Configure WebUI</button></form></p>"
 #define configure_5 "<p><form action='lo' method='get'><button>Configure Logging</button></form></p>"
-#ifdef ZgatewayLORA
+#ifdef OMG_GATEWAY_LORA
 #  define configure_6 "<p><form action='la' method='get'><button>Configure LORA</button></form></p>"
-#elif defined(ZgatewayRTL_433) || defined(ZgatewayPilight) || defined(ZgatewayRF) || defined(ZgatewayRF2) || defined(ZactuatorSomfy)
+#elif defined(OMG_GATEWAY_RTL_433) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_RF2) || defined(OMG_ACTUATOR_SOMFY)
 #  define configure_6 "<p><form action='rf' method='get'><button>Configure RF</button></form></p>"
 #else
 #  define configure_6

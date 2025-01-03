@@ -27,7 +27,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZgatewayLORA
+#ifdef OMG_GATEWAY_LORA
 
 #  include <LoRa.h>
 #  include <SPI.h>

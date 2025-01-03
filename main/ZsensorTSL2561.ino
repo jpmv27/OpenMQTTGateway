@@ -39,7 +39,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorTSL2561
+#ifdef OMG_SENSOR_TSL2561
 #  include <Adafruit_Sensor.h>
 #  include <Adafruit_TSL2561_U.h>
 

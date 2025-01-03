@@ -31,11 +31,11 @@
 #  include "config_WebContent.h"
 #  include "config_WebUI.h"
 
-#  if defined(ZgatewayCloud)
+#  if defined(OMG_GATEWAY_CLOUD)
 #    include "config_Cloud.h"
 #  endif
 
-#  if defined(ZdisplaySSD1306)
+#  if defined(OMG_DISPLAY_SSD1306)
 #    include "config_SSD1306.h"
 #  endif
 
@@ -1017,7 +1017,7 @@ void handleLO() {
   server.send(200, "text/html", response);
 }
 
-#  ifdef ZgatewayLORA
+#  ifdef OMG_GATEWAY_LORA
 /**
  * @brief /LA - Configure LORA Page
  * T: handleLA: uri: /la, args: 11, method: 1
@@ -1171,20 +1171,20 @@ void handleLA() {
   response += String(buffer);
   server.send(200, "text/html", response);
 }
-#  elif defined(ZgatewayRTL_433) || defined(ZgatewayPilight) || defined(ZgatewayRF) || defined(ZgatewayRF2) || defined(ZactuatorSomfy)
+#  elif defined(OMG_GATEWAY_RTL_433) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_RF2) || defined(OMG_ACTUATOR_SOMFY)
 #    include <map>
 std::map<int, String> activeReceiverOptions = {
     {0, "Inactive"},
-#    if defined(ZgatewayPilight) && !defined(ZradioSX127x)
+#    if defined(OMG_GATEWAY_PILIGHT) && !defined(OMG_RADIO_SX127X)
     {1, "PiLight"},
 #    endif
-#    if defined(ZgatewayRF) && !defined(ZradioSX127x)
+#    if defined(OMG_GATEWAY_RF) && !defined(OMG_RADIO_SX127X)
     {2, "RF"},
 #    endif
-#    ifdef ZgatewayRTL_433
+#    ifdef OMG_GATEWAY_RTL_433
     {3, "RTL_433"},
 #    endif
-#    if defined(ZgatewayRF2) && !defined(ZradioSX127x)
+#    if defined(OMG_GATEWAY_RF2) && !defined(OMG_RADIO_SX127X)
     {4, "RF2 (restart required)"}
 #    endif
 };
@@ -1324,7 +1324,7 @@ void handleRT() {
   }
 }
 
-#  if defined(ZgatewayCloud)
+#  if defined(OMG_GATEWAY_CLOUD)
 /**
  * @brief /CL - Cloud Configuration
  * 
@@ -1440,23 +1440,23 @@ void handleIN() {
     String informationDisplay = stateMeasures(); // .replace(",\"", "}1");  // .replace("\":", "=2")
 
 // }1 json-oled }2 true } }1 Cloud }2 cloudEnabled}2true}1c
-#  if defined(ZgatewayBT)
+#  if defined(OMG_GATEWAY_BT)
     informationDisplay += "1<BR>BT}2}1"; // }1 the bracket is not needed as the previous message ends with }
     informationDisplay += stateBTMeasures(false);
 #  endif
-#  if defined(ZdisplaySSD1306)
+#  if defined(OMG_DISPLAY_SSD1306)
     informationDisplay += "1<BR>SSD1306}2}1"; // }1 the bracket is not needed as the previous message ends with }
     informationDisplay += stateSSD1306Display();
 #  endif
-#  if defined(ZgatewayCloud)
+#  if defined(OMG_GATEWAY_CLOUD)
     informationDisplay += "1<BR>Cloud}2}1";
     informationDisplay += stateCLOUDStatus();
 #  endif
-#  if defined(ZgatewayLORA)
+#  if defined(OMG_GATEWAY_LORA)
     informationDisplay += "1<BR>LORA}2}1";
     informationDisplay += stateLORAMeasures();
 #  endif
-#  if defined(ZgatewayRF)
+#  if defined(OMG_GATEWAY_RF)
     informationDisplay += "1<BR>RF}2}1";
     informationDisplay += stateRFMeasures();
 #  endif
@@ -1723,12 +1723,12 @@ void WebUISetup() {
   server.on("/cg", HTTP_POST, handleCG); // Configure gateway"
 #  endif
   server.on("/wu", handleWU); // Configure WebUI
-#  ifdef ZgatewayLORA
+#  ifdef OMG_GATEWAY_LORA
   server.on("/la", handleLA); // Configure LORA
-#  elif defined(ZgatewayRTL_433) || defined(ZgatewayPilight) || defined(ZgatewayRF) || defined(ZgatewayRF2) || defined(ZactuatorSomfy)
+#  elif defined(OMG_GATEWAY_RTL_433) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_RF2) || defined(OMG_ACTUATOR_SOMFY)
   server.on("/rf", handleRF); // Configure RF
 #  endif
-#  if defined(ZgatewayCloud)
+#  if defined(OMG_GATEWAY_CLOUD)
   server.on("/cl", handleCL); // Configure Cloud
   server.on("/tk", handleTK); // Store Device Token
 #  endif
@@ -1939,7 +1939,7 @@ void webUIPubPrint(const char* topicori, JsonObject& data) {
           break;
         }
 
-#  ifdef ZgatewayRTL_433
+#  ifdef OMG_GATEWAY_RTL_433
         case webUIHash("RTL_433toMQTT"): {
           if (data["model"] && strncmp(data["model"], "status", 6)) { // Does not contain "status"
             // {"model":"Acurite-Tower","id":2043,"channel":"B","battery_ok":1,"temperature_C":5.3,"humidity":81,"mic":"CHECKSUM","protocol":"Acurite 592TXR Temp/Humidity, 5n1 Weather Station, 6045 Lightning, 3N1, Atlas","rssi":-81,"duration":121060}
@@ -2033,7 +2033,7 @@ void webUIPubPrint(const char* topicori, JsonObject& data) {
           break;
         }
 #  endif
-#  ifdef ZsensorBME280
+#  ifdef OMG_SENSOR_BME280
         case webUIHash("CLIMAtoMQTT"): {
           // {"tempc":17.06,"tempf":62.708,"hum":50.0752,"pa":98876.14,"altim":205.8725,"altift":675.4348}
 
@@ -2095,7 +2095,7 @@ void webUIPubPrint(const char* topicori, JsonObject& data) {
           break;
         }
 #  endif
-#  ifdef ZgatewayBT
+#  ifdef OMG_GATEWAY_BT
         case webUIHash("BTtoMQTT"): {
           // {"id":"AA:BB:CC:DD:EE:FF","mac_type":0,"adv_type":0,"name":"sps","manufacturerdata":"de071f1000b1612908","rssi":-70,"brand":"Inkbird","model":"T(H) Sensor","model_id":"IBS-TH1/TH2/P01B","type":"THBX","cidc":false,"acts":true,"tempc":20.14,"tempf":68.252,"hum":41.27,"batt":41}
 
@@ -2433,7 +2433,7 @@ void webUIPubPrint(const char* topicori, JsonObject& data) {
           }
         }
 #  endif
-#  ifdef ZsensorRN8209
+#  ifdef OMG_SENSOR_RN8209
         case webUIHash("RN8209toMQTT"): {
           // {"volt":1073178,"current":0,"power":0}
 
@@ -2481,7 +2481,7 @@ void webUIPubPrint(const char* topicori, JsonObject& data) {
           break;
         }
 #  endif
-#  ifdef ZgatewayLORA
+#  ifdef OMG_GATEWAY_LORA
         case webUIHash("LORAtoMQTT"): {
           // {"tempc":25.4,"hum":0,"batt":0}
 

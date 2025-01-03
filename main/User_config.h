@@ -349,44 +349,44 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 /*-------------DEFINE THE MODULES YOU WANT BELOW----------------*/
 //Addons and module management, uncomment the Z line corresponding to the module you want to use
 
-//#define ZgatewayRF     "RF"       //ESP8266, Arduino, ESP32
-//#define ZgatewayIR     "IR"       //ESP8266, Arduino,         Sonoff RF Bridge
-//#define ZgatewayLORA   "LORA"       //ESP8266, Arduino, ESP32
-//#define ZgatewayPilight "Pilight" //ESP8266, Arduino, ESP32
-//#define ZgatewayWeatherStation "WeatherStation" //ESP8266, Arduino, ESP32
-//#define ZgatewayGFSunInverter "GFSunInverter"   //ESP32
-//#define ZgatewayBT     "BT"       //ESP8266, ESP32
-//#define ZgatewayRF2    "RF2"      //ESP8266, Arduino, ESP32
-//#define ZgatewaySRFB   "SRFB"     //                          Sonoff RF Bridge
-//#define Zgateway2G     "2G"       //ESP8266, Arduino, ESP32
-//#define ZgatewayRFM69  "RFM69"    //ESP8266, Arduino, ESP32
-//#define ZactuatorONOFF "ONOFF"    //ESP8266, Arduino, ESP32,  Sonoff RF Bridge
-//#define ZsensorINA226  "INA226"   //ESP8266, Arduino, ESP32
-//#define ZsensorHCSR04  "HCSR04"   //ESP8266, Arduino, ESP32
-//#define ZsensorHCSR501 "HCSR501"  //ESP8266, Arduino, ESP32,  Sonoff RF Bridge
-//#define ZsensorADC     "ADC"      //ESP8266, Arduino, ESP32
-//#define ZsensorBH1750  "BH1750"   //ESP8266, Arduino, ESP32
-//#define ZsensorMQ2 "MQ2"  //ESP8266, Arduino, ESP32
-//#define ZsensorTEMT6000 "TEMT6000"  //ESP8266
-//#define ZsensorTSL2561 "TSL2561"  //ESP8266, Arduino, ESP32
-//#define ZsensorBME280  "BME280"   //ESP8266, Arduino, ESP32
-//#define ZsensorHTU21   "HTU21"    //ESP8266, Arduino, ESP32
-//#define ZsensorLM75   "LM75"    //ESP8266, Arduino, ESP32
-//#define ZsensorDHT     "DHT"      //ESP8266, Arduino, ESP32,  Sonoff RF Bridge
-//#define ZsensorDS1820  "DS1820"   //ESP8266, Arduino, ESP32
-//#define ZsensorGPIOKeyCode "GPIOKeyCode" //ESP8266, Arduino, ESP32
-//#define ZsensorGPIOInput "GPIOInput" //ESP8266, Arduino, ESP32
+//#define OMG_GATEWAY_RF     "RF"       //ESP8266, Arduino, ESP32
+//#define OMG_GATEWAY_IR     "IR"       //ESP8266, Arduino,         Sonoff RF Bridge
+//#define OMG_GATEWAY_LORA   "LORA"       //ESP8266, Arduino, ESP32
+//#define OMG_GATEWAY_PILIGHT "Pilight" //ESP8266, Arduino, ESP32
+//#define OMG_GATEWAY_WEATHERSTATION "WeatherStation" //ESP8266, Arduino, ESP32
+//#define OMG_GATEWAY_GFSUNINVERTER "GFSunInverter"   //ESP32
+//#define OMG_GATEWAY_BT     "BT"       //ESP8266, ESP32
+//#define OMG_GATEWAY_RF2    "RF2"      //ESP8266, Arduino, ESP32
+//#define OMG_GATEWAY_SRFB   "SRFB"     //                          Sonoff RF Bridge
+//#define OMG_GATEWAY_2G     "2G"       //ESP8266, Arduino, ESP32
+//#define OMG_GATEWAY_RFM69  "RFM69"    //ESP8266, Arduino, ESP32
+//#define OMG_ACTUATOR_ONOFF "ONOFF"    //ESP8266, Arduino, ESP32,  Sonoff RF Bridge
+//#define OMG_SENSOR_INA226  "INA226"   //ESP8266, Arduino, ESP32
+//#define OMG_SENSOR_HCSR04  "HCSR04"   //ESP8266, Arduino, ESP32
+//#define OMG_SENSOR_HCSR501 "HCSR501"  //ESP8266, Arduino, ESP32,  Sonoff RF Bridge
+//#define OMG_SENSOR_ADC     "ADC"      //ESP8266, Arduino, ESP32
+//#define OMG_SENSOR_BH1750  "BH1750"   //ESP8266, Arduino, ESP32
+//#define OMG_SENSOR_MQ2 "MQ2"  //ESP8266, Arduino, ESP32
+//#define OMG_SENSOR_TEMT6000 "TEMT6000"  //ESP8266
+//#define OMG_SENSOR_TSL2561 "TSL2561"  //ESP8266, Arduino, ESP32
+//#define OMG_SENSOR_BME280  "BME280"   //ESP8266, Arduino, ESP32
+//#define OMG_SENSOR_HTU21   "HTU21"    //ESP8266, Arduino, ESP32
+//#define OMG_SENSOR_LM75   "LM75"    //ESP8266, Arduino, ESP32
+//#define OMG_SENSOR_DHT     "DHT"      //ESP8266, Arduino, ESP32,  Sonoff RF Bridge
+//#define OMG_SENSOR_DS1820  "DS1820"   //ESP8266, Arduino, ESP32
+//#define OMG_SENSOR_GPIOKEYCODE "GPIOKeyCode" //ESP8266, Arduino, ESP32
+//#define OMG_SENSOR_GPIOINPUT "GPIOInput" //ESP8266, Arduino, ESP32
 //#define OMG_MQTT_DISCOVERY "HADiscovery"//ESP8266, Arduino, ESP32, Sonoff RF Bridge
-//#define ZactuatorFASTLED "FASTLED" //ESP8266, Arduino, ESP32, Sonoff RF Bridge
-//#define ZboardM5STICKC "M5StickC"
-//#define ZboardM5STICKCP "M5StickCP"
-//#define ZboardM5STACK  "M5STACK"
-//#define ZboardM5TOUGH  "M5TOUGH"
-//#define ZradioCC1101   "CC1101"   //ESP8266, ESP32
-//#define ZactuatorPWM   "PWM"      //ESP8266, ESP32
-//#define ZsensorSHTC3 "SHTC3" //ESP8266, Arduino, ESP32,  Sonoff RF Bridge
-//#define ZactuatorSomfy "Somfy"    //ESP8266, Arduino, ESP32
-//#define ZgatewaySERIAL   "SERIAL"  //ESP8266, Arduino, ESP32
+//#define OMG_ACTUATOR_FASTLED "FASTLED" //ESP8266, Arduino, ESP32, Sonoff RF Bridge
+//#define OMG_BOARD_M5STICKC "M5StickC"
+//#define OMG_BOARD_M5STICKCP "M5StickCP"
+//#define OMG_BOARD_M5STACK  "M5STACK"
+//#define OMG_BOARD_M5TOUGH  "M5TOUGH"
+//#define OMG_RADIO_CC1101   "CC1101"   //ESP8266, ESP32
+//#define OMG_ACTUATOR_PWM   "PWM"      //ESP8266, ESP32
+//#define OMG_SENSOR_SHTC3 "SHTC3" //ESP8266, Arduino, ESP32,  Sonoff RF Bridge
+//#define OMG_ACTUATOR_SOMFY "Somfy"    //ESP8266, Arduino, ESP32
+//#define OMG_GATEWAY_SERIAL   "SERIAL"  //ESP8266, Arduino, ESP32
 
 /*-------------DEFINE YOUR MQTT ADVANCED PARAMETERS BELOW----------------*/
 #ifndef will_Topic
@@ -556,7 +556,7 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 /*----------------------------OTHER PARAMETERS-----------------------------*/
 /*-------------------CHANGING THEM IS NOT COMPULSORY-----------------------*/
 /*----------------------------USER PARAMETERS-----------------------------*/
-#ifdef ZgatewaySRFB
+#ifdef OMG_GATEWAY_SRFB
 #  define SERIAL_BAUD 19200
 #else
 #  ifndef SERIAL_BAUD
@@ -584,7 +584,7 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #  define OMG_MQTT_VALUE_AS_A_TOPIC false // define true to integrate msg value into the subject when receiving
 #endif
 
-#if defined(ZgatewayRF) || defined(ZgatewayIR) || defined(ZgatewaySRFB) || defined(ZgatewayWeatherStation) || defined(ZgatewayRTL_433)
+#if defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_IR) || defined(OMG_GATEWAY_SRFB) || defined(OMG_GATEWAY_WEATHERSTATION) || defined(OMG_GATEWAY_RTL_433)
 // variable to avoid duplicates
 #  ifndef time_avoid_duplicate
 #    define time_avoid_duplicate 3000 // if you want to avoid duplicate MQTT message received set this to > 0, the value is the time in milliseconds during which we don't publish duplicates
@@ -721,7 +721,7 @@ struct SYSConfig_s {
 #  define DEFAULT_OFFLINE false
 #endif
 
-#if defined(ZgatewayRF) || defined(ZgatewayIR) || defined(ZgatewaySRFB) || defined(ZgatewayWeatherStation) || defined(ZgatewayRTL_433)
+#if defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_IR) || defined(OMG_GATEWAY_SRFB) || defined(OMG_GATEWAY_WEATHERSTATION) || defined(OMG_GATEWAY_RTL_433)
 bool isAduplicateSignal(uint64_t);
 void storeSignalValue(uint64_t);
 #endif

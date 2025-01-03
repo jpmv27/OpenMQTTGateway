@@ -27,7 +27,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZgatewayIR
+#ifdef OMG_GATEWAY_IR
 
 #  include <IRrecv.h> // Needed if you want to receive IR commands.
 #  include <IRremoteESP8266.h>

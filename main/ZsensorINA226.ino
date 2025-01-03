@@ -34,7 +34,7 @@
 //
 #include "User_config.h"
 
-#ifdef ZsensorINA226
+#ifdef OMG_SENSOR_INA226
 #  include <Wire.h>
 
 float rShunt = 0.1; // Shunt Widerstand festlegen, hier 0.1 Ohm

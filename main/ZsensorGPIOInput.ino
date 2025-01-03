@@ -28,7 +28,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorGPIOInput
+#ifdef OMG_SENSOR_GPIOINPUT
 #  if defined(TRIGGER_GPIO) && INPUT_GPIO == TRIGGER_GPIO
 unsigned long resetTime = 0;
 #  endif
@@ -66,7 +66,7 @@ void MeasureGPIOInput() {
         Logger.debug(OMG_LOGID, F("Button Held" CR));
         gatewayState = GatewayState::WAITING_ONBOARDING;
 // Switching off the relay during reset or failsafe operations
-#    ifdef ZactuatorONOFF
+#    ifdef OMG_ACTUATOR_ONOFF
         uint8_t level = digitalRead(ACTUATOR_ONOFF_GPIO);
         if (level == ACTUATOR_ON) {
           ActuatorTrigger();
@@ -93,7 +93,7 @@ void MeasureGPIOInput() {
       GPIOdata["origin"] = subjectGPIOInputtoMQTT;
       enqueueJsonObject(GPIOdata);
 
-#  if defined(ZactuatorONOFF) && defined(ACTUATOR_TRIGGER)
+#  if defined(OMG_ACTUATOR_ONOFF) && defined(ACTUATOR_TRIGGER)
       //Trigger the actuator if we are not at startup
       if (InputState != 3) {
 #    if defined(ACTUATOR_BUTTON_TRIGGER_LEVEL)

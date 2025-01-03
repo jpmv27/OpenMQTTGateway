@@ -31,7 +31,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if defined(ZdisplaySSD1306)
+#if defined(OMG_DISPLAY_SSD1306)
 
 #  include <ArduinoJson.h>
 

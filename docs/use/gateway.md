@@ -287,7 +287,7 @@ Added to MQTT, OpenMQTTGateway cans use Serial to transmit or receive json data 
 
 The build need to have the following macro:
 ```
-  '-DZgatewaySERIAL="SERIAL"'
+  '-DOMG_GATEWAY_SERIAL="SERIAL"'
 ```
 
 An example scenario is a slave offline ESP32 dedicated to RF decoding connected to another online ESP32 through Serial.

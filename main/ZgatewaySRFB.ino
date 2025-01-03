@@ -30,7 +30,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZgatewaySRFB
+#ifdef OMG_GATEWAY_SRFB
 
 unsigned char _uartbuf[RF_MESSAGE_SIZE + 3] = {0};
 unsigned char _uartpos = 0;

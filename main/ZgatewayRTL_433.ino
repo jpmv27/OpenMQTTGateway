@@ -26,7 +26,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifdef ZgatewayRTL_433
+#ifdef OMG_GATEWAY_RTL_433
 
 #  include <ArduinoJson.h>
 #  include <config_RF.h>

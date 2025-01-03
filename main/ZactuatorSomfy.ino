@@ -23,13 +23,13 @@
 */
 #include "User_config.h"
 
-#ifdef ZactuatorSomfy
+#ifdef OMG_ACTUATOR_SOMFY
 
 #  include <EEPROM.h>
 #  include <EEPROMRollingCodeStorage.h>
 #  include <SomfyRemote.h>
 
-#  ifdef ZradioCC1101
+#  ifdef OMG_RADIO_CC1101
 #    include <ELECHOUSE_CC1101_SRC_DRV.h>
 #  endif
 
@@ -53,7 +53,7 @@ void XtoSomfy(const char* topicOri, JsonObject& jsonData) {
   if (cmpToMainTopic(topicOri, subjectMQTTtoSomfy)) {
     Logger.debug(OMG_LOGID, F("MQTTtoSomfy json data analysis" CR));
     float txFrequency = jsonData["frequency"] | RFConfig.frequency;
-#    ifdef ZradioCC1101 // set Receive off and Transmitt on
+#    ifdef OMG_RADIO_CC1101 // set Receive off and Transmitt on
     disableCurrentReceiver();
     ELECHOUSE_cc1101.SetTx(txFrequency);
     Logger.notice(OMG_LOGID, F("Transmit frequency: %F" CR), txFrequency);

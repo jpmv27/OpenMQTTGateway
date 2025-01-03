@@ -37,7 +37,7 @@
 */
 #include "User_config.h"
 
-#ifdef ZsensorAHTx0
+#ifdef OMG_SENSOR_AHTX0
 #  include <stdint.h>
 
 #  include "Adafruit_AHTX0.h"

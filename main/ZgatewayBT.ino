@@ -28,7 +28,7 @@ Thanks to wolass https://github.com/wolass for suggesting me HM 10 and dinosd ht
 */
 #include "User_config.h"
 
-#ifdef ZgatewayBT
+#ifdef OMG_GATEWAY_BT
 
 SemaphoreHandle_t semaphoreCreateOrUpdateDevice;
 SemaphoreHandle_t semaphoreBLEOperation;
