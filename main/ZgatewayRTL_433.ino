@@ -322,7 +322,7 @@ void setupRTL_433() {
   semaphorecreateOrUpdateDeviceRTL_433 = xSemaphoreCreateBinary();
   xSemaphoreGive(semaphorecreateOrUpdateDeviceRTL_433);
 #  endif
-  Logger.debug(OMG_LOGID, F("ZgatewayRTL_433 command topic: %s%s%s" CR), mqtt_topic, gateway_name, subjectMQTTtoRFset);
+  Logger.debug(OMG_LOGID, F("ZgatewayRTL_433 command topic: %s%s%s" CR), mqtt_topic, g_gateway_name, subjectMQTTtoRFset);
   Logger.notice(OMG_LOGID, F("ZgatewayRTL_433 setup done " CR));
 }
 

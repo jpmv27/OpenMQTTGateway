@@ -312,7 +312,7 @@ void enableRF2Receive() {
 
   Logger.notice(OMG_LOGID, F("RF_EMITTER_GPIO: %d " CR), RF_EMITTER_GPIO);
   Logger.notice(OMG_LOGID, F("RF_RECEIVER_GPIO: %d " CR), RF_RECEIVER_GPIO);
-  Logger.debug(OMG_LOGID, F("ZgatewayRF2 command topic: %s%s%s" CR), mqtt_topic, gateway_name, subjectMQTTtoRF2);
+  Logger.debug(OMG_LOGID, F("ZgatewayRF2 command topic: %s%s%s" CR), mqtt_topic, g_gateway_name, subjectMQTTtoRF2);
   pinMode(RF_EMITTER_GPIO, OUTPUT);
   digitalWrite(RF_EMITTER_GPIO, LOW);
   Logger.debug(OMG_LOGID, F("ZgatewayRF2 setup done " CR));

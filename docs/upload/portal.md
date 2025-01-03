@@ -75,5 +75,5 @@ build_flags =
   '-DMQTT_SERVER="11.22.33.44"'
   '-DMQTT_USER="salut"'
   '-DMQTT_PASS="atoi"'
-  '-DGateway_Name="OpenMQTTGateway_ESP32_OLM_GTW"'
+  '-DOMG_GATEWAY_NAME="OpenMQTTGateway_ESP32_OLM_GTW"'
 ```

@@ -283,7 +283,7 @@ void enableRFReceive() {
   receiveInterupt = RF_RECEIVER_GPIO;
   mySwitch.setRepeatTransmit(RF_EMITTER_REPEAT);
   mySwitch.enableReceive(receiveInterupt);
-  Logger.debug(OMG_LOGID, F("ZgatewayRF command topic: %s%s%s" CR), mqtt_topic, gateway_name, subjectMQTTtoRF);
+  Logger.debug(OMG_LOGID, F("ZgatewayRF command topic: %s%s%s" CR), mqtt_topic, g_gateway_name, subjectMQTTtoRF);
   Logger.debug(OMG_LOGID, F("ZgatewayRF setup done" CR));
 }
 #endif

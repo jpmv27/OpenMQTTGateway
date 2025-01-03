@@ -293,7 +293,7 @@ extern void enablePilightReceive() {
   Logger.notice(OMG_LOGID, F("Switching to Pilight Receiver: %F" CR), RFConfig.frequency);
   Logger.notice(OMG_LOGID, F("RF_EMITTER_GPIO: %d " CR), RF_EMITTER_GPIO);
   Logger.notice(OMG_LOGID, F("RF_RECEIVER_GPIO: %d " CR), RF_RECEIVER_GPIO);
-  Logger.debug(OMG_LOGID, F("ZgatewayPilight command topic: %s%s%s" CR), mqtt_topic, gateway_name, subjectMQTTtoPilight);
+  Logger.debug(OMG_LOGID, F("ZgatewayPilight command topic: %s%s%s" CR), mqtt_topic, g_gateway_name, subjectMQTTtoPilight);
 
   initCC1101();
 

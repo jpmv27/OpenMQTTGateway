@@ -15,7 +15,7 @@ lib_deps =
 build_flags =
   ${com-esp.build_flags}
   '-DZgatewayBT="BT"'
-  '-DGateway_Name="OpenMQTTGateway_ESP32_1"'
+  '-DOMG_GATEWAY_NAME="OpenMQTTGateway_ESP32_1"'
 upload_protocol = espota
 upload_port = 192.168.1.82
 upload_flags =
@@ -34,7 +34,7 @@ lib_deps =
 build_flags =
   ${com-esp.build_flags}
   '-DZgatewayBT="BT"'
-  '-DGateway_Name="OpenMQTTGateway_ESP32_2"'
+  '-DOMG_GATEWAY_NAME="OpenMQTTGateway_ESP32_2"'
   ;-DCORE_DEBUG_LEVEL=4
 upload_protocol = espota
 upload_port = 192.168.1.111
@@ -55,7 +55,7 @@ build_flags =
   ${com-esp.build_flags}
   '-DZgatewayPilight="Pilight"'
   '-DZactuatorONOFF="ONOFF"'
-  '-DGateway_Name="OpenMQTTGateway_ESP8266_ONOFFRF"'
+  '-DOMG_GATEWAY_NAME="OpenMQTTGateway_ESP8266_ONOFFRF"'
 board_build.flash_mode = dout
 
 [env:esp32-lolin32lite-ble-lp]
@@ -70,7 +70,7 @@ build_flags =
   '-DZgatewayBT="BT"'
   '-DLED_RECEIVE=22'
   '-DLED_RECEIVE_ON=0'
-  '-DGateway_Name="OpenMQTTGateway_LOLIN32LITE_LP"'
+  '-DOMG_GATEWAY_NAME="OpenMQTTGateway_LOLIN32LITE_LP"'
   '-DESPWifiManualSetup=true'
   '-Dwifi_ssid="MyWiFiAP"'
   '-Dwifi_password="MyWiFiAPPassword"'
@@ -95,7 +95,7 @@ build_flags =
 	'-DLED_INFO_ON=0'
 	'-DZsensorGPIOInput="GPIOInput"'
 	'-DINPUT_GPIO=0'
-	'-DGateway_Name="OpenMQTTGateway_SRFB_Direct"'
+	'-DOMG_GATEWAY_NAME="OpenMQTTGateway_SRFB_Direct"'
 board_build.flash_mode = dout
 board_build.ldscript = eagle.flash.1m64.ld ;this frees more space for firmware uplad via OTA.
 
@@ -121,7 +121,7 @@ build_flags =
 	'-DLED_INFO_ON=0'
 	'-DZsensorGPIOInput="GPIOInput"'
 	'-DINPUT_GPIO=0'
-	'-DGateway_Name="OpenMQTTGateway_SRFB_Direct"'
+	'-DOMG_GATEWAY_NAME="OpenMQTTGateway_SRFB_Direct"'
 board_build.flash_mode = dout
 extra_scripts = scripts/compressFirmware.py
 board_build.ldscript = eagle.flash.1m64.ld ;this frees more space for firmware uplad. Should also be uses for initial flash via serial
@@ -139,7 +139,7 @@ build_flags =
   '-UZmqttDiscovery'          ; disables MQTT Discovery
 ;  '-UZmqttDiscovery="HADiscovery"'
   '-DvalueAsATopic=true'       ; MQTT topic includes model and device
-  '-DGateway_Name="OpenMQTTGateway_MQ2_GAS"'
+  '-DOMG_GATEWAY_NAME="OpenMQTTGateway_MQ2_GAS"'
   '-DZsensorMQ2="MQ2"'
   '-DTimeBetweenReadingmq2=8000'
 board_build.flash_mode = dout
@@ -160,7 +160,7 @@ build_flags =
   ${com-esp.build_flags}
   '-DZgatewayRF="RF"'
   '-DZradioCC1101="CC1101"'
-  '-DGateway_Name="OMG_D1MINI_RF"'
+  '-DOMG_GATEWAY_NAME="OMG_D1MINI_RF"'
   ;; manual network config could be required due to
   ;; the dhcp incompatibilities with the newer wifi routers
   ; '-DNetworkAdvancedSetup=true'
@@ -189,7 +189,7 @@ build_flags =
   '-UZmqttDiscovery'          ; disables MQTT Discovery
 ;  '-UZmqttDiscovery="HADiscovery"'
   '-DvalueAsATopic=true'       ; MQTT topic includes model and device
-  '-DGateway_Name="OpenMQTTGatewayDS1820Pool"'
+  '-DOMG_GATEWAY_NAME="OpenMQTTGatewayDS1820Pool"'
   '-DZsensorDS1820="DS1820"'
   '-DDS1820_OWBUS_GPIO=D2'
   '-DDEEP_SLEEP_IN_US=120000000'
@@ -211,7 +211,7 @@ build_flags =
   '-UZmqttDiscovery'              ; disables MQTT Discovery
 ;  '-UZmqttDiscovery="HADiscovery"'
   '-DvalueAsATopic=true'          ; MQTT topic includes model and device
-  '-DGateway_Name="OpenMQTTGatewayMHRDWaterLeak"'
+  '-DOMG_GATEWAY_NAME="OpenMQTTGatewayMHRDWaterLeak"'
   '-DZsensorC37_YL83_HMRD="HMRD"' ;Which type of sensor
   '-DC37_YL83_HMRD_Digital_GPIO=GPIO_NUM_14'
   '-DC37_YL83_HMRD_Analog_GPIO=GPIO_NUM_35'
