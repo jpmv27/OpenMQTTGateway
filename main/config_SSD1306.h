@@ -43,8 +43,8 @@
 
 /*-------------------DEFINE LOG LEVEL----------------------*/
 
-#ifndef LOG_LEVEL_OLED
-#  define LOG_LEVEL_OLED ELOG_LEVEL_WARNING // Default to only display Warning level messages
+#ifndef OMG_LOG_LEVEL_OLED
+#  define OMG_LOG_LEVEL_OLED ELOG_LEVEL_WARNING // Default to only display Warning level messages
 #endif
 
 #ifndef LOG_TO_OLED

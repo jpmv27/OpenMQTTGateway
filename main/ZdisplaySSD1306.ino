@@ -57,9 +57,9 @@ Toogle log display
 void logToOLED(bool display) {
   logToOLEDDisplay = display;
   if (display) {
-    Logger.registerSerial(OMG_LOGID, LOG_LEVEL_OLED, "OMG", Oled); // Log on OLED following LOG_LEVEL_OLED
+    Logger.registerSerial(OMG_LOGID, OMG_LOG_LEVEL_OLED, "OMG", Oled); // Log on OLED following LOG_LEVEL_OLED
   } else {
-    Logger.registerSerial(OMG_LOGID, LOG_LEVEL, "OMG");
+    Logger.registerSerial(OMG_LOGID, OMG_LOG_LEVEL, "OMG");
   }
 }
 
@@ -80,7 +80,7 @@ void setupSSD1306() {
   Logger.notice(OMG_LOGID, F("Setup SSD1306 Display end" CR));
 
 #  if LOG_TO_OLED
-  Logger.registerSerial(OMG_LOGID, LOG_LEVEL_OLED, "OMG", Oled); // Log on OLED following LOG_LEVEL_OLED
+  Logger.registerSerial(OMG_LOGID, OMG_LOG_LEVEL_OLED, "OMG", Oled); // Log on OLED following LOG_LEVEL_OLED
   jsonDisplay = false;
 #  else
   jsonDisplay = true;

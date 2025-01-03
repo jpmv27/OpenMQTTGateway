@@ -23,7 +23,7 @@ lib_deps =
   ${libraries.arduinolog}
 build_flags =
   -w ; supress all warnings
-;  '-DLOG_LEVEL=LOG_LEVEL_TRACE'  ; Enable trace level logging
+;  '-DOMG_LOG_LEVEL=ELOG_LEVEL_TRACE'  ; Enable trace level logging
 monitor_speed = 115200
 ```
 Later "environments" get more specific, but inherit everything that was defined in this common environment:
