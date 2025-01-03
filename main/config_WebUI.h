@@ -78,7 +78,7 @@
 #define WEBUI_SECURE                                                                    \
   if (webUISecure) {                                                                    \
     if (!server.authenticate(www_username, ota_pass)) {                                 \
-      return server.requestAuthentication(DIGEST_AUTH, gateway_name, authFailResponse); \
+      return server.requestAuthentication(DIGEST_AUTH, g_gateway_name, authFailResponse); \
     }                                                                                   \
   }
 

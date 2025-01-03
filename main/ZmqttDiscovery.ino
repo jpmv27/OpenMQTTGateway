@@ -127,7 +127,7 @@ void announceDeviceTrigger(bool use_gateway_info, char* topic, char* type, char*
     char state_topic[mqtt_topic_max_size];
 
     strcpy(state_topic, mqtt_topic);
-    strcat(state_topic, gateway_name);
+    strcat(state_topic, g_gateway_name);
 
     strcat(state_topic, topic);
     sensor["topic"] = state_topic;
@@ -139,7 +139,7 @@ void announceDeviceTrigger(bool use_gateway_info, char* topic, char* type, char*
   JsonArray identifiers = device.createNestedArray("identifiers");
 
   if (use_gateway_info) {
-    device["name"] = gateway_name;
+    device["name"] = g_gateway_name;
 #  ifndef GATEWAY_MODEL
     String model = "";
     serializeJson(modules, model);
@@ -182,7 +182,7 @@ void announceDeviceTrigger(bool use_gateway_info, char* topic, char* type, char*
       device["model"] = device_model;
     }
 
-    device["via_device"] = gateway_name; //device name of the board
+    device["via_device"] = g_gateway_name; //device name of the board
   }
   sensor["device"] = device; //device representing the board
 
@@ -257,7 +257,7 @@ void createDiscovery(const char* sensor_type,
     // allowing to have the entity detected by several gateways and a consistent discovery topic among the gateways
     if (gateway_entity) {
       strcpy(state_topic, mqtt_topic);
-      strcat(state_topic, gateway_name);
+      strcat(state_topic, g_gateway_name);
     } else {
       strcpy(state_topic, "+/+");
     }
@@ -274,7 +274,7 @@ void createDiscovery(const char* sensor_type,
   if (availability_topic && availability_topic[0] && gateway_entity) {
     char avty_topic[mqtt_topic_max_size];
     strcpy(avty_topic, mqtt_topic);
-    strcat(avty_topic, gateway_name);
+    strcat(avty_topic, g_gateway_name);
     strcat(avty_topic, availability_topic);
     sensor["avty_t"] = avty_topic;
   }
@@ -376,7 +376,7 @@ void createDiscovery(const char* sensor_type,
   if (cmd_topic[0]) {
     char command_topic[mqtt_topic_max_size];
     strcpy(command_topic, mqtt_topic);
-    strcat(command_topic, gateway_name);
+    strcat(command_topic, g_gateway_name);
     strcat(command_topic, cmd_topic);
     if (strcmp(sensor_type, "cover") == 0 && strcmp(state_class, "blind") == 0) {
       sensor["tilt_cmd_t"] = command_topic; // tilt_command_topic for cover
@@ -397,7 +397,7 @@ void createDiscovery(const char* sensor_type,
 
   if (gateway_entity) {
     //device representing the board
-    device["name"] = String(gateway_name);
+    device["name"] = String(g_gateway_name);
 #  ifndef GATEWAY_MODEL
     String model = "";
     serializeJson(modules, model);
@@ -445,7 +445,7 @@ void createDiscovery(const char* sensor_type,
       }
     }
 
-    device["via_device"] = String(gateway_name); //device name of the board
+    device["via_device"] = String(g_gateway_name); //device name of the board
   }
 
   sensor["device"] = device;

@@ -90,7 +90,7 @@ void receivingCommandTask(void* pvParameters) {
   } else {
     if (jsonBlufi.containsKey("target") && jsonBlufi["target"].is<char*>()) {
       char topic[(parameters_size)*2 + jsonBlufi["target"].size() + 1];
-      snprintf(topic, sizeof(topic), "%s%s%s", mqtt_topic, gateway_name, jsonBlufi["target"].as<const char*>());
+      snprintf(topic, sizeof(topic), "%s%s%s", mqtt_topic, g_gateway_name, jsonBlufi["target"].as<const char*>());
       jsonBlufi.remove("target");
       char jsonStr[JSON_MSG_BUFFER_MAX];
       serializeJson(jsonBlufi, jsonStr);
@@ -102,7 +102,7 @@ void receivingCommandTask(void* pvParameters) {
         json["save_cnt"] = true;
       }
       char topic[(parameters_size)*2 + strlen(subjectMQTTtoSYSset) + 1];
-      snprintf(topic, sizeof(topic), "%s%s%s", mqtt_topic, gateway_name, subjectMQTTtoSYSset);
+      snprintf(topic, sizeof(topic), "%s%s%s", mqtt_topic, g_gateway_name, subjectMQTTtoSYSset);
       char jsonStr[JSON_MSG_BUFFER_MAX];
       serializeJson(jsonBlufi, jsonStr);
       receivingDATA(topic, jsonStr);

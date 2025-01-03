@@ -1255,7 +1255,7 @@ void PublishDeviceData(JsonObject& BLEdata) {
         BLEdata["mac"] = BLEdata["id"].as<std::string>();
         BLEdata["id"] = BLEdata["uuid"].as<std::string>();
       }
-      String topic = String(mqtt_topic) + BTConfig.presenceTopic + String(gateway_name);
+      String topic = String(mqtt_topic) + BTConfig.presenceTopic + String(g_gateway_name);
       Logger.debug(OMG_LOGID, F("Pub HA Presence %s" CR), topic.c_str());
       BLEdata["topic"] = topic;
       enqueueJsonObject(BLEdata, QueueSemaphoreTimeOutTask);

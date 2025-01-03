@@ -74,7 +74,7 @@ lib_deps =
   ${libraries.bme280}
 build_flags =
   ${env:nodemcuv2-pilight.build_flags}
-  '-DGateway_Name="OpenMQTTGateway"'
+  '-DOMG_GATEWAY_NAME="OpenMQTTGateway"'
   '-DZsensorBME280="BME280"'
   '-DBase_Topic="rf/"'
   '-DESPWifiManualSetup=true'
@@ -159,7 +159,7 @@ build_flags =
   ${com-esp.build_flags}
   '-DZgatewayRF="RF"'
   '-DZgatewayIR="IR"'
-  '-DGateway_Name="OpenMQTTGateway_ESP32_RF_IR"'
+  '-DOMG_GATEWAY_NAME="OpenMQTTGateway_ESP32_RF_IR"'
 ```
 
 Once your configuration is done you can upload the program to your board by clicking on the white arrow at the blue bottom bar of your PIO editor or with the following command:
@@ -195,7 +195,7 @@ lib_deps =
 build_flags =
   ${com-esp.build_flags}
   '-DZgatewayBT="BT"'
-  '-DGateway_Name="OpenMQTTGateway_ESP32"'
+  '-DOMG_GATEWAY_NAME="OpenMQTTGateway_ESP32"'
 upload_protocol = espota
 upload_port = 192.168.1.22
 upload_flags =

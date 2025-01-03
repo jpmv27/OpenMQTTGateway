@@ -51,10 +51,10 @@
 /*-------------DEFINE GATEWAY NAME BELOW IT CAN ALSO BE DEFINED IN platformio.ini----------------*/
 
 // Uncomment to use the MAC address first 4 digits in the format of 5566 as the suffix of the short gateway name.
-// Any definition of Gateway_Name will be ignored. The Gateway_Short_name _ MAC will be used as the access point name.
-//#define USE_MAC_AS_GATEWAY_NAME
-#ifndef Gateway_Name
-#  define Gateway_Name "OpenMQTTGateway"
+// Any definition of OMG_GATEWAY_NAME will be ignored. The Gateway_Short_name _ MAC will be used as the access point name.
+//#define OMG_USE_MAC_AS_GATEWAY_NAME
+#ifndef OMG_GATEWAY_NAME
+#  define OMG_GATEWAY_NAME "OpenMQTTGateway"
 #endif
 #ifndef Gateway_Short_Name
 #  define Gateway_Short_Name "OMG" // 3 characters maximum
@@ -117,7 +117,7 @@
 
 //#define WM_PWD_FROM_MAC true // enable to set the password from the last 8 digits of the ESP MAC address for enhanced security, enabling this option requires to have access to the MAC address, either through a sticker or with serial monitoring
 #ifndef WifiManager_ssid
-#  define WifiManager_ssid Gateway_Name //this is the network name of the initial setup access point
+#  define WifiManager_ssid OMG_GATEWAY_NAME //this is the network name of the initial setup access point
 #endif
 #ifndef WifiManager_ConfigPortalTimeOut
 #  define WifiManager_ConfigPortalTimeOut 240 //time in seconds for the setup portal to stay open, default 240s
@@ -650,7 +650,7 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 /*----------- SHARED WITH OMG MODULES --------------*/
 
 char mqtt_topic[parameters_size + 1] = Base_Topic;
-char gateway_name[parameters_size + 1] = Gateway_Name;
+char g_gateway_name[parameters_size + 1] = OMG_GATEWAY_NAME;
 
 #if LOG_TO_SYSLOG
 char syslogServer[parameters_size + 1] = SYSLOG_SERVER;

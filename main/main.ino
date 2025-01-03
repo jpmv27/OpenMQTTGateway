@@ -240,7 +240,7 @@ struct GfSun2000Data {};
 void setupTLS(int index = CNT_DEFAULT_INDEX);
 
 char ota_pass[parameters_size] = gw_password;
-#ifdef USE_MAC_AS_GATEWAY_NAME
+#ifdef OMG_USE_MAC_AS_GATEWAY_NAME
 #  undef WifiManager_ssid
 #  define MAC_NAME_MAX_LEN 30
 char WifiManager_ssid[MAC_NAME_MAX_LEN];
@@ -558,7 +558,7 @@ void emptyQueue() {
  * @param retainFlag true if you what a retain
  */
 bool pub(const char* topicori, const char* payload, bool retainFlag) {
-  String topic = String(mqtt_topic) + String(gateway_name) + String(topicori);
+  String topic = String(mqtt_topic) + String(g_gateway_name) + String(topicori);
   return pubMQTT(topic.c_str(), payload, retainFlag);
 }
 
@@ -582,7 +582,7 @@ bool pub(JsonObject& data) {
   }
   String topic;
   if (data.containsKey("origin") && data["origin"].is<const char*>()) {
-    topic = String(mqtt_topic) + String(gateway_name) + String(data["origin"].as<const char*>());
+    topic = String(mqtt_topic) + String(g_gateway_name) + String(data["origin"].as<const char*>());
     data.remove("origin");
   } else if (data.containsKey("topic") && data["topic"].is<const char*>()) {
     topic = data["topic"].as<const char*>();
@@ -646,7 +646,7 @@ bool pub(JsonObject& data) {
  * @param payload the message to sends
  */
 bool pub(const char* topicori, const char* payload) {
-  String topic = String(mqtt_topic) + String(gateway_name) + String(topicori);
+  String topic = String(mqtt_topic) + String(g_gateway_name) + String(topicori);
   return pubMQTT(topic, payload);
 }
 
@@ -860,9 +860,9 @@ bool cmpToMainTopic(const char* topicOri, const char* toAdd) {
   // Move pointer of sizeof chunk
   topicOri += strlen(mqtt_topic);
   // And so on...
-  if (strncmp(topicOri, gateway_name, strlen(gateway_name)) != 0)
+  if (strncmp(topicOri, g_gateway_name, strlen(g_gateway_name)) != 0)
     return false;
-  topicOri += strlen(gateway_name);
+  topicOri += strlen(g_gateway_name);
   if (strncmp(topicOri, toAdd, strlen(toAdd)) != 0)
     return false;
   return true;
@@ -971,7 +971,7 @@ void setupMQTT() {
   Logger.debug(OMG_LOGID, F("Mqtt server: %s" CR), broker_host);
   Logger.debug(OMG_LOGID, F("Port: %u" CR), broker_port);
 
-  mqtt.reset(new PicoMQTT::Client(*eClient, broker_host, broker_port, gateway_name,
+  mqtt.reset(new PicoMQTT::Client(*eClient, broker_host, broker_port, g_gateway_name,
                                   parameters.mqtt_user, parameters.mqtt_pass,
                                   0, // minimum reconnect attempt interval [ms]
                                   60 * 1000, // keep alive interval [ms]
@@ -985,7 +985,7 @@ void setupMQTT() {
   mqtt->will.qos = 0;
   mqtt->will.retain = false;
 #  else
-  mqtt->will.topic = String(mqtt_topic) + gateway_name + will_Topic;
+  mqtt->will.topic = String(mqtt_topic) + g_gateway_name + will_Topic;
   mqtt->will.payload = will_Message;
   mqtt->will.qos = will_QoS;
   mqtt->will.retain = will_Retain;
@@ -1113,7 +1113,7 @@ void setupMQTT() {
     }
   };
 
-  mqtt->subscribe(String(mqtt_topic) + gateway_name + subjectMQTTtoX, receivingDATA, mqtt_max_payload_size);
+  mqtt->subscribe(String(mqtt_topic) + g_gateway_name + subjectMQTTtoX, receivingDATA, mqtt_max_payload_size);
 
 #  ifdef ZgatewayRF
   // subject on which other OMG will publish, this OMG will store these msg and by the way don't republish them if they have been already published
@@ -1305,7 +1305,7 @@ void setup() {
   Logger.registerSerial(OMG_LOGID, LOG_LEVEL, "OMG");
 #if LOG_TO_SYSLOG
   if (strcmp(syslogServer, "") != 0 && strcmp(syslogPort, "") != 0) {
-    Logger.configureSyslog(syslogServer, String(syslogPort).toInt(), gateway_name);
+    Logger.configureSyslog(syslogServer, String(syslogPort).toInt(), g_gateway_name);
     Logger.registerSyslog(OMG_LOGID, LOG_LEVEL_SYSLOG, SYSLOG_FACILITY, "OMG");
   } else {
     Logger.error(OMG_LOGID, F("Invalid syslog configuration, skipping registration" CR));
@@ -1432,7 +1432,7 @@ void setup() {
 #ifdef ZmqttDiscovery
   Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt discovery prefix: %s" CR), discovery_prefix);
 #endif
-  Logger.debug(OMG_LOGID, F("OpenMQTTGateway gateway name: %s" CR), gateway_name);
+  Logger.debug(OMG_LOGID, F("OpenMQTTGateway gateway name: %s" CR), g_gateway_name);
 #if !MQTT_BROKER_MODE
   Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt server: %s" CR), cnt_parameters_array[cnt_index].mqtt_server);
   Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt port: %s" CR), cnt_parameters_array[cnt_index].mqtt_port);
@@ -1646,7 +1646,7 @@ void setOTA() {
   ArduinoOTA.setPort(ota_port);
 
   // Hostname defaults to esp8266-[ChipID]
-  ArduinoOTA.setHostname(gateway_name);
+  ArduinoOTA.setHostname(g_gateway_name);
 
   // No authentication by default
   ArduinoOTA.setPassword(ota_pass);
@@ -1805,7 +1805,7 @@ void ESPRestart(byte reason) {
 #if defined(ESPWifiManualSetup)
 void setupWiFiFromBuild() {
   // Must set hostname before mode. See https://github.com/espressif/arduino-esp32/issues/6700
-  WiFi.setHostname(gateway_name);
+  WiFi.setHostname(g_gateway_name);
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP(wifi_ssid, wifi_password);
   Logger.debug(OMG_LOGID, F("Connecting to %s" CR), wifi_ssid);
@@ -2016,7 +2016,7 @@ void saveConfig() {
 #  ifdef ZmqttDiscovery
   json["discovery_prefix"] = discovery_prefix;
 #  endif
-  json["gateway_name"] = gateway_name;
+  json["gateway_name"] = g_gateway_name;
   json["ota_pass"] = ota_pass;
 #  if LOG_TO_SYSLOG
   json["syslog_server"] = syslogServer;
@@ -2156,7 +2156,7 @@ bool loadConfigFromFlash() {
           strcpy(discovery_prefix, json["discovery_prefix"]);
 #  endif
         if (json.containsKey("gateway_name"))
-          strcpy(gateway_name, json["gateway_name"]);
+          strcpy(g_gateway_name, json["gateway_name"]);
         if (json.containsKey("ota_pass")) {
           strcpy(ota_pass, json["ota_pass"]);
 #  ifdef WM_PWD_FROM_MAC // From ESP Mac Address, last 8 digits as the password
@@ -2183,11 +2183,11 @@ bool loadConfigFromFlash() {
     }
   } else {
     Logger.notice(OMG_LOGID, F("No config file found defining default values" CR));
-#  ifdef USE_MAC_AS_GATEWAY_NAME
+#  ifdef OMG_USE_MAC_AS_GATEWAY_NAME
     String s = WiFi.macAddress();
-    sprintf(gateway_name, "%.2s%.2s%.2s%.2s%.2s%.2s",
+    sprintf(g_gateway_name, "%.2s%.2s%.2s%.2s%.2s%.2s",
             s.c_str(), s.c_str() + 3, s.c_str() + 6, s.c_str() + 9, s.c_str() + 12, s.c_str() + 15);
-    Log.notice(F("Gateway Name: %s.local" CR), gateway_name);
+    Log.notice(F("Gateway Name: %s.local" CR), g_gateway_name);
 #  endif
 #  ifdef WM_PWD_FROM_MAC // From ESP Mac Address, last 8 digits as the password
     sprintf(ota_pass, "%.2s%.2s%.2s%.2s",
@@ -2201,10 +2201,10 @@ bool loadConfigFromFlash() {
 void setupWiFiManager() {
   delay(10);
   // Must set hostname before mode. See https://github.com/espressif/arduino-esp32/issues/6700
-  wifiManager.setHostname(gateway_name);
+  wifiManager.setHostname(g_gateway_name);
   WiFi.mode(WIFI_STA);
 
-#  ifdef USE_MAC_AS_GATEWAY_NAME
+#  ifdef OMG_USE_MAC_AS_GATEWAY_NAME
   String s = WiFi.macAddress();
   snprintf(WifiManager_ssid, MAC_NAME_MAX_LEN, "%s_%.2s%.2s", Gateway_Short_Name, s.c_str(), s.c_str() + 3);
 #  endif
@@ -2230,7 +2230,7 @@ void setupWiFiManager() {
 #      endif
 #    endif
   WiFiManagerParameter custom_mqtt_topic("topic", "mqtt base topic", mqtt_topic, mqtt_topic_max_size, " minlength='1' maxlength='64' required");
-  WiFiManagerParameter custom_gateway_name("name", "gateway name", gateway_name, parameters_size, " minlength='1' maxlength='64' required");
+  WiFiManagerParameter custom_g_gateway_name("name", "gateway name", g_gateway_name, parameters_size, " minlength='1' maxlength='64' required");
   WiFiManagerParameter custom_ota_pass("ota", "gateway password", ota_pass, parameters_size, " input type='password' minlength='8' maxlength='64' required");
 #  endif
   //WiFiManager
@@ -2368,7 +2368,7 @@ void setupWiFiManager() {
     }
 #      endif
 #    endif
-    strcpy(gateway_name, custom_gateway_name.getValue());
+    strcpy(g_gateway_name, custom_gateway_name.getValue());
     strcpy(ota_pass, custom_ota_pass.getValue());
 #  endif
 
@@ -2419,7 +2419,7 @@ void WiFiEvent(WiFiEvent_t event) {
   switch (event) {
     case ARDUINO_EVENT_ETH_START:
       Logger.debug(OMG_LOGID, F("Ethernet Started" CR));
-      ETH.setHostname(gateway_name);
+      ETH.setHostname(g_gateway_name);
       break;
     case ARDUINO_EVENT_ETH_CONNECTED:
       Logger.notice(OMG_LOGID, F("Ethernet Connected" CR));
@@ -2960,7 +2960,7 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
     }
   } else {
 #if defined(SecondaryModule) // Redirect certain commands to Serial
-    String topicSerial = String(mqtt_topic) + String(gateway_name) + subjectMQTTtoSERIAL;
+    String topicSerial = String(mqtt_topic) + String(g_gateway_name) + subjectMQTTtoSERIAL;
     const char* cSecondaryModule = SecondaryModule;
     if (strcmp(cSecondaryModule, "BT") == 0) {
       if (cmpToMainTopic(topicOri, subjectMQTTtoBTset)) {
@@ -3615,7 +3615,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       }
 #endif
       if (SYSdata.containsKey("gateway_name")) {
-        strncpy(gateway_name, SYSdata["gateway_name"], parameters_size);
+        strncpy(g_gateway_name, SYSdata["gateway_name"], parameters_size);
       }
       if (SYSdata.containsKey("gw_pass")) {
         strncpy(ota_pass, SYSdata["gw_pass"], parameters_size);

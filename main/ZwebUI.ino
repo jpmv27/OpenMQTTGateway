@@ -415,12 +415,12 @@ void handleRoot() {
       serializeJson(modules, jsonChar, measureJson(modules) + 1);
       char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-      snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Restart").c_str());
+      snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Restart").c_str());
       String response = String(buffer);
       response += String(restart_script);
       response += String(script);
       response += String(style);
-      snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, gateway_name, "Restart");
+      snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, g_gateway_name, "Restart");
       response += String(buffer);
       snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
       response += String(buffer);
@@ -439,12 +439,12 @@ void handleRoot() {
 
     char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Main Menu").c_str());
+    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Main Menu").c_str());
     String response = String(buffer);
     response += String(root_script);
     response += String(script);
     response += String(style);
-    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, root_body, jsonChar, gateway_name);
+    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, root_body, jsonChar, g_gateway_name);
     response += String(buffer);
     snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
     response += String(buffer);
@@ -469,11 +469,11 @@ void handleCN() {
 
     char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Configuration").c_str());
+    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Configuration").c_str());
     String response = String(buffer);
     response += String(script);
     response += String(style);
-    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_body, jsonChar, gateway_name);
+    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_body, jsonChar, g_gateway_name);
     response += String(buffer);
     snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
     response += String(buffer);
@@ -517,12 +517,12 @@ void handleWU() {
 
   char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Configure WebUI").c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Configure WebUI").c_str());
   String response = String(buffer);
   response += String(script);
   response += String(style);
   int logLevel = Logger.getSerialLogLevel(OMG_LOGID, WebLog);
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_webui_body, jsonChar, gateway_name, (displayMetric ? "checked" : ""), (webUISecure ? "checked" : ""));
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_webui_body, jsonChar, g_gateway_name, (displayMetric ? "checked" : ""), (webUISecure ? "checked" : ""));
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);
@@ -566,18 +566,18 @@ void handleSY() {
         Logger.setSyslogLogLevel(OMG_LOGID, server.arg("l1").toInt(), FAC_USER);
       }
       if (update) {
-        String topic = String(mqtt_topic) + String(gateway_name) + String(subjectMQTTtoSYSset);
+        String topic = String(mqtt_topic) + String(g_gateway_name) + String(subjectMQTTtoSYSset);
         Logger.warning(OMG_LOGID, F("[WebUI] Save Syslog and Restart" CR));
         char jsonChar[100];
         serializeJson(modules, jsonChar, measureJson(modules) + 1);
         char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Save Syslog and Restart").c_str());
+        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Save Syslog and Restart").c_str());
         String response = String(buffer);
         response += String(restart_script);
         response += String(script);
         response += String(style);
-        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, gateway_name, "Save Syslog and Restart");
+        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, g_gateway_name, "Save Syslog and Restart");
         response += String(buffer);
         snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
         response += String(buffer);
@@ -597,12 +597,12 @@ void handleSY() {
 
   char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Configure Syslog").c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Configure Syslog").c_str());
   String response = String(buffer);
   response += String(script);
   response += String(style);
   int logLevel = Logger.getSyslogLogLevel(OMG_LOGID, FAC_USER);
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_syslog_body, jsonChar, gateway_name, syslogServer, syslogPort, (logLevel == ELOG_LEVEL_NOLOG ? "selected" : ""), (logLevel == ELOG_LEVEL_EMERGENCY ? "selected" : ""), (logLevel == ELOG_LEVEL_ALERT ? "selected" : ""), (logLevel == ELOG_LEVEL_CRITICAL ? "selected" : ""), (logLevel == ELOG_LEVEL_ERROR ? "selected" : ""), (logLevel == ELOG_LEVEL_WARNING ? "selected" : ""), (logLevel == ELOG_LEVEL_NOTICE ? "selected" : ""), (logLevel == ELOG_LEVEL_INFO ? "selected" : ""), (logLevel == ELOG_LEVEL_DEBUG ? "selected" : ""));
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_syslog_body, jsonChar, g_gateway_name, syslogServer, syslogPort, (logLevel == ELOG_LEVEL_NOLOG ? "selected" : ""), (logLevel == ELOG_LEVEL_EMERGENCY ? "selected" : ""), (logLevel == ELOG_LEVEL_ALERT ? "selected" : ""), (logLevel == ELOG_LEVEL_CRITICAL ? "selected" : ""), (logLevel == ELOG_LEVEL_ERROR ? "selected" : ""), (logLevel == ELOG_LEVEL_WARNING ? "selected" : ""), (logLevel == ELOG_LEVEL_NOTICE ? "selected" : ""), (logLevel == ELOG_LEVEL_INFO ? "selected" : ""), (logLevel == ELOG_LEVEL_DEBUG ? "selected" : ""));
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);
@@ -692,12 +692,12 @@ void handleWI() {
 
       char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-      snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Configure WiFi").c_str());
+      snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Configure WiFi").c_str());
       String response = String(buffer);
       response += String(wifi_script);
       response += String(script);
       response += String(style);
-      snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_wifi_body, jsonChar, gateway_name, WiFiScan.c_str(), WiFi.SSID().c_str());
+      snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_wifi_body, jsonChar, g_gateway_name, WiFiScan.c_str(), WiFi.SSID().c_str());
       response += String(buffer);
       snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
       response += String(buffer);
@@ -721,18 +721,18 @@ void handleWI() {
         }
       }
       if (update) {
-        String topic = String(mqtt_topic) + String(gateway_name) + String(subjectMQTTtoSYSset);
+        String topic = String(mqtt_topic) + String(g_gateway_name) + String(subjectMQTTtoSYSset);
         Logger.warning(OMG_LOGID, F("[WebUI] Save WiFi and Restart" CR));
         char jsonChar[100];
         serializeJson(modules, jsonChar, measureJson(modules) + 1);
         char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Save WiFi and Restart").c_str());
+        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Save WiFi and Restart").c_str());
         String response = String(buffer);
         response += String(restart_script);
         response += String(script);
         response += String(style);
-        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, gateway_name, "Save WiFi and Restart");
+        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, g_gateway_name, "Save WiFi and Restart");
         response += String(buffer);
         snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
         response += String(buffer);
@@ -751,12 +751,12 @@ void handleWI() {
 
   char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Configure WiFi").c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Configure WiFi").c_str());
   String response = String(buffer);
   response += String(wifi_script);
   response += String(script);
   response += String(style);
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_wifi_body, jsonChar, gateway_name, WiFiScan.c_str(), WiFi.SSID().c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_wifi_body, jsonChar, g_gateway_name, WiFiScan.c_str(), WiFi.SSID().c_str());
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);
@@ -833,7 +833,7 @@ void handleMQ() {
 
       if (server.hasArg("h")) {
         WEBtoSYS["gateway_name"] = server.arg("h");
-        if (strncmp(gateway_name, server.arg("h").c_str(), parameters_size)) {
+        if (strncmp(g_gateway_name, server.arg("h").c_str(), parameters_size)) {
           update = true;
         }
       }
@@ -862,19 +862,19 @@ void handleMQ() {
         serializeJson(modules, jsonChar, measureJson(modules) + 1);
         char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Save MQTT and Reconnect").c_str());
+        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Save MQTT and Reconnect").c_str());
         String response = String(buffer);
         response += String(restart_script);
         response += String(script);
         response += String(style);
-        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, gateway_name, "Save MQTT and Reconnect");
+        snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, g_gateway_name, "Save MQTT and Reconnect");
         response += String(buffer);
         snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
         response += String(buffer);
         server.send(200, "text/html", response);
 
         delay(2000); // Wait for web page to be sent before
-        String topic = String(mqtt_topic) + String(gateway_name) + String(subjectMQTTtoSYSset);
+        String topic = String(mqtt_topic) + String(g_gateway_name) + String(subjectMQTTtoSYSset);
         XtoSYS((char*)topic.c_str(), WEBtoSYS);
         return;
       } else {
@@ -889,22 +889,22 @@ void handleMQ() {
 
   char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Configure MQTT").c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Configure MQTT").c_str());
   String response = String(buffer);
   response += String(script);
   response += String(style);
   // mqtt server (mh), mqtt port (ml), mqtt username (mu), mqtt password (mp), secure connection (sc), server certificate (msc), mqtt topic (mt), discovery prefix (dp) (last one only #ifdef ZmqttDiscovery)
 #  if MQTT_BROKER_MODE
 #    ifdef ZmqttDiscovery
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, gateway_name, "", "1883", "", "", gateway_name, mqtt_topic, discovery_prefix);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, g_gateway_name, "", "1883", "", "", g_gateway_name, mqtt_topic, discovery_prefix);
 #    else
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, gateway_name, "", "1883", "", "", gateway_name, mqtt_topic);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, g_gateway_name, "", "1883", "", "", g_gateway_name, mqtt_topic);
 #    endif
 #  else
 #    ifdef ZmqttDiscovery
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, gateway_name, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_server, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_port, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_user, (cnt_parameters_array[CNT_DEFAULT_INDEX].isConnectionSecure ? "checked" : ""), gateway_name, mqtt_topic, discovery_prefix);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, g_gateway_name, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_server, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_port, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_user, (cnt_parameters_array[CNT_DEFAULT_INDEX].isConnectionSecure ? "checked" : ""), g_gateway_name, mqtt_topic, discovery_prefix);
 #    else
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, gateway_name, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_server, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_port, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_user, (cnt_parameters_array[CNT_DEFAULT_INDEX].isConnectionSecure ? "checked" : ""), gateway_name, mqtt_topic);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, g_gateway_name, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_server, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_port, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_user, (cnt_parameters_array[CNT_DEFAULT_INDEX].isConnectionSecure ? "checked" : ""), g_gateway_name, mqtt_topic);
 #    endif
 #  endif
   response += String(buffer);
@@ -946,19 +946,19 @@ void handleCG() {
     serializeJson(modules, jsonChar, measureJson(modules) + 1);
     char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Save Password and Restart").c_str());
+    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Save Password and Restart").c_str());
     String response = String(buffer);
     response += String(restart_script);
     response += String(script);
     response += String(style);
-    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, gateway_name, "Save Password and Restart");
+    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, g_gateway_name, "Save Password and Restart");
     response += String(buffer);
     snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
     response += String(buffer);
     server.send(200, "text/html", response);
 
     delay(2000); // Wait for web page to be sent before
-    String topic = String(mqtt_topic) + String(gateway_name) + String(subjectMQTTtoSYSset);
+    String topic = String(mqtt_topic) + String(g_gateway_name) + String(subjectMQTTtoSYSset);
     XtoSYS((char*)topic.c_str(), WEBtoSYS);
   } else {
     Logger.warning(OMG_LOGID, F("[WebUI] No changes" CR));
@@ -969,11 +969,11 @@ void handleCG() {
 
   char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Configure gateway").c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Configure gateway").c_str());
   String response = String(buffer);
   response += String(script);
   response += String(style);
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_gateway_body, jsonChar, gateway_name, ota_pass);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_gateway_body, jsonChar, g_gateway_name, ota_pass);
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);
@@ -1005,12 +1005,12 @@ void handleLO() {
 
   char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Configure Logging").c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Configure Logging").c_str());
   String response = String(buffer);
   response += String(script);
   response += String(style);
   int logLevel = Logger.getSerialLogLevel(OMG_LOGID, WebLog);
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_logging_body, jsonChar, gateway_name, (logLevel == ELOG_LEVEL_NOLOG ? "selected" : ""), (logLevel == ELOG_LEVEL_EMERGENCY ? "selected" : ""), (logLevel == ELOG_LEVEL_ALERT ? "selected" : ""), (logLevel == ELOG_LEVEL_CRITICAL ? "selected" : ""), (logLevel == ELOG_LEVEL_ERROR ? "selected" : ""), (logLevel == ELOG_LEVEL_WARNING ? "selected" : ""), (logLevel == ELOG_LEVEL_NOTICE ? "selected" : ""), (logLevel == ELOG_LEVEL_INFO ? "selected" : ""), (logLevel == ELOG_LEVEL_DEBUG ? "selected" : ""));
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_logging_body, jsonChar, g_gateway_name, (logLevel == ELOG_LEVEL_NOLOG ? "selected" : ""), (logLevel == ELOG_LEVEL_EMERGENCY ? "selected" : ""), (logLevel == ELOG_LEVEL_ALERT ? "selected" : ""), (logLevel == ELOG_LEVEL_CRITICAL ? "selected" : ""), (logLevel == ELOG_LEVEL_ERROR ? "selected" : ""), (logLevel == ELOG_LEVEL_WARNING ? "selected" : ""), (logLevel == ELOG_LEVEL_NOTICE ? "selected" : ""), (logLevel == ELOG_LEVEL_INFO ? "selected" : ""), (logLevel == ELOG_LEVEL_DEBUG ? "selected" : ""));
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);
@@ -1115,13 +1115,13 @@ void handleLA() {
   serializeJson(modules, jsonChar, measureJson(modules) + 1);
 
   char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Configure LORA").c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Configure LORA").c_str());
   String response = String(buffer);
   response += String(script);
   response += String(style);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_lora_body,
            jsonChar,
-           gateway_name,
+           g_gateway_name,
            LORAConfig.frequency == 868000000 ? "selected" : "",
            LORAConfig.frequency == 915000000 ? "selected" : "",
            LORAConfig.frequency == 433000000 ? "selected" : "",
@@ -1275,12 +1275,12 @@ void handleRF() {
   serializeJson(modules, jsonChar, measureJson(modules) + 1);
   char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Configure RF").c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Configure RF").c_str());
   String response = String(buffer);
   response += String(script);
   response += String(style);
 
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_rf_body, jsonChar, gateway_name, RFConfig.frequency, activeReceiverHtml.c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_rf_body, jsonChar, g_gateway_name, RFConfig.frequency, activeReceiverHtml.c_str());
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);
@@ -1307,12 +1307,12 @@ void handleRT() {
 
     char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Erase and Restart").c_str());
+    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Erase and Restart").c_str());
     String response = String(buffer);
     response += String(restart_script);
     response += String(script);
     response += String(style);
-    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, gateway_name, "Erase and Restart");
+    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, g_gateway_name, "Erase and Restart");
     response += String(buffer);
     snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
     response += String(buffer);
@@ -1352,7 +1352,7 @@ void handleCL() {
 
   char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Configure Cloud").c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Configure Cloud").c_str());
   String response = String(buffer);
   response += String(script);
   response += String(style);
@@ -1369,9 +1369,9 @@ void handleCL() {
 
   requestToken = esp_random();
 #    ifdef ESP32_ETHERNET
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_cloud_body, jsonChar, gateway_name, " cloud checked", " Not", (String(CLOUDGATEWAY) + "token/start").c_str(), (char*)ETH.macAddress().c_str(), ("http://" + String(TheengsUtils::ip2CharArray(ETH.localIP())) + "/").c_str(), gateway_name, uptime(), requestToken);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_cloud_body, jsonChar, g_gateway_name, " cloud checked", " Not", (String(CLOUDGATEWAY) + "token/start").c_str(), (char*)ETH.macAddress().c_str(), ("http://" + String(TheengsUtils::ip2CharArray(ETH.localIP())) + "/").c_str(), g_gateway_name, uptime(), requestToken);
 #    else
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_cloud_body, jsonChar, gateway_name, cloudEnabled, deviceToken, (String(CLOUDGATEWAY) + "token/start").c_str(), (char*)WiFi.macAddress().c_str(), ("http://" + String(TheengsUtils::ip2CharArray(WiFi.localIP())) + "/").c_str(), gateway_name, uptime(), requestToken);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_cloud_body, jsonChar, g_gateway_name, cloudEnabled, deviceToken, (String(CLOUDGATEWAY) + "token/start").c_str(), (char*)WiFi.macAddress().c_str(), ("http://" + String(TheengsUtils::ip2CharArray(WiFi.localIP())) + "/").c_str(), g_gateway_name, uptime(), requestToken);
 #    endif
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
@@ -1402,11 +1402,11 @@ void handleTK() {
 
       char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-      snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Received Device Token").c_str());
+      snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Received Device Token").c_str());
       String response = String(buffer);
       response += String(script);
       response += String(style);
-      snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, token_body, jsonChar, gateway_name);
+      snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, token_body, jsonChar, g_gateway_name);
       response += String(buffer);
       snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
       response += String(buffer);
@@ -1482,7 +1482,7 @@ void handleIN() {
 
     char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Information").c_str());
+    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Information").c_str());
     String response = String(buffer);
 
     snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, information_script, informationDisplay.c_str());
@@ -1490,7 +1490,7 @@ void handleIN() {
 
     response += String(script);
     response += String(style);
-    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, information_body, jsonChar, gateway_name);
+    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, information_body, jsonChar, g_gateway_name);
     response += String(buffer);
 
     snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
@@ -1538,7 +1538,7 @@ void handleUP() {
         Logger.notice(OMG_LOGID, F("[WebUI] XtoSYSupdate %s" CR), output.c_str());
       }
 
-      String topic = String(mqtt_topic) + String(gateway_name) + String(subjectMQTTtoSYSupdate);
+      String topic = String(mqtt_topic) + String(g_gateway_name) + String(subjectMQTTtoSYSupdate);
       MQTTHttpsFWUpdate((char*)topic.c_str(), WEBtoSYS);
       return;
     } else if (server.hasArg("le")) {
@@ -1554,7 +1554,7 @@ void handleUP() {
           Logger.notice(OMG_LOGID, F("[WebUI] XtoSYSupdate %s" CR), output.c_str());
         }
 
-        String topic = String(mqtt_topic) + String(gateway_name) + String(subjectMQTTtoSYSupdate);
+        String topic = String(mqtt_topic) + String(g_gateway_name) + String(subjectMQTTtoSYSupdate);
         MQTTHttpsFWUpdate((char*)topic.c_str(), WEBtoSYS);
         return;
       }
@@ -1565,12 +1565,12 @@ void handleUP() {
 
   char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Firmware Upgrade").c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Firmware Upgrade").c_str());
   String response = String(buffer);
   response += String(script);
   response += String(style);
   String systemUrl = RELEASE_LINK + latestVersion + "/" + ENV_NAME + "-firmware.bin";
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, upgrade_body, jsonChar, gateway_name, systemUrl.c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, upgrade_body, jsonChar, g_gateway_name, systemUrl.c_str());
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);
@@ -1583,12 +1583,12 @@ void sendRestartPage() {
   serializeJson(modules, jsonChar, measureJson(modules) + 1);
   char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Updating Firmware and Restart").c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Updating Firmware and Restart").c_str());
   String response = String(buffer);
   response += String(restart_script);
   response += String(script);
   response += String(style);
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, gateway_name, "Updating Firmware and Restart");
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, reset_body, jsonChar, g_gateway_name, "Updating Firmware and Restart");
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);
@@ -1611,7 +1611,7 @@ void handleCS() {
     if (server.hasArg("c1")) {
       String c1 = server.arg("c1");
 
-      String cmdTopic = String(mqtt_topic) + String(gateway_name) + "/" + c1.substring(0, c1.indexOf(' '));
+      String cmdTopic = String(mqtt_topic) + String(g_gateway_name) + "/" + c1.substring(0, c1.indexOf(' '));
       String command = c1.substring(c1.indexOf(' ') + 1);
       if (command.length()) {
         WEBUI_TRACE_LOG(F("[WebUI] handleCS inject MQTT Command topic: '%s', command: '%s'" CR), cmdTopic.c_str(), command.c_str());
@@ -1649,12 +1649,12 @@ void handleCS() {
 
     char buffer[WEB_TEMPLATE_BUFFER_MAX_SIZE];
 
-    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(gateway_name) + " - Console").c_str());
+    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, header_html, (String(g_gateway_name) + " - Console").c_str());
     String response = String(buffer);
     response += String(console_script);
     response += String(script);
     response += String(style);
-    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, console_body, jsonChar, gateway_name);
+    snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, console_body, jsonChar, g_gateway_name);
     response += String(buffer);
     snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
     response += String(buffer);
