@@ -77,7 +77,7 @@ build_flags =
   '-DOMG_GATEWAY_NAME="OpenMQTTGateway"'
   '-DOMG_SENSOR_BME280="BME280"'
   '-DOMG_MQTT_BASE_TOPIC="rf/"'
-  '-DESPWifiManualSetup=true'
+  '-DOMG_ESP_WIFI_MANUAL_SETUP=true'
   '-DOMG_WIFI_SSID="mynetwork"'
   '-DOMG_WIFI_PASSWORD="Cato\\\'sYounger\\\$on"' ; Cato'sYounger$on
   '-DOMG_MQTT_USER="mqttusername"'
@@ -103,7 +103,7 @@ upload_flags =
 
 ::: warning Note
 Adding manual WiFi and MQTT credentials to an environment also requires to define
-`'-DESPWifiManualSetup=true'`
+`'-DOMG_ESP_WIFI_MANUAL_SETUP=true'`
 for the credentials to be registered correctly.
 :::
 

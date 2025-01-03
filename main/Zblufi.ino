@@ -387,12 +387,12 @@ bool startBlufi() {
   uint8_t mac[6];
   esp_read_mac(mac, ESP_MAC_WIFI_STA);
   char advName[17] = {0};
-  // Check length of Gateway_Short_Name
-  if (strlen(Gateway_Short_Name) > 3) {
-    Logger.error(OMG_LOGID, F("Gateway_Short_Name is too long, max 3 characters" CR));
+  // Check length of OMG_GATEWAY_SHORT_NAME
+  if (strlen(OMG_GATEWAY_SHORT_NAME) > 3) {
+    Logger.error(OMG_LOGID, F("OMG_GATEWAY_SHORT_NAME is too long, max 3 characters" CR));
     return false;
   }
-  snprintf(advName, sizeof(advName), Gateway_Short_Name "_%02X%02X%02X%02X%02X%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  snprintf(advName, sizeof(advName), OMG_GATEWAY_SHORT_NAME "_%02X%02X%02X%02X%02X%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
   NimBLEDevice::init(advName);
   esp_blufi_gatt_svr_init();
   ble_gatts_start();

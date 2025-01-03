@@ -47,38 +47,38 @@
 #  define OMG_LOG_LEVEL_OLED ELOG_LEVEL_WARNING // Default to only display Warning level messages
 #endif
 
-#ifndef LOG_TO_OLED
-#  define LOG_TO_OLED false // Default to not display log messages on display
+#ifndef OMG_LOG_TO_OLED
+#  define OMG_LOG_TO_OLED false // Default to not display log messages on display
 #endif
 
-#ifndef ZwebUI
-#  ifndef JSON_TO_OLED
-#    define JSON_TO_OLED true // Default to displaying JSON messages on the display
+#ifndef OMG_WEB_UI
+#  ifndef OMG_JSON_TO_OLED
+#    define OMG_JSON_TO_OLED true // Default to displaying JSON messages on the display
 #  endif
 #else
-#  ifndef JSON_TO_OLED
-#    define JSON_TO_OLED false // If WebUI is NOT included within the build, the JSON message parser is not included within the build and the JSON messages are not available for display
+#  ifndef OMG_JSON_TO_OLED
+#    define OMG_JSON_TO_OLED false // If WebUI is NOT included within the build, the JSON message parser is not included within the build and the JSON messages are not available for display
 #  endif
 #endif
 
-#ifndef DISPLAY_PAGE_INTERVAL
-#  define DISPLAY_PAGE_INTERVAL 3 // Number of seconds between json message displays
+#ifndef OMG_DISPLAY_PAGE_INTERVAL
+#  define OMG_DISPLAY_PAGE_INTERVAL 3 // Number of seconds between json message displays
 #endif
 
-#ifndef DISPLAY_IDLE_LOGO
-#  define DISPLAY_IDLE_LOGO true // Display the OMG logo when idle
+#ifndef OMG_DISPLAY_IDLE_LOGO
+#  define OMG_DISPLAY_IDLE_LOGO true // Display the OMG logo when idle
 #endif
 
-#ifndef DISPLAY_FLIP
-#  define DISPLAY_FLIP true // Flip display orientation
+#ifndef OMG_DISPLAY_FLIP
+#  define OMG_DISPLAY_FLIP true // Flip display orientation
 #endif
 
-#ifndef DISPLAY_STATE
-#  define DISPLAY_STATE true // set to false if you don't want to use the display
+#ifndef OMG_DISPLAY_STATE
+#  define OMG_DISPLAY_STATE true // set to false if you don't want to use the display
 #endif
 
-#ifndef DISPLAY_BRIGHTNESS
-#  define DISPLAY_BRIGHTNESS 50 // 0-100; 50 % brightness as default
+#ifndef OMG_DISPLAY_BRIGHTNESS
+#  define OMG_DISPLAY_BRIGHTNESS 50 // 0-100; 50 % brightness as default
 #endif
 
 /*------------------- DEFAULT DISPLAY GEOMETRY ----------------------*/

@@ -21,8 +21,8 @@
 
 #include "TheengsUtils.h"
 
-#ifndef NTP_SERVER
-#  define NTP_SERVER "pool.ntp.org"
+#ifndef OMG_NTP_SERVER
+#  define OMG_NTP_SERVER "pool.ntp.org"
 #endif
 
 String TheengsUtils::toString(uint64_t input) {
@@ -90,7 +90,7 @@ unsigned long TheengsUtils::uptime() {
 }
 
 void TheengsUtils::syncNTP() {
-  configTime(0, 0, NTP_SERVER);
+  configTime(0, 0, OMG_NTP_SERVER);
   time_t now = time(nullptr);
   while (now < 8 * 3600 * 2) {
     delay(500);

@@ -10,7 +10,7 @@ The current SSD1306 display states are being published to the `SSD1306toMQTT` to
 ### Display ON/OFF
 To turn the SSD1306 display on or off.
 
-This can be enabled with the compiler directive `-DDISPLAY_STATE=true`.
+This can be enabled with the compiler directive `-DOMG_DISPLAY_STATE=true`.
 
 MQTT Display OFF command:
 
@@ -39,7 +39,7 @@ The display brightness can be set between 0-100%.
 
 It is recommended to set a value lower than 100 to extend the life of the OLED display. The default setting is 50.
 
-This can be set with the compiler directive `-DDISPLAY_BRIGHTNESS=50`.
+This can be set with the compiler directive `-DDISPLAY_OMG_BRIGHTNESS=50`.
 
 or with the runtime command
 
@@ -48,7 +48,7 @@ or with the runtime command
 ### Metric or Imperial property units
 To have applicable device properties displayed in Imperial units, e.g. °F for temperature.
 
-This can be set with the compiler directive `-DDISPLAY_METRIC=false`.
+This can be set with the compiler directive `-DOMG_DISPLAY_METRIC=false`.
 
 As the display Metric setting is being defined in the WebUI part of OpenMQTTGateway changes need to be sent there with the runtime command
 
@@ -56,7 +56,7 @@ As the display Metric setting is being defined in the WebUI part of OpenMQTTGate
 
 ### Rotating the display by 180 degrees
 
-This can be set with the compiler directive `-DDISPLAY_FLIP=false`.
+This can be set with the compiler directive `-DOMG_DISPLAY_FLIP=false`.
 
 or with the runtime command
 
@@ -65,7 +65,7 @@ or with the runtime command
 ### Display idle Logo
 To display the OpenMQTTGateway logo during device display idle time. This reduces the likelihood of burn-in.
 
-This can be set with the compiler directive `-DDISPLAY_IDLE_LOGO=true`.
+This can be set with the compiler directive `-DOMG_DISPLAY_IDLE_LOGO=true`.
 
 or at runtime with
 
@@ -73,7 +73,7 @@ or at runtime with
 
 ### Setting the log output
 
-The display of serial log messages to the display can be enabled via compiler directive `-DLOG_TO_OLED=true` or via MQTT commands.
+The display of serial log messages to the display can be enabled via compiler directive `-DOMG_LOG_TO_OLED=true` or via MQTT commands.
 
 For example if you want to set the serial log to OLED
 
@@ -89,7 +89,7 @@ The log level of the messages displayed is Errors and Warnings, and this can onl
 
 The display of messages from various modules is also supported. Currently supported modules include `ZgatewayRTL_433`, `ZgatewayBT` and `ZsensorBME280`.
 
-This can be enabled with the compiler directive `-DJSON_TO_OLED=true`.
+This can be enabled with the compiler directive `-DOMG_JSON_TO_OLED=true`.
 
 You can also change it by MQTT. For example if you want to display module json messages:
 
@@ -147,12 +147,12 @@ This example describes how to do it with the ESP32 board.
       '-DOLED_SDA=21'               ; SSD1306 pin SDA
       '-DOLED_SCL=22'               ; SSD1306 pin SCL
       '-DGenericSSD1306=true'
-      '-DJSON_TO_OLED=true'
-      '-DDISPLAY_PAGE_INTERVAL=30'
-    ;  '-DLOG_TO_OLED=true'         ; Enable log to OLED
+      '-DOMG_JSON_TO_OLED=true'
+      '-DOMG_DISPLAY_PAGE_INTERVAL=30'
+    ;  '-DOMG_LOG_TO_OLED=true'         ; Enable log to OLED
     ;  '-DOMG_LOG_LEVEL_OLED=ELOG_LOG_LEVEL_NOTICE'
-    ;  '-DDISPLAY_IDLE_LOGO=false'
-    ;  '-DDISPLAY_BRIGHTNESS=80'
-    ;  '-DDISPLAY_METRIC=false'
-    ;  '-DDISPLAY_FLIP=false'
+    ;  '-DOMG_DISPLAY_IDLE_LOGO=false'
+    ;  '-DOMG_DISPLAY_BRIGHTNESS=80'
+    ;  '-DOMG_DISPLAY_METRIC=false'
+    ;  '-DOMG_DISPLAY_FLIP=false'
     ```

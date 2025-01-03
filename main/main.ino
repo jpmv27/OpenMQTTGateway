@@ -121,7 +121,7 @@ struct GfSun2000Data {};
 #endif
 
 // Modules config inclusion
-#if defined(ZwebUI) && defined(ESP32)
+#if defined(OMG_WEB_UI) && defined(ESP32)
 #  include "config_WebUI.h"
 #endif
 #if defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_RF2) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_ACTUATOR_SOMFY) || defined(OMG_GATEWAY_RTL_433)
@@ -770,11 +770,11 @@ bool pubMQTT(String topic, unsigned long payload) {
 void delayWithOTA(long waitMillis) {
   long waitStep = 100;
   for (long waitedMillis = 0; waitedMillis < waitMillis; waitedMillis += waitStep) {
-#ifndef ESPWifiManualSetup
+#ifndef OMG_ESP_WIFI_MANUAL_SETUP
     checkButton(); // check if a reset of wifi/mqtt settings is asked
 #endif
     ArduinoOTA.handle();
-#if defined(ZwebUI) && defined(ESP32)
+#if defined(OMG_WEB_UI) && defined(ESP32)
     WebUILoop();
 #endif
 #ifdef ESP32
@@ -838,7 +838,7 @@ void SYSConfig_save() {
 #  endif
   String conf = "";
   serializeJson(jsonBuffer, conf);
-  preferences.begin(Gateway_Short_Name, false);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
   int result = preferences.putString("SYSConfig", conf);
   preferences.end();
   Logger.notice(OMG_LOGID, F("SYS Config_save: %s, result: %d" CR), conf.c_str(), result);
@@ -868,7 +868,7 @@ bool cmpToMainTopic(const char* topicOri, const char* toAdd) {
 #if defined(ESP32)
 void SYSConfig_load() {
   StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
-  preferences.begin(Gateway_Short_Name, true);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, true);
   if (preferences.isKey("SYSConfig")) {
     auto error = deserializeJson(jsonBuffer, preferences.getString("SYSConfig", "{}"));
     preferences.end();
@@ -1031,7 +1031,7 @@ void setupMQTT() {
       cnt_parameters_array[cnt_index].validConnection = true;
       readCntParameters(cnt_index);
 
-#  ifndef ESPWifiManualSetup
+#  ifndef OMG_ESP_WIFI_MANUAL_SETUP
       if (cnt_parameters_backup->saveOnSuccess) // Save the new parameters to the flash
         saveConfig();
 #  endif
@@ -1077,7 +1077,7 @@ void setupMQTT() {
     delayWithOTA(10000);
 
     if (failure_number_mqtt > maxRetryWatchDog) {
-#  ifndef ESPWifiManualSetup
+#  ifndef OMG_ESP_WIFI_MANUAL_SETUP
       // Look for the next valid connection
       for (int i = 0; i < cnt_parameters_array_size; i++) {
         cnt_index++;
@@ -1309,7 +1309,7 @@ void setup() {
   }
 #endif
   Logger.notice(OMG_LOGID, F(CR "************* WELCOME TO OpenMQTTGateway **************" CR));
-#if defined(TRIGGER_GPIO) && !defined(ESPWifiManualSetup)
+#if defined(TRIGGER_GPIO) && !defined(OMG_ESP_WIFI_MANUAL_SETUP)
   pinMode(TRIGGER_GPIO, INPUT_PULLUP);
   checkButton();
 #endif
@@ -1396,7 +1396,7 @@ void setup() {
     startBlufi();
 #endif
 
-#if defined(ESPWifiManualSetup)
+#if defined(OMG_ESP_WIFI_MANUAL_SETUP)
   setupWiFiFromBuild();
 #else
   if (loadConfigFromFlash()) { // Config present
@@ -1440,9 +1440,9 @@ void setup() {
 
   setOTA();
 
-#if defined(ZwebUI) && defined(ESP32)
+#if defined(OMG_WEB_UI) && defined(ESP32)
   WebUISetup();
-  modules.add(ZwebUI);
+  modules.add(OMG_WEB_UI);
 #endif
 
   delay(1500);
@@ -1691,7 +1691,7 @@ void setOTA() {
 
 #if !OMG_MQTT_BROKER_MODE
 void setupTLS(int index) {
-  configTime(0, 0, NTP_SERVER);
+  configTime(0, 0, OMG_NTP_SERVER);
   WiFiClientSecure* sClient = static_cast<WiFiClientSecure*>(eClient.get());
   Logger.notice(OMG_LOGID, F("cnt index used: %d" CR), index);
   if (!cnt_parameters_array[index].isCertValidate) {
@@ -1773,11 +1773,11 @@ void setupTLS(int index) {
   9 - SELFTEST end
 */
 void ESPRestart(byte reason) {
-#ifdef SecondaryModule
+#ifdef OMG_SECONDARY_MODULE
   // Erase the secondary module config
   String restartCmdStr = "{\"cmd\":\"" + String(restartCmd) + "\"}";
   Logger.notice(OMG_LOGID, F("Restarting secondary module : %s" CR), restartCmdStr.c_str());
-  receivingDATA(subjectMQTTtoSYSsetSecondaryModule, restartCmdStr.c_str());
+  receivingDATA(subjectMQTTtoSYSsetOMG_SECONDARY_MODULE, restartCmdStr.c_str());
   delay(2000);
 #endif
   StaticJsonDocument<128> jsonBuffer;
@@ -1799,7 +1799,7 @@ void ESPRestart(byte reason) {
 #endif
 }
 
-#if defined(ESPWifiManualSetup)
+#if defined(OMG_ESP_WIFI_MANUAL_SETUP)
 void setupWiFiFromBuild() {
   // Must set hostname before mode. See https://github.com/espressif/arduino-esp32/issues/6700
   WiFi.setHostname(g_gateway_name);
@@ -2203,7 +2203,7 @@ void setupWiFiManager() {
 
 #  ifdef OMG_USE_MAC_AS_GATEWAY_NAME
   String s = WiFi.macAddress();
-  snprintf(g_WifiManager_ssid, MAC_NAME_MAX_LEN, "%s_%.2s%.2s", Gateway_Short_Name, s.c_str(), s.c_str() + 3);
+  snprintf(g_WifiManager_ssid, MAC_NAME_MAX_LEN, "%s_%.2s%.2s", OMG_GATEWAY_SHORT_NAME, s.c_str(), s.c_str() + 3);
 #  endif
 
   wifiManager.setDebugOutput(OMG_WM_DEBUG);
@@ -2211,7 +2211,7 @@ void setupWiFiManager() {
   // The extra parameters to be configured (can be either global or just in the setup)
   // After connecting, parameter.getValue() will get you the configured value
   // id/name placeholder/prompt default
-#  ifndef WIFIMNG_HIDE_MQTT_CONFIG
+#  ifndef OMG_WIFIMNG_HIDE_MQTT_CONFIG
 #    if !OMG_MQTT_BROKER_MODE
   WiFiManagerParameter custom_mqtt_server("server", "mqtt server", cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_server, parameters_size, " minlength='1' maxlength='64' required");
   WiFiManagerParameter custom_mqtt_port("port", "mqtt port", cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_port, 6, " minlength='1' maxlength='5' required");
@@ -2254,7 +2254,7 @@ void setupWiFiManager() {
   wifiManager.setSTAStaticIPConfig(ip_adress, gateway_adress, subnet_adress, dns_adress);
 #  endif
 
-#  ifndef WIFIMNG_HIDE_MQTT_CONFIG
+#  ifndef OMG_WIFIMNG_HIDE_MQTT_CONFIG
   //add all your parameters here
 #    if !OMG_MQTT_BROKER_MODE
   wifiManager.addParameter(&custom_mqtt_server);
@@ -2333,7 +2333,7 @@ void setupWiFiManager() {
   if (shouldSaveConfig) {
     //read updated parameters
     cnt_index = CNT_DEFAULT_INDEX;
-#  ifndef WIFIMNG_HIDE_MQTT_CONFIG
+#  ifndef OMG_WIFIMNG_HIDE_MQTT_CONFIG
 #    if !OMG_MQTT_BROKER_MODE
     strcpy(cnt_parameters_array[cnt_index].mqtt_server, custom_mqtt_server.getValue());
     strcpy(cnt_parameters_array[cnt_index].mqtt_port, custom_mqtt_port.getValue());
@@ -2486,7 +2486,7 @@ void sleep() {}
 #endif
 
 void loop() {
-#ifndef ESPWifiManualSetup
+#ifndef OMG_ESP_WIFI_MANUAL_SETUP
   checkButton(); // check if a reset of wifi/mqtt settings is asked
 #endif
 
@@ -2530,7 +2530,7 @@ void loop() {
 #if OMG_MQTT_MESSAGE_UTC_TIMESTAMP || OMG_MQTT_MESSAGE_UNIX_TIMESTAMP || OMG_MQTT_MESSAGE_LOCAL_TIMESTAMP
       TheengsUtils::syncNTP();
 #if OMG_MQTT_MESSAGE_LOCAL_TIMESTAMP
-      TheengsUtils::setTimezone(TIMEZONE);
+      TheengsUtils::setTimezone(OMG_TIMEZONE);
 #endif
 #endif
       if (!timer_sys_checks) { // Update check at start up only
@@ -2540,7 +2540,7 @@ void loop() {
       }
       timer_sys_checks = millis();
     }
-#if defined(ZwebUI) && defined(ESP32)
+#if defined(OMG_WEB_UI) && defined(ESP32)
     WebUILoop();
 #endif
     mqtt->loop();
@@ -2582,7 +2582,7 @@ void loop() {
 #if defined(OMG_GATEWAY_RTL_433) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_RF2) || defined(OMG_ACTUATOR_SOMFY)
       stateRFMeasures();
 #endif
-#if defined(ZwebUI) && defined(ESP32)
+#if defined(OMG_WEB_UI) && defined(ESP32)
       stateWebUIStatus();
 #endif
     }
@@ -2753,7 +2753,7 @@ float intTemperatureRead() {
  Erase flash and restart the ESP
 */
 void erase(bool restart) {
-#ifdef SecondaryModule
+#ifdef OMG_SECONDARY_MODULE
   // Erase the secondary module config
   String eraseCmdStr = "{\"cmd\":\"" + String(eraseCmd) + "\"}";
   Logger.notice(OMG_LOGID, F("Erasing secondary module config: %s" CR), eraseCmdStr.c_str());
@@ -2764,7 +2764,7 @@ void erase(bool restart) {
 
 #if defined(ESP8266)
   WiFi.disconnect(true);
-#  ifndef ESPWifiManualSetup
+#  ifndef OMG_ESP_WIFI_MANUAL_SETUP
   wifiManager.resetSettings();
 #  endif
   delay(5000);
@@ -2956,9 +2956,9 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
       Logger.debug(OMG_LOGID, F("BUS Msg origin: %s" CR), strTopicOri.c_str());
     }
   } else {
-#if defined(SecondaryModule) // Redirect certain commands to Serial
+#if defined(OMG_SECONDARY_MODULE) // Redirect certain commands to Serial
     String topicSerial = String(mqtt_topic) + String(g_gateway_name) + subjectMQTTtoSERIAL;
-    const char* cSecondaryModule = SecondaryModule;
+    const char* cSecondaryModule = OMG_SECONDARY_MODULE;
     if (strcmp(cSecondaryModule, "BT") == 0) {
       if (cmpToMainTopic(topicOri, subjectMQTTtoBTset)) {
         strTopicOri = topicSerial.c_str();
@@ -3046,7 +3046,7 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
 #  ifdef OMG_MQTT_HTTPS_FW_UPDATE
     MQTTHttpsFWUpdate(strTopicOri.c_str(), jsondata);
 #  endif
-#  if defined(ZwebUI) && defined(ESP32)
+#  if defined(OMG_WEB_UI) && defined(ESP32)
     XtoWebUI(strTopicOri.c_str(), jsondata);
 #  endif
 #endif
@@ -3092,7 +3092,7 @@ String latestVersion;
 
 #    include "zzHTTPUpdate.h"
 
-#    if CHECK_OTA_UPDATE
+#    if OTA_CHECK_OTA_UPDATE
 /**
  * Check on a server the latest version information to build a releaseLink
  * The release link will be used when the user trigger an OTA update command
@@ -3302,7 +3302,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
           if (cnt_index != 0) // We don't enable the change of cert provided at build time
             cnt_parameters_array[cnt_index].ota_server_cert = ota_cert;
 #  endif
-#  ifndef ESPWifiManualSetup
+#  ifndef OMG_ESP_WIFI_MANUAL_SETUP
           saveConfig();
 #  endif
           ESPRestart(6);
@@ -3383,7 +3383,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
       jsondata["origin"] = subjectRLStoMQTT;
       enqueueJsonObject(jsondata);
 
-#  ifndef ESPWifiManualSetup
+#  ifndef OMG_ESP_WIFI_MANUAL_SETUP
       saveConfig();
 #  endif
 
@@ -3628,14 +3628,14 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
         restartESP = true;
       }
 #endif
-#ifndef ESPWifiManualSetup
+#ifndef OMG_ESP_WIFI_MANUAL_SETUP
       saveConfig();
 #endif
       mqttSetupPending = true; // trigger reconnect in loop using the new topic/name
     }
 
 #if !OMG_MQTT_BROKER_MODE
-#  ifdef MQTTsetMQTT
+#  ifdef OMG_MQTT_SET_MQTT
 
     bool save_cnt = false;
     bool read_cnt = false;

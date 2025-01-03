@@ -44,12 +44,12 @@
 
 SemaphoreHandle_t semaphoreOLEDOperation;
 
-boolean logToOLEDDisplay = LOG_TO_OLED;
-boolean jsonDisplay = JSON_TO_OLED;
-boolean displayFlip = DISPLAY_FLIP;
-boolean displayState = DISPLAY_STATE;
-boolean idlelogo = DISPLAY_IDLE_LOGO;
-uint8_t displayBrightness = DISPLAY_BRIGHTNESS;
+boolean logToOLEDDisplay = OMG_LOG_TO_OLED;
+boolean jsonDisplay = OMG_JSON_TO_OLED;
+boolean displayFlip = OMG_DISPLAY_FLIP;
+boolean displayState = OMG_DISPLAY_STATE;
+boolean idlelogo = OMG_DISPLAY_IDLE_LOGO;
+uint8_t displayBrightness = OMG_DISPLAY_BRIGHTNESS;
 
 /*
 Toogle log display
@@ -73,13 +73,13 @@ void setupSSD1306() {
   Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 command topic: %s" CR), subjectMQTTtoSSD1306set);
   Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 log-oled: %T" CR), logToOLEDDisplay);
   Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 json-oled: %T" CR), jsonDisplay);
-  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 DISPLAY_PAGE_INTERVAL: %d" CR), DISPLAY_PAGE_INTERVAL);
+  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 DISPLAY_PAGE_INTERVAL: %d" CR), OMG_DISPLAY_PAGE_INTERVAL);
   Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 DISPLAY_IDLE_LOGO: %T" CR), idlelogo);
   Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 DISPLAY_FLIP: %T" CR), displayFlip);
   Oled.begin();
   Logger.notice(OMG_LOGID, F("Setup SSD1306 Display end" CR));
 
-#  if LOG_TO_OLED
+#  if OMG_LOG_TO_OLED
   Logger.registerSerial(OMG_LOGID, OMG_LOG_LEVEL_OLED, "OMG", Oled); // Log on OLED following LOG_LEVEL_OLED
   jsonDisplay = false;
 #  else
@@ -135,13 +135,13 @@ void loopSSD1306() {
       if (!Oled.displayPage(currentWebUIMessage)) {
         Logger.warning(OMG_LOGID, F("[ssd1306] displayPage failed: %s" CR), currentWebUIMessage->title);
       }
-      nextDisplayPage = uptime() + DISPLAY_PAGE_INTERVAL;
+      nextDisplayPage = uptime() + OMG_DISPLAY_PAGE_INTERVAL;
       logoDisplayed = false;
       newSSD1306Message = false;
     }
   }
   /*
-  Display logo if it has been more than DISPLAY_PAGE_INTERVAL
+  Display logo if it has been more than OMG_DISPLAY_PAGE_INTERVAL
   */
   if (uptime() > nextDisplayPage + 1 && !logoDisplayed && idlelogo && displayState) {
     Oled.display->normalDisplay();
@@ -214,7 +214,7 @@ void XtoSSD1306(const char* topicOri, JsonObject& SSD1306data) { // json object 
       }
     } else if (SSD1306data.containsKey("erase") && SSD1306data["erase"]) {
       // Erase config from NVS (non-volatile storage)
-      preferences.begin(Gateway_Short_Name, false);
+      preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
       if (preferences.isKey("SSD1306Config")) {
         success = preferences.remove("SSD1306Config");
       }
@@ -243,25 +243,25 @@ void SSD1306Config_save() {
   // Save config into NVS (non-volatile storage)
   String conf = "";
   serializeJson(jsonBuffer, conf);
-  preferences.begin(Gateway_Short_Name, false);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
   int result = preferences.putString("SSD1306Config", conf);
   preferences.end();
   Logger.notice(OMG_LOGID, F("SSD1306 Config_save: %s, result: %d" CR), conf.c_str(), result);
 }
 
 void SSD1306Config_init() {
-  displayState = DISPLAY_STATE;
-  displayBrightness = DISPLAY_BRIGHTNESS;
-  logToOLEDDisplay = LOG_TO_OLED;
-  jsonDisplay = JSON_TO_OLED;
-  idlelogo = DISPLAY_IDLE_LOGO;
-  displayFlip = DISPLAY_FLIP;
+  displayState = OMG_DISPLAY_STATE;
+  displayBrightness = OMG_DISPLAY_BRIGHTNESS;
+  logToOLEDDisplay = OMG_LOG_TO_OLED;
+  jsonDisplay = OMG_JSON_TO_OLED;
+  idlelogo = OMG_DISPLAY_IDLE_LOGO;
+  displayFlip = OMG_DISPLAY_FLIP;
   Logger.notice(OMG_LOGID, F("SSD1306 config initialised" CR));
 }
 
 bool SSD1306Config_load() {
   StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
-  preferences.begin(Gateway_Short_Name, true);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, true);
   if (preferences.isKey("SSD1306Config")) {
     auto error = deserializeJson(jsonBuffer, preferences.getString("SSD1306Config", "{}"));
     preferences.end();
@@ -414,7 +414,7 @@ Write line of text to the display with vertical scrolling of screen
 size_t OledSerial::write(const uint8_t* buffer, size_t size) {
   if (xPortGetCoreID() == CONFIG_ARDUINO_RUNNING_CORE) {
     if (xSemaphoreTake(semaphoreOLEDOperation, pdMS_TO_TICKS(30000)) == pdTRUE) {
-      nextDisplayPage = uptime() + DISPLAY_PAGE_INTERVAL;
+      nextDisplayPage = uptime() + OMG_DISPLAY_PAGE_INTERVAL;
       display->normalDisplay();
       display->clear();
       display->setColor(WHITE);

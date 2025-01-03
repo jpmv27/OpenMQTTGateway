@@ -47,7 +47,7 @@ String getUniqueId(String name, String sufix) {
   return String(uniqueId);
 }
 
-#  if defined(OMG_GATEWAY_BT) || defined(SecondaryModule)
+#  if defined(OMG_GATEWAY_BT) || defined(OMG_SECONDARY_MODULE)
 /**
  * Create a discover messages form a list of attribute
  * 
@@ -466,7 +466,7 @@ void eraseTopic(const char* sensor_type, const char* unique_id) {
   pubMQTT((char*)topic.c_str(), "", true);
 }
 
-#  if defined(OMG_GATEWAY_BT) || defined(SecondaryModule)
+#  if defined(OMG_GATEWAY_BT) || defined(OMG_SECONDARY_MODULE)
 void btPresenceParametersDiscovery() {
   createDiscovery("number", //set Type
                   subjectBTtoMQTT, "BT: Presence/Tracker timeout", (char*)getUniqueId("presenceawaytimer", "").c_str(), //set state_topic,name,uniqueId
@@ -502,9 +502,9 @@ void btScanParametersDiscovery() {
 
 void pubMqttDiscovery() {
   Logger.debug(OMG_LOGID, F("omgStatusDiscovery" CR));
-#  ifdef SecondaryModule
-  String uptimeName = "SYS: Uptime " + String(SecondaryModule);
-  String uptimeId = "uptime-" + String(SecondaryModule);
+#  ifdef OMG_SECONDARY_MODULE
+  String uptimeName = "SYS: Uptime " + String(OMG_SECONDARY_MODULE);
+  String uptimeId = "uptime-" + String(OMG_SECONDARY_MODULE);
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTTSecondaryModule, uptimeName.c_str(), (char*)getUniqueId(uptimeId, "").c_str(), //set state_topic,name,uniqueId
                   will_Topic, "duration", "{{ value_json.uptime }}", //set availability_topic,device_class,value_template,
@@ -514,8 +514,8 @@ void pubMqttDiscovery() {
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassMeasurement //State Class
   );
-  String freememName = "SYS: Free memory " + String(SecondaryModule);
-  String freememId = "freemem-" + String(SecondaryModule);
+  String freememName = "SYS: Free memory " + String(OMG_SECONDARY_MODULE);
+  String freememId = "freemem-" + String(OMG_SECONDARY_MODULE);
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTTSecondaryModule, freememName.c_str(), (char*)getUniqueId(freememId, "").c_str(), //set state_topic,name,uniqueId
                   will_Topic, "data_size", "{{ value_json.freemem }}", //set availability_topic,device_class,value_template,
@@ -525,8 +525,8 @@ void pubMqttDiscovery() {
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassMeasurement //State Class
   );
-  String restartName = "SYS: Restart " + String(SecondaryModule);
-  String restartId = "restart-" + String(SecondaryModule);
+  String restartName = "SYS: Restart " + String(OMG_SECONDARY_MODULE);
+  String restartId = "restart-" + String(OMG_SECONDARY_MODULE);
   createDiscovery("button", //set Type
                   will_Topic, restartName.c_str(), (char*)getUniqueId(restartId, "").c_str(), //set state_topic,name,uniqueId
                   will_Topic, "restart", "", //set availability_topic,device_class,value_template,
@@ -1237,7 +1237,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  if defined(OMG_GATEWAY_BT) || defined(SecondaryModule)
+#  if defined(OMG_GATEWAY_BT) || defined(OMG_SECONDARY_MODULE)
 #    ifdef ESP32
 
   createDiscovery("number", //set Type
