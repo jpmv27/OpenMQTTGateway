@@ -58,7 +58,7 @@ void MeasureGPIOInput() {
     // whatever the reading is at, it's been there for longer than the debounce
     // delay, so take it as the actual current state:
     yield();
-#  if defined(TRIGGER_GPIO) && INPUT_GPIO == TRIGGER_GPIO && !defined(ESPWifiManualSetup)
+#  if defined(TRIGGER_GPIO) && INPUT_GPIO == TRIGGER_GPIO && !defined(OMG_ESP_WIFI_MANUAL_SETUP)
     if (reading == LOW) {
       if (resetTime == 0) {
         resetTime = millis();

@@ -81,7 +81,7 @@ mosquitto_pub -t "home/OpenMQTTGateway/commands/MQTTtoSYS/config" -m
 ::: tip INFO
 By default this function is not available on the pre built binary of RFBridge, in order to have less code size and enable to have OTA update working properly. So as to enable it remove from the rf bridge env:
 ```
-build_flags = '-UMQTTsetMQTT'
+build_flags = '-UOMG_MQTT_SET_MQTT'
 ``` 
 :::
 

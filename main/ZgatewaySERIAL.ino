@@ -247,7 +247,7 @@ void SERIALtoX() {
           } else {
             // send as json
             if (SERIALdata.containsKey("origin") || SERIALdata.containsKey("topic")) {
-#      ifdef SecondaryModule
+#      ifdef OMG_SECONDARY_MODULE
               // We need to assign the discovery message to the primary module instead of the secondary module
               if (SERIALdata.containsKey("device") && SERIALdata["device"].containsKey("via_device")) {
                 SERIALdata["device"]["via_device"] = g_gateway_name;

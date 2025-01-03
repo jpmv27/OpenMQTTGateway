@@ -31,8 +31,8 @@
 
 #define WEBUI_TEXT_WIDTH 128
 
-#ifndef WEBUI_LOG_TO_SERIAL
-#  define WEBUI_LOG_TO_SERIAL true
+#ifndef OMG_WEBUI_LOG_TO_SERIAL
+#  define OMG_WEBUI_LOG_TO_SERIAL true
 #endif
 
 #ifndef OMG_LOG_LEVEL_WEBUI
@@ -45,8 +45,8 @@
 #  define WEB_TEMPLATE_BUFFER_MAX_SIZE 3000 // Max size of the template buffer
 #endif
 
-#ifndef DISPLAY_METRIC
-#  define DISPLAY_METRIC true // Units used for display of sensor data
+#ifndef OMG_DISPLAY_METRIC
+#  define OMG_DISPLAY_METRIC true // Units used for display of sensor data
 #endif
 
 #ifndef DISPLAY_WEBUI_INTERVAL
@@ -65,12 +65,12 @@
 #  define WEBUI_TRACE_LOG(...)
 #endif
 
-#ifndef WEBUI_AUTH
-#  define WEBUI_AUTH true // Default to WebUI authentication
+#ifndef OMG_WEBUI_AUTH
+#  define OMG_WEBUI_AUTH true // Default to WebUI authentication
 #endif
 
-#ifndef WEBUI_LOGIN
-#  define WEBUI_LOGIN "admin"
+#ifndef OMG_WEBUI_LOGIN
+#  define OMG_WEBUI_LOGIN "admin"
 #endif
 
 /*------------------- End of Compiler Directives ----------------------*/
@@ -104,7 +104,7 @@ struct webUIQueueMessage {
 
 /*------------------- Global Functions and Variables ----------------------*/
 
-#ifdef ZwebUI
+#ifdef OMG_WEB_UI
 #  define pubWebUI(...) webUIPubPrint(__VA_ARGS__)
 void webUIPubPrint(const char*, JsonObject&);
 #endif

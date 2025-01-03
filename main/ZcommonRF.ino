@@ -237,7 +237,7 @@ void RFConfig_fromJson(JsonObject& RFdata) {
 #  ifdef ESP32
   if (RFdata.containsKey("erase") && RFdata["erase"].as<bool>()) {
     // Erase config from NVS (non-volatile storage)
-    preferences.begin(Gateway_Short_Name, false);
+    preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
     if (preferences.isKey("RFConfig")) {
       int result = preferences.remove("RFConfig");
       Logger.notice(OMG_LOGID, F("RF config erase result: %d" CR), result);
@@ -261,7 +261,7 @@ void RFConfig_fromJson(JsonObject& RFdata) {
     // Save config into NVS (non-volatile storage)
     String conf = "";
     serializeJson(jsonBuffer, conf);
-    preferences.begin(Gateway_Short_Name, false);
+    preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
     int result = preferences.putString("RFConfig", conf);
     preferences.end();
     Logger.notice(OMG_LOGID, F("RF Config_save: %s, result: %d" CR), conf.c_str(), result);
@@ -279,7 +279,7 @@ void RFConfig_init() {
 void RFConfig_load() {
 #  ifdef ESP32
   StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
-  preferences.begin(Gateway_Short_Name, true);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, true);
   if (preferences.isKey("RFConfig")) {
     auto error = deserializeJson(jsonBuffer, preferences.getString("RFConfig", "{}"));
     preferences.end();

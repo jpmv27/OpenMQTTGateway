@@ -55,7 +55,7 @@ If you get the following error:
 This is most probable caused by the time of the esp is not correct/synchronized.
 The esp uses the Network Time Protocol (NTP) to get the current time from a time server.
 If you get this error ntp is not configured correctly in the gateway.
-Uncomment `//#    define NTP_SERVER "pool.ntp.org"` to set the `pool.ntp.org` as the time server.
+Uncomment `//#    define OMG_NTP_SERVER "pool.ntp.org"` to set the `pool.ntp.org` as the time server.
 You can also choose any other ntp time server you like.
 
 It is normal that the time synchronization process takes some time and the MQTT connection will not be successful the first time.

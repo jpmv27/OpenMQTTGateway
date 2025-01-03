@@ -22,7 +22,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "User_config.h"
-#if defined(ZwebUI) && defined(ESP32)
+#if defined(OMG_WEB_UI) && defined(ESP32)
 #  include <ArduinoJson.h>
 #  include <SPIFFS.h>
 #  include <WebServer.h> // Docs for this are here - https://github.com/espressif/arduino-esp32/tree/master/libraries/WebServer
@@ -63,10 +63,10 @@ const uint16_t TOPSZ = 151; // Max number of characters in topic string
 uint8_t masterlog_level; // Master log level used to override set log level
 bool reset_web_log_flag = false; // Reset web console log
 
-const char* www_username = WEBUI_LOGIN;
+const char* www_username = OMG_WEBUI_LOGIN;
 String authFailResponse = "Authentication Failed";
-bool webUISecure = WEBUI_AUTH;
-boolean displayMetric = DISPLAY_METRIC;
+bool webUISecure = OMG_WEBUI_AUTH;
+boolean displayMetric = OMG_DISPLAY_METRIC;
 
 /*********************************************************************************************\
  * ESP32 AutoMutex
@@ -853,7 +853,7 @@ void handleMQ() {
       }
 #  endif
 
-#  ifndef ESPWifiManualSetup
+#  ifndef OMG_ESP_WIFI_MANUAL_SETUP
       if (update) {
         Logger.warning(OMG_LOGID, F("[WebUI] Save MQTT and Reconnect" CR));
         WEBtoSYS["cnt_index"] = CNT_DEFAULT_INDEX;
@@ -913,7 +913,7 @@ void handleMQ() {
   server.send(200, "text/html", response);
 }
 
-#  ifndef ESPWifiManualSetup
+#  ifndef OMG_ESP_WIFI_MANUAL_SETUP
 /**
  * @brief /CG - Configure gateway Page
  * T: handleCG: uri: /gw, args: 2, method: 1
@@ -1719,7 +1719,7 @@ void WebUISetup() {
   server.on("/cn", handleCN); // Configuration
   server.on("/wi", HTTP_POST, handleWI); // Configure Wifi
   server.on("/mq", HTTP_POST, handleMQ); // Configure MQTT
-#  ifndef ESPWifiManualSetup
+#  ifndef OMG_ESP_WIFI_MANUAL_SETUP
   server.on("/cg", HTTP_POST, handleCG); // Configure gateway"
 #  endif
   server.on("/wu", handleWU); // Configure WebUI
@@ -1797,7 +1797,7 @@ void XtoWebUI(const char* topicOri, JsonObject& WebUIdata) { // json object deco
       }
     } else if (WebUIdata.containsKey("erase") && WebUIdata["erase"]) {
       // Erase config from NVS (non-volatile storage)
-      preferences.begin(Gateway_Short_Name, false);
+      preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
       success = preferences.remove("WebUIConfig");
       preferences.end();
       if (success) {
@@ -1837,7 +1837,7 @@ bool WebUIConfig_save() {
   // Save config into NVS (non-volatile storage)
   String conf = "";
   serializeJson(jsonBuffer, conf);
-  preferences.begin(Gateway_Short_Name, false);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
   int result = preferences.putString("WebUIConfig", conf);
   preferences.end();
   Logger.debug(OMG_LOGID, F("[WebUI] WebUIConfig_save: %s, result: %d" CR), conf.c_str(), result);
@@ -1845,14 +1845,14 @@ bool WebUIConfig_save() {
 }
 
 void WebUIConfig_init() {
-  displayMetric = DISPLAY_METRIC;
-  webUISecure = WEBUI_AUTH;
+  displayMetric = OMG_DISPLAY_METRIC;
+  webUISecure = OMG_WEBUI_AUTH;
   Logger.notice(OMG_LOGID, F("WebUI config initialised" CR));
 }
 
 bool WebUIConfig_load() {
   StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
-  preferences.begin(Gateway_Short_Name, true);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, true);
   if (preferences.isKey("WebUIConfig")) {
     auto error = deserializeJson(jsonBuffer, preferences.getString("WebUIConfig", "{}"));
     preferences.end();
@@ -2591,7 +2591,7 @@ Write line of text to the display with vertical scrolling of screen
 size_t SerialWeb::write(const uint8_t* buffer, size_t size) {
   // Default to Serial output if the display is not available
   addLog(buffer, size);
-#  if WEBUI_LOG_TO_SERIAL
+#  if OMG_WEBUI_LOG_TO_SERIAL
   return Serial.write(buffer, size);
 #  else
   return size;

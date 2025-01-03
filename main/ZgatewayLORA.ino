@@ -277,7 +277,7 @@ void LORAConfig_init() {
 
 void LORAConfig_load() {
   StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
-  preferences.begin(Gateway_Short_Name, true);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, true);
   if (preferences.isKey("LORAConfig")) {
     auto error = deserializeJson(jsonBuffer, preferences.getString("LORAConfig", "{}"));
     preferences.end();
@@ -332,7 +332,7 @@ void LORAConfig_fromJson(JsonObject& LORAdata) {
 
   if (LORAdata.containsKey("erase") && LORAdata["erase"].as<bool>()) {
     // Erase config from NVS (non-volatile storage)
-    preferences.begin(Gateway_Short_Name, false);
+    preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
     if (preferences.isKey("LORAConfig")) {
       int result = preferences.remove("LORAConfig");
       Logger.notice(OMG_LOGID, F("LORA config erase result: %d" CR), result);
@@ -365,7 +365,7 @@ void LORAConfig_fromJson(JsonObject& LORAdata) {
     // Save config into NVS (non-volatile storage)
     String conf = "";
     serializeJson(jsonBuffer, conf);
-    preferences.begin(Gateway_Short_Name, false);
+    preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
     int result = preferences.putString("LORAConfig", conf);
     preferences.end();
     Logger.notice(OMG_LOGID, F("LORA Config_save: %s, result: %d" CR), conf.c_str(), result);

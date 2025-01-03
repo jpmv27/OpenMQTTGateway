@@ -42,7 +42,7 @@
  * - mqtt_server
  * - mqtt_port
  *
- * To completely disable WifiManager, define ESPWifiManualSetup.
+ * To completely disable WifiManager, define OMG_ESP_WIFI_MANUAL_SETUP.
  * If you do so, please don't forget to set these variables before compiling
  *
  * Otherwise you can provide these credentials on the web interface after connecting
@@ -56,12 +56,12 @@
 #ifndef OMG_GATEWAY_NAME
 #  define OMG_GATEWAY_NAME "OpenMQTTGateway"
 #endif
-#ifndef Gateway_Short_Name
-#  define Gateway_Short_Name "OMG" // 3 characters maximum
+#ifndef OMG_GATEWAY_SHORT_NAME
+#  define OMG_GATEWAY_SHORT_NAME "OMG" // 3 characters maximum
 #endif
 
-#ifndef Base_Topic
-#  define Base_Topic "home/"
+#ifndef OMG_MQTT_BASE_TOPIC
+#  define OMG_MQTT_BASE_TOPIC "home/"
 #endif
 
 /*-------------DEFINE YOUR NETWORK PARAMETERS BELOW----------------*/
@@ -82,7 +82,7 @@
 #  endif
 #endif
 
-//#  define ESPWifiManualSetup true //uncomment you don't want to use wifimanager for your credential settings on ESP
+//#  define OMG_ESP_WIFI_MANUAL_SETUP true //uncomment you don't want to use wifimanager for your credential settings on ESP
 
 //#define ESP32_ETHERNET=true // Uncomment to use Ethernet module on ESP32 Ethernet gateway and adapt the settings to your board below, the default parameter are for OLIMEX ESP32 gateway
 #ifdef ESP32_ETHERNET
@@ -106,7 +106,7 @@
 #  endif
 #endif
 
-#if defined(ESPWifiManualSetup) // for nodemcu, weemos and esp8266
+#if defined(OMG_ESP_WIFI_MANUAL_SETUP) // for nodemcu, weemos and esp8266
 #  ifndef OMG_WIFI_SSID
 #    define OMG_WIFI_SSID "wifi ssid"
 #  endif
@@ -128,7 +128,7 @@
 #ifndef OMG_WM_DEBUG // WiFi Manager debug
 #  define OMG_WM_DEBUG 1
 #endif
-//#define WIFIMNG_HIDE_MQTT_CONFIG //Uncomment so as to hide MQTT setting from Wifi manager page
+//#define OMG_WIFIMNG_HIDE_MQTT_CONFIG //Uncomment so as to hide MQTT setting from Wifi manager page
 
 /*-------------DEFINE YOUR ADVANCED NETWORK PARAMETERS BELOW----------------*/
 //#define MDNS_SD //uncomment if you  want to use mDNS for discovering automatically your IP server, please note that mDNS with ESP32 can cause the BLE to not work
@@ -144,8 +144,8 @@
 #define mqtt_topic_max_size 150
 #define mqtt_key_max_size   20
 #ifdef OMG_MQTT_HTTPS_FW_UPDATE
-#  ifndef CHECK_OTA_UPDATE
-#    define CHECK_OTA_UPDATE true // enable to check for the presence of a new version for your environment on Github
+#  ifndef OTA_CHECK_OTA_UPDATE
+#    define OTA_CHECK_OTA_UPDATE true // enable to check for the presence of a new version for your environment on Github
 #  endif
 #endif
 
@@ -196,8 +196,8 @@
 #define ATTEMPTS_BEFORE_BG 10 // Number of wifi connection attempts before going to BG protocol
 #define ATTEMPTS_BEFORE_B  20 // Number of wifi connection attempts before going to B protocol
 
-#ifndef NTP_SERVER
-#  define NTP_SERVER "pool.ntp.org"
+#ifndef OMG_NTP_SERVER
+#  define OMG_NTP_SERVER "pool.ntp.org"
 #endif
 
 #ifndef OMG_LOG_TO_SYSLOG
@@ -237,7 +237,7 @@
 
 #if OMG_MQTT_BROKER_MODE
 // In MQTT broker mode the MQTT web config is not needed
-#  define WIFIMNG_HIDE_MQTT_CONFIG true
+#  define OMG_WIFIMNG_HIDE_MQTT_CONFIG true
 #endif
 
 #define GITHUB_OTA_SERVER_CERT_HASH "d4d211b4553af9fac371f24c2268d59d2b0fec6b9aa0fdbbde068f078d7daf86" // SHA256 fingerprint of the certificate used by the OTA server
@@ -649,7 +649,7 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 
 /*----------- SHARED WITH OMG MODULES --------------*/
 
-char mqtt_topic[parameters_size + 1] = Base_Topic;
+char mqtt_topic[parameters_size + 1] = OMG_MQTT_BASE_TOPIC;
 char g_gateway_name[parameters_size + 1] = OMG_GATEWAY_NAME;
 
 #if OMG_LOG_TO_SYSLOG

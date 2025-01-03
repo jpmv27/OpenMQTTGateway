@@ -48,7 +48,7 @@
 #else
 #  define configure_3
 #endif*/
-#ifndef ESPWifiManualSetup
+#ifndef OMG_ESP_WIFI_MANUAL_SETUP
 #  define configure_3 "<p><form action='cg' method='post'><button>Configure Gateway</button></form></p>"
 #else
 #  define configure_3
@@ -111,7 +111,7 @@ const char config_mqtt_body[] = body_header "<fieldset class=\"set1\"><legend><s
 // mqtt server (mh), mqtt port (ml), mqtt username (mu), mqtt password (mp), secure connection (sc), server certificate (msc), mqtt topic (mt)
 const char config_mqtt_body[] = body_header "<fieldset class=\"set1\"><legend><span><b>MQTT Parameters</b></span></legend><form method='post' action='mq'><p><b>MQTT Server</b><br><input id='mh' name='mh' placeholder=" OMG_MQTT_SERVER " value='%s'></p><p><b>MQTT Port</b><br><input id='ml' name='ml' placeholder=" OMG_MQTT_PORT " value='%s'></p><p><b>MQTT Username</b><br><input id='mu' name='mu' placeholder=" OMG_MQTT_USER " value='%s'></p><p><label><b>MQTT Password</b></label><br><input id='mp' name='mp' type='password' placeholder=\"Password\" ></p><p><b>MQTT Secure Connection</b><br><input id='sc' name='sc' type='checkbox' %s></p><p><b>Gateway Name</b><br><input id='h' name='h' placeholder=" OMG_GATEWAY_NAME " value=\"%s\"></p><p><b>MQTT Base Topic</b><br><input id='mt' name='mt' placeholder='' value='%s'></p><br><button name='save' type='submit' class='button bgrn'>Save</button></form></fieldset>" body_footer_config_menu;
 #endif
-#ifndef ESPWifiManualSetup
+#ifndef OMG_ESP_WIFI_MANUAL_SETUP
 const char config_gateway_body[] = body_header "<fieldset class=\"set1\"><legend><span><b>Gateway Configuration</b></span></legend><form method='post' action='cg'><p><b>Gateway Password (8 characters min)</b><br><input id='gp' name='gp' type='password' placeholder=\"********\"  minlength='8'></p><br><button name='save' type='submit' class='button bgrn'>Save</button></form></fieldset>" body_footer_config_menu;
 #endif
 const char config_logging_body[] = body_header "<fieldset class=\"set1\"><legend><span><b>OpenMQTTGateway Logging</b></span></legend><form method='get' action='lo'><p><b>Log Level</b><br><select id='lo'><option %s value='8'>No Log</option><option %s value='0'>Emergency</option><option %s value='1'>Alert</option><option %s value='2'>Critical</option><option %s value='3'>Error</option><option %s value='4'>Warning</option><option %s value='5'>Notice</option><option %s value='6'>Info</option><option %s value='7'>Debug</option></select></p><br><button name='save' type='submit' class='button bgrn'>Save</button></form></fieldset>" body_footer_config_menu;
