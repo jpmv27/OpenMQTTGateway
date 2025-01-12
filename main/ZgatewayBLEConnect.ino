@@ -129,6 +129,7 @@ bool zBLEConnect::processActions(std::vector<BLEAction>& actions) {
   return result;
 }
 
+#if defined(OMG_BT_LYWSD03MMC) || defined(OMG_BT_MHO_C401)
 /*-----------------------LYWSD03MMC && MHO_C401 HANDLING-----------------------*/
 void LYWSD03MMC_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, size_t length, bool isNotify) {
   if (m_taskHandle == nullptr) {
@@ -146,10 +147,14 @@ void LYWSD03MMC_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pD
       for (std::vector<BLEdevice*>::iterator it = devices.begin(); it != devices.end(); ++it) {
         BLEdevice* p = *it;
         if ((strcmp(p->macAdr, (char*)mac_address.c_str()) == 0)) {
+#ifdef OMG_BT_LYWSD03MMC
           if (p->sensorModel_id == BLEconectable::id::LYWSD03MMC)
             BLEdata["model"] = "LYWSD03MMC";
-          else if (p->sensorModel_id == BLEconectable::id::MHO_C401)
+#endif // OMG_BT_LYWSD03MMC
+#ifdef OMG_BT_MHO_C401
+          if (p->sensorModel_id == BLEconectable::id::MHO_C401)
             BLEdata["model"] = "MHO-C401";
+#endif // OMG_BT_MHO_C401
         }
       }
       BLEdata["id"] = (char*)mac_address.c_str();
@@ -191,7 +196,9 @@ void LYWSD03MMC_connect::publishData() {
     }
   }
 }
+#endif // defined(OMG_BT_LYWSD03MMC) || defined(OMG_BT_MHO_C401)
 
+#ifdef OMG_BT_DT24
 /*-----------------------DT24 HANDLING-----------------------*/
 void DT24_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, size_t length, bool isNotify) {
   if (m_taskHandle == nullptr) {
@@ -256,7 +263,9 @@ void DT24_connect::publishData() {
     }
   }
 }
+#endif // OMG_BT_DT24
 
+#ifdef OMG_BT_BM2
 /*-----------------------BM2 HANDLING-----------------------*/
 void BM2_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, size_t length, bool isNotify) {
   if (m_taskHandle == nullptr) {
@@ -335,7 +344,9 @@ void BM2_connect::publishData() {
     }
   }
 }
+#endif // OMG_BT_BM2
 
+#ifdef OMG_BT_HHCCJCY01HHCC
 /*-----------------------HHCCJCY01HHCC HANDLING-----------------------*/
 void HHCCJCY01HHCC_connect::publishData() {
   NimBLEUUID serviceUUID("00001204-0000-1000-8000-00805f9b34fb");
@@ -370,7 +381,9 @@ void HHCCJCY01HHCC_connect::publishData() {
     Logger.notice(OMG_LOGID, F("Failed getting characteristic" CR));
   }
 }
+#endif // OMG_BT_HHCCJCY01HHCC
 
+#ifdef OMG_BT_XMWSDJ04MMC
 /*-----------------------XMWSDJ04MMC HANDLING-----------------------*/
 void XMWSDJ04MMC_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, size_t length, bool isNotify) {
   if (m_taskHandle == nullptr) {
@@ -425,7 +438,9 @@ void XMWSDJ04MMC_connect::publishData() {
     }
   }
 }
+#endif // OMG_BT_XMWSDJ04MMC
 
+#ifdef OMG_BT_SBS1
 /*-----------------------SBS1 HANDLING-----------------------*/
 void SBS1_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, size_t length, bool isNotify) {
   if (m_taskHandle == nullptr) {
@@ -508,7 +523,9 @@ bool SBS1_connect::processActions(std::vector<BLEAction>& actions) {
 
   return result;
 }
+#endif // OMG_BT_SBS1
 
+#ifdef OMG_BT_SBBT
 /*-----------------------SBBT HANDLING-----------------------*/
 void SBBT_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, size_t length, bool isNotify) {
   if (m_taskHandle == nullptr) {
@@ -614,7 +631,9 @@ bool SBBT_connect::processActions(std::vector<BLEAction>& actions) {
 
   return result;
 }
+#endif // OMG_BT_SBBT
 
+#ifdef OMG_BT_SBCU
 /*-----------------------SBCU HANDLING-----------------------*/
 void SBCU_connect::notifyCB(NimBLERemoteCharacteristic* pChar, uint8_t* pData, size_t length, bool isNotify) {
   if (m_taskHandle == nullptr) {
@@ -706,6 +725,7 @@ bool SBCU_connect::processActions(std::vector<BLEAction>& actions) {
 
   return result;
 }
+#endif // OMG_BT_SBCU
 
 #  endif // OMG_GATEWAY_BT
 #endif //ESP32
