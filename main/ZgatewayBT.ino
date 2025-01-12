@@ -806,6 +806,7 @@ void BLEconnect() {
             BLEclient.processActions(BLEactions);
           }
 #endif // OMG_BT_SBCU
+#ifdef OMG_BT_GENERIC
           if (BLEactions.size() == 0) {
             GENERIC_connect BLEclient(addr);
             if (BLEclient.processActions(BLEactions)) {
@@ -814,6 +815,7 @@ void BLEconnect() {
               p->connect = false;
             }
           }
+#endif // OMG_BT_GENERIC
           if (BLEactions.size() > 0) {
             std::vector<BLEAction> swap;
             for (auto& it : BLEactions) {
