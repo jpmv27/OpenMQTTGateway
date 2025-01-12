@@ -119,11 +119,11 @@ extern String stateBTMeasures(bool);
 #  define EnableBT true
 #endif
 
-#ifndef BLEDecoder
-#  define BLEDecoder true //true if we use the Theengs decoder
+#ifndef OMG_BLE_DECODER
+#  define OMG_BLE_DECODER true //true if we use the Theengs decoder
 #endif
 
-#if !BLEDecoder
+#if !OMG_BLE_DECODER
 #  define UNKWNON_MODEL -1
 #else
 #  define UNKWNON_MODEL TheengsDecoder::BLE_ID_NUM::UNKNOWN_MODEL

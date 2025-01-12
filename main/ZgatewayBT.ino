@@ -52,7 +52,7 @@ using namespace std;
 // Global struct to store live BT configuration data
 BTConfig_s BTConfig;
 
-#  if BLEDecoder
+#  if OMG_BLE_DECODER
 #    include <decoder.h>
 TheengsDecoder decoder;
 #  endif
@@ -130,7 +130,7 @@ String stateBTMeasures(bool start) {
   jo["crstck"] = uxTaskGetStackHighWaterMark(xCoreTaskHandle);
   jo["enabled"] = BTConfig.enabled;
   jo["scnct"] = scanCount;
-#  if BLEDecoder
+#  if OMG_BLE_DECODER
   jo["onlysensors"] = BTConfig.pubOnlySensors;
   jo["randommacs"] = BTConfig.pubRandomMACs;
   jo["filterConnectable"] = BTConfig.filterConnectable;
@@ -414,7 +414,7 @@ void updateDevicesStatus() {
     unsigned long now = millis();
     // Check for tracker status
     bool isTracker = false;
-#  if BLEDecoder
+#  if OMG_BLE_DECODER
     std::string tag = decoder.getTheengAttribute(p->sensorModel_id, "tag");
     if (tag.length() >= 4) {
       isTracker = checkIfIsTracker(tag[3]);
@@ -473,6 +473,7 @@ void strupp(char* beg) {
 }
 
 #  ifdef OMG_MQTT_DISCOVERY
+#ifdef OMG_BT_DT24
 void DT24Discovery(const char* mac, const char* sensorModel_id) {
 #    define DT24parametersCount 7
   Logger.debug(OMG_LOGID, F("DT24Discovery" CR));
@@ -489,7 +490,9 @@ void DT24Discovery(const char* mac, const char* sensorModel_id) {
 
   createDiscoveryFromList(mac, DT24sensor, DT24parametersCount, "DT24", "ATorch", sensorModel_id);
 }
+#endif // OMG_BT_DT24
 
+#ifdef OMG_BT_BM2
 void BM2Discovery(const char* mac, const char* sensorModel_id) {
 #    define BM2parametersCount 2
   Logger.debug(OMG_LOGID, F("BM2Discovery" CR));
@@ -501,7 +504,9 @@ void BM2Discovery(const char* mac, const char* sensorModel_id) {
 
   createDiscoveryFromList(mac, BM2sensor, BM2parametersCount, "BM2", "Generic", sensorModel_id);
 }
+#endif // OMG_BT_BM2
 
+#if defined(OMG_BT_LYWSD03MMC) || defined(OMG_BT_MHO_C401)
 void LYWSD03MMCDiscovery(const char* mac, const char* sensorModel) {
 #    define LYWSD03MMCparametersCount 4
   Logger.debug(OMG_LOGID, F("LYWSD03MMCDiscovery" CR));
@@ -515,6 +520,7 @@ void LYWSD03MMCDiscovery(const char* mac, const char* sensorModel) {
 
   createDiscoveryFromList(mac, LYWSD03MMCsensor, LYWSD03MMCparametersCount, "LYWSD03MMC", "Xiaomi", sensorModel);
 }
+#endif // defined(OMG_BT_LYWSD03MMC) || defined(OMG_BT_MHO_C401)
 
 void MHO_C401Discovery(const char* mac, const char* sensorModel) {
 #    define MHO_C401parametersCount 4
@@ -530,6 +536,8 @@ void MHO_C401Discovery(const char* mac, const char* sensorModel) {
   createDiscoveryFromList(mac, MHO_C401sensor, MHO_C401parametersCount, "MHO_C401", "Xiaomi", sensorModel);
 }
 
+
+#ifdef OMG_BT_HHCCJCY01HHCC
 void HHCCJCY01HHCCDiscovery(const char* mac, const char* sensorModel) {
 #    define HHCCJCY01HHCCparametersCount 5
   Logger.debug(OMG_LOGID, F("HHCCJCY01HHCCDiscovery" CR));
@@ -544,7 +552,9 @@ void HHCCJCY01HHCCDiscovery(const char* mac, const char* sensorModel) {
 
   createDiscoveryFromList(mac, HHCCJCY01HHCCsensor, HHCCJCY01HHCCparametersCount, "HHCCJCY01HHCC", "Xiaomi", sensorModel);
 }
+#endif // OMG_BT_HHCCJCY01HHCC
 
+#ifdef OMG_BT_XMWSDJ04MMC
 void XMWSDJ04MMCDiscovery(const char* mac, const char* sensorModel) {
 #    define XMWSDJ04MMCparametersCount 4
   Logger.debug(OMG_LOGID, F("XMWSDJ04MMCDiscovery" CR));
@@ -558,14 +568,27 @@ void XMWSDJ04MMCDiscovery(const char* mac, const char* sensorModel) {
 
   createDiscoveryFromList(mac, XMWSDJ04MMCsensor, XMWSDJ04MMCparametersCount, "XMWSDJ04MMC", "Xiaomi", sensorModel);
 }
+#endif // OMG_BT_XMWSDJ04MMC
 
 #  else
+#ifdef OMG_BT_LYWSD03MMC
 void LYWSD03MMCDiscovery(const char* mac, const char* sensorModel) {}
+#endif // OMG_BT_LYWSD03MMC
+#ifdef OMG_BT_MHO_C401
 void MHO_C401Discovery(const char* mac, const char* sensorModel) {}
+#endif // OMG_BT_MHO_C401
+#ifdef OMG_BT_HHCCJCY01HHCC
 void HHCCJCY01HHCCDiscovery(const char* mac, const char* sensorModel) {}
+#endif // OMG_BT_HHCCJCY01HHCC
+#ifdef OMG_BT_DT24
 void DT24Discovery(const char* mac, const char* sensorModel_id) {}
+#endif // OMG_BT_DT24
+#ifdef OMG_BT_BM2
 void BM2Discovery(const char* mac, const char* sensorModel_id) {}
+#endif // OMG_BT_BM2
+#ifdef OMG_BT_XMWSDJ04MMC
 void XMWSDJ04MMCDiscovery(const char* mac, const char* sensorModel_id) {}
+#endif // OMG_BT_XMWSDJ04MMC
 #  endif
 
 /*
@@ -713,7 +736,7 @@ void BLEscan() {
 /**
  * Connect to BLE devices and initiate the callbacks with a service/characteristic request
  */
-#  if BLEDecoder
+#  if OMG_BLE_DECODER
 void BLEconnect() {
   if (!BTProcessLock) {
     Logger.notice(OMG_LOGID, F("BLE Connect begin" CR));
@@ -723,37 +746,67 @@ void BLEconnect() {
         if (p->connect) {
           Logger.debug(OMG_LOGID, F("Model to connect found: %s" CR), p->macAdr);
           NimBLEAddress addr((const char*)p->macAdr, p->macType);
-          if (p->sensorModel_id == BLEconectable::id::LYWSD03MMC ||
-              p->sensorModel_id == BLEconectable::id::MHO_C401) {
+#if defined(OMG_BT_LYWSD03MMC) || defined(OMG_BT_MHO_C401)
+          if (false
+#ifdef OMG_BT_LYWSD03MMC
+              || p->sensorModel_id == BLEconectable::id::LYWSD03MMC
+#endif // OMG_BT_LYWSD03MMC
+#ifdef OMG_BT_MHO_C401
+              || p->sensorModel_id == BLEconectable::id::MHO_C401
+#endif // OMG_BT_MHO_C401
+              ) {
             LYWSD03MMC_connect BLEclient(addr);
             BLEclient.processActions(BLEactions);
             BLEclient.publishData();
-          } else if (p->sensorModel_id == BLEconectable::id::DT24_BLE) {
+          }
+#endif // defined(OMG_BT_LYWSD03MMC) || defined(OMG_BT_MHO_C401)
+#ifdef OMG_BT_DT24
+          if (p->sensorModel_id == BLEconectable::id::DT24_BLE) {
             DT24_connect BLEclient(addr);
             BLEclient.processActions(BLEactions);
             BLEclient.publishData();
-          } else if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::BM2) {
+          }
+#endif // OMG_BT_DT24
+#ifdef OMG_BT_BM2
+          if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::BM2) {
             BM2_connect BLEclient(addr);
             BLEclient.processActions(BLEactions);
             BLEclient.publishData();
-          } else if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC) {
+          }
+#endif // OMG_BT_BM2
+#ifdef OMG_BT_HHCCJCY01HHCC
+          if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC) {
             HHCCJCY01HHCC_connect BLEclient(addr);
             BLEclient.processActions(BLEactions);
             BLEclient.publishData();
-          } else if (p->sensorModel_id == BLEconectable::id::XMWSDJ04MMC) {
+          }
+#endif // OMG_BT_HHCCJCY01HHCC
+#ifdef OMG_BT_XMWSDJ04MMC
+          if (p->sensorModel_id == BLEconectable::id::XMWSDJ04MMC) {
             XMWSDJ04MMC_connect BLEclient(addr);
             BLEclient.processActions(BLEactions);
             BLEclient.publishData();
-          } else if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::SBS1) {
+          }
+#endif // BT_XMWSDJ04MMC
+#ifdef OMG_BT_SBS1
+          if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::SBS1) {
             SBS1_connect BLEclient(addr);
             BLEclient.processActions(BLEactions);
-          } else if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::SBBT) {
+          }
+#endif // OMG_BT_SBS1
+#ifdef OMG_BT_SBBT
+          if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::SBBT) {
             SBBT_connect BLEclient(addr);
             BLEclient.processActions(BLEactions);
-          } else if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::SBCU) {
+          }
+#endif // OMG_BT_SBBT
+#ifdef OMG_BT_SBCU
+          if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::SBCU) {
             SBCU_connect BLEclient(addr);
             BLEclient.processActions(BLEactions);
-          } else {
+          }
+#endif // OMG_BT_SBCU
+          if (BLEactions.size() == 0) {
             GENERIC_connect BLEclient(addr);
             if (BLEclient.processActions(BLEactions)) {
               // If we don't regularly connect to this, disable connections so advertisements
@@ -767,12 +820,26 @@ void BLEconnect() {
               if (!it.complete && --it.ttl) {
                 swap.push_back(it);
               } else if (memcmp(it.addr, p->macAdr, sizeof(it.addr)) == 0) {
-                if (p->sensorModel_id != BLEconectable::id::DT24_BLE &&
-                    p->sensorModel_id != TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC &&
-                    p->sensorModel_id != BLEconectable::id::LYWSD03MMC &&
-                    p->sensorModel_id != TheengsDecoder::BLE_ID_NUM::BM2 &&
-                    p->sensorModel_id != BLEconectable::id::MHO_C401 &&
-                    p->sensorModel_id != BLEconectable::id::XMWSDJ04MMC) {
+                if (true
+#ifdef OMG_BT_DT24
+                    && p->sensorModel_id != BLEconectable::id::DT24_BLE
+#endif // OMG_BT_DT24
+#ifdef OMG_BT_HHCCJCY01HHCC
+                    && p->sensorModel_id != TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC &&
+#endif // OMG_BT_HHCCJCY01HHCC
+#ifdef OMG_BT_LYWSD03MMC
+                    && p->sensorModel_id != BLEconectable::id::LYWSD03MMC
+#endif // OMG_BT_LYWSD03MMC
+#ifdef OMG_BT_BM2
+                    && p->sensorModel_id != TheengsDecoder::BLE_ID_NUM::BM2
+#endif // OMG_BT_BM2
+#ifdef OMG_BT_MHO_C401
+                    && p->sensorModel_id != BLEconectable::id::MHO_C401
+#endif // OMG_BT_MHO_C401
+#ifdef OMG_BT_XMWSDJ04MMC
+                    && p->sensorModel_id != BLEconectable::id::XMWSDJ04MMC
+#endif // OMG_BT_XMWSDJ04MMC
+                    ) {
                   // if irregulary connected to and connection failed clear the connect flag.
                   p->connect = false;
                 }
@@ -913,7 +980,7 @@ boolean valid_service_data(const char* data, int size) {
   return false;
 }
 
-#  if defined(OMG_MQTT_DISCOVERY) && BLEDecoder == true
+#  if defined(OMG_MQTT_DISCOVERY) && OMG_BLE_DECODER == true
 // This function always should be called from the main core as it generates direct mqtt messages
 // When overrideDiscovery=true, we publish discovery messages of known devices (even if no new)
 void launchBTDiscovery(bool overrideDiscovery) {
@@ -956,8 +1023,15 @@ void launchBTDiscovery(bool overrideDiscovery) {
         String discovery_topic = String(subjectBTtoMQTT) + "/" + macWOdots;
         if (!BTConfig.extDecoderEnable && // Do not decode if an external decoder is configured
             p->sensorModel_id > UNKWNON_MODEL &&
-            p->sensorModel_id < TheengsDecoder::BLE_ID_NUM::BLE_ID_MAX &&
-            p->sensorModel_id != TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC && p->sensorModel_id != TheengsDecoder::BLE_ID_NUM::BM2) { // Exception on HHCCJCY01HHCC and BM2 as these ones are discoverable and connectable
+            p->sensorModel_id < TheengsDecoder::BLE_ID_NUM::BLE_ID_MAX
+#ifdef OMG_BT_HHCCJCY01HHCC
+            && p->sensorModel_id != TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC // Exception on HHCCJCY01HHCC and BM2 as these ones are discoverable and connectable
+#endif // OMG_BT_HHCCJCY01HHCC
+#ifdef OMG_BT_BM2
+            && p->sensorModel_id != TheengsDecoder::BLE_ID_NUM::BM2
+#endif // OMG_BT_BM2
+            ) {
+
           if (isTracker) {
             String tracker_name = String(model_id.c_str()) + "-tracker";
             String tracker_id = macWOdots + "-tracker";
@@ -1001,6 +1075,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
               String entity_name = String(model_id.c_str()) + "-" + String(prop.key().c_str());
               String unique_id = macWOdots + "-" + String(prop.key().c_str());
               String value_template = "{{ value_json." + String(prop.key().c_str()) + " | is_defined }}";
+#ifdef OMG_BT_SBS1
               if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::SBS1 && strcmp(prop.key().c_str(), "state") == 0) {
                 String payload_on = "{\"model_id\":\"X1\",\"cmd\":\"on\",\"id\":\"" + String(p->macAdr) + "\"}";
                 String payload_off = "{\"model_id\":\"X1\",\"cmd\":\"off\",\"id\":\"" + String(p->macAdr) + "\"}";
@@ -1022,7 +1097,9 @@ void launchBTDiscovery(bool overrideDiscovery) {
                                 Gateway_AnnouncementMsg, will_Message, false, subjectMQTTtoBT,
                                 model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
                                 stateClassNone);
-              } else if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::SBBT && strcmp(prop.key().c_str(), "open") == 0) {
+#endif // OMG_BT_SBS1
+#ifdef OMG_BT_SBBT
+              if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::SBBT && strcmp(prop.key().c_str(), "open") == 0) {
                 value_template = "{% if value_json.direction == \"up\" -%} {{ 100 - value_json.open/2 }}{% elif value_json.direction == \"down\" %}{{ value_json.open/2 }}{% else %} {{ value_json.open/2 }}{%- endif %}";
                 String command_template = "{\"model_id\":\"W270160X\",\"tilt\":{{ value | int }},\"id\":\"" + String(p->macAdr) + "\"}";
                 createDiscovery("cover", //set Type
@@ -1032,7 +1109,10 @@ void launchBTDiscovery(bool overrideDiscovery) {
                                 Gateway_AnnouncementMsg, will_Message, false, subjectMQTTtoBT,
                                 model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
                                 "blind", nullptr, nullptr, nullptr, command_template.c_str());
-              } else if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::SBCU && strcmp(prop.key().c_str(), "position") == 0) {
+              }
+#endif // OMG_BT_SBBT
+#ifdef OMG_BT_SBCU
+              if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::SBCU && strcmp(prop.key().c_str(), "position") == 0) {
                 String command_template = "{\"model_id\":\"W070160X\",\"position\":{{ value | int }},\"id\":\"" + String(p->macAdr) + "\"}";
                 createDiscovery("cover", //set Type
                                 discovery_topic.c_str(), entity_name.c_str(), unique_id.c_str(),
@@ -1041,7 +1121,9 @@ void launchBTDiscovery(bool overrideDiscovery) {
                                 Gateway_AnnouncementMsg, will_Message, false, subjectMQTTtoBT,
                                 model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
                                 "curtain", nullptr, nullptr, nullptr, command_template.c_str());
-              } else if ((p->sensorModel_id == TheengsDecoder::XMTZC04HMKG || p->sensorModel_id == TheengsDecoder::XMTZC04HMLB || p->sensorModel_id == TheengsDecoder::XMTZC05HMKG || p->sensorModel_id == TheengsDecoder::XMTZC05HMLB) &&
+              }
+#endif // OMG_BT_SBCU
+              if ((p->sensorModel_id == TheengsDecoder::XMTZC04HMKG || p->sensorModel_id == TheengsDecoder::XMTZC04HMLB || p->sensorModel_id == TheengsDecoder::XMTZC05HMKG || p->sensorModel_id == TheengsDecoder::XMTZC05HMLB) &&
                          strcmp(prop.key().c_str(), "weighing_mode") == 0) {
                 createDiscovery("sensor",
                                 discovery_topic.c_str(), entity_name.c_str(), unique_id.c_str(),
@@ -1096,12 +1178,21 @@ void launchBTDiscovery(bool overrideDiscovery) {
           }
         } else {
           if (p->sensorModel_id > BLEconectable::id::MIN &&
-                  p->sensorModel_id < BLEconectable::id::MAX ||
-              p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC || p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::BM2) {
+                  p->sensorModel_id < BLEconectable::id::MAX
+#ifdef OMG_BT_HHCCJCY01HHCC
+              || p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC
+#endif // OMG_BT_HHCCJCY01HHCC
+#ifdef OMG_BT_BM2
+              || p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::BM2
+#endif // OMG_BT_BM2
+              ) {
             // Discovery of sensors from which we retrieve data only by connect
+#ifdef OMG_BT_DT24
             if (p->sensorModel_id == BLEconectable::id::DT24_BLE) {
               DT24Discovery(macWOdots.c_str(), "DT24-BLE");
             }
+#endif // OMG_BT_DT24
+#ifdef OMG_BT_BM2
             if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::BM2) {
               // Sensor discovery
               BM2Discovery(macWOdots.c_str(), "BM2");
@@ -1115,18 +1206,27 @@ void launchBTDiscovery(bool overrideDiscovery) {
                               model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
                               stateClassNone);
             }
+#endif // OMG_BT_BM2
+#ifdef OMG_BT_LYWSD03MMC
             if (p->sensorModel_id == BLEconectable::id::LYWSD03MMC) {
               LYWSD03MMCDiscovery(macWOdots.c_str(), "LYWSD03MMC");
             }
+#endif // OMG_BT_LYWSD03MMC
+#ifdef OMG_BT_MHO_C401
             if (p->sensorModel_id == BLEconectable::id::MHO_C401) {
               MHO_C401Discovery(macWOdots.c_str(), "MHO-C401");
             }
+#endif // OMG_BT_MHO_C401
+#ifdef OMG_BT_XMWSDJ04MMC
             if (p->sensorModel_id == BLEconectable::id::XMWSDJ04MMC) {
               XMWSDJ04MMCDiscovery(macWOdots.c_str(), "XMWSDJ04MMC");
             }
+#endif // OMG_BT_XMWSDJ04MMC
+#ifdef OMG_BT_HHCCJCY01HHCC
             if (p->sensorModel_id == TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC) {
               HHCCJCY01HHCCDiscovery(macWOdots.c_str(), "HHCCJCY01HHCC");
             }
+#endif // OMG_BT_HHCCJCY01HHCC
           } else {
             Logger.debug(OMG_LOGID, F("Device UNKNOWN_MODEL %s" CR), p->macAdr);
           }
@@ -1142,7 +1242,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
 void launchBTDiscovery(bool overrideDiscovery) {}
 #  endif
 
-#  if BLEDecoder
+#  if OMG_BLE_DECODER
 void process_bledata(JsonObject& BLEdata) {
   yield(); // Necessary to let the loop run in case of connectivity issues
   if (!BLEdata.containsKey("id")) {
@@ -1168,7 +1268,14 @@ void process_bledata(JsonObject& BLEdata) {
   if ((BLEdata["type"].as<string>()).compare("RMAC") != 0 && model_id != TheengsDecoder::BLE_ID_NUM::IBEACON) { // Do not store in memory the random mac devices and iBeacons
     if (model_id >= 0) { // Broadcaster devices
       Logger.debug(OMG_LOGID, F("Decoder found device: %s" CR), BLEdata["model_id"].as<const char*>());
-      if (model_id == TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC || model_id == TheengsDecoder::BLE_ID_NUM::BM2) { // Device that broadcast and can be connected
+      if (false
+#ifdef OMG_BT_HHCCJCY01HHCC
+          || model_id == TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC
+#endif // OMG_BT_HHCCJCY01HHCC
+#ifdef OMG_BT_BM2
+          || model_id == TheengsDecoder::BLE_ID_NUM::BM2
+#endif // OMG_BT_BM2
+          ) { // Device that broadcast and can be connected
         createOrUpdateDevice(mac, device_flags_connect, model_id, mac_type, deviceName);
       } else {
         createOrUpdateDevice(mac, device_flags_init, model_id, mac_type, deviceName);
@@ -1196,14 +1303,22 @@ void process_bledata(JsonObject& BLEdata) {
     } else {
       if (BLEdata.containsKey("name")) { // Connectable only devices
         std::string name = BLEdata["name"];
+#ifdef OMG_BT_LYWSD03MMC
         if (name.compare("LYWSD03MMC") == 0)
           model_id = BLEconectable::id::LYWSD03MMC;
-        else if (name.compare("DT24-BLE") == 0)
+#endif // OMG_BT_LYWSD03MMC
+#ifdef OMG_BT_DT24
+        if (name.compare("DT24-BLE") == 0)
           model_id = BLEconectable::id::DT24_BLE;
-        else if (name.compare("MHO-C401") == 0)
+#endif OMG_BT_DT24
+#ifdef OMG_BT_MHO_C401
+        if (name.compare("MHO-C401") == 0)
           model_id = BLEconectable::id::MHO_C401;
-        else if (name.compare("XMWSDJ04MMC") == 0)
+#endif // OMG_BT_MHO_C401
+#ifdef OMG_BT_XMWSDJ04MMC
+        if (name.compare("XMWSDJ04MMC") == 0)
           model_id = BLEconectable::id::XMWSDJ04MMC;
+#endif // XMWSDJ04MMC
 
         if (model_id > 0) {
           Logger.debug(OMG_LOGID, F("Connectable device found: %s" CR), name.c_str());
@@ -1211,11 +1326,13 @@ void process_bledata(JsonObject& BLEdata) {
         }
       } else if (BTConfig.extDecoderEnable && model_id < 0 && BLEdata.containsKey("servicedata")) {
         const char* service_data = (const char*)(BLEdata["servicedata"] | "");
+#ifdef OMG_BT_HHCCJCY01HHCC
         if (strstr(service_data, "209800") != NULL) {
           model_id == TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC;
           Logger.debug(OMG_LOGID, F("Connectable device found: HHCCJCY01HHCC" CR));
           createOrUpdateDevice(mac, device_flags_connect, model_id, mac_type, deviceName);
         }
+#endif // OMG_BT_HHCCJCY01HHCC
       }
     }
   } else {
@@ -1262,7 +1379,7 @@ void PublishDeviceData(JsonObject& BLEdata) {
     }
 
     // If the device is not a sensor and pubOnlySensors is true we don't publish this payload
-    if (!BTConfig.pubOnlySensors || BLEdata.containsKey("model") || !BLEDecoder) { // Identified device
+    if (!BTConfig.pubOnlySensors || BLEdata.containsKey("model") || !OMG_BLE_DECODER) { // Identified device
       buildTopicFromId(BLEdata, subjectBTtoMQTT);
       enqueueJsonObject(BLEdata, QueueSemaphoreTimeOutTask);
     } else {
@@ -1384,7 +1501,7 @@ void startBTActionTask() {
       1); /* Core where the task should run */
 }
 
-#  if BLEDecoder
+#  if OMG_BLE_DECODER
 void KnownBTActions(JsonObject& BTdata) {
   if (!BTdata.containsKey("id")) {
     Logger.error(OMG_LOGID, F("BLE mac address missing" CR));
@@ -1398,6 +1515,7 @@ void KnownBTActions(JsonObject& BTdata) {
   action.ttl = 3;
   bool res = false;
   if (BTdata.containsKey("model_id") && BTdata["model_id"].is<const char*>()) {
+#ifdef OMG_BT_SBS1
     if (BTdata["model_id"] == "X1") {
       if (BTdata.containsKey("cmd") && BTdata["cmd"].is<const char*>()) {
         action.value_type = BLE_VAL_STRING;
@@ -1407,7 +1525,10 @@ void KnownBTActions(JsonObject& BTdata) {
                              TheengsDecoder::BLE_ID_NUM::SBS1, 1);
         res = true;
       }
-    } else if (BTdata["model_id"] == "W270160X") {
+    }
+#endif // OMG_BT_SBS1
+#ifdef OMG_BT_SBBT
+    if (BTdata["model_id"] == "W270160X") {
       if (BTdata.containsKey("tilt") && BTdata["tilt"].is<int>()) {
         action.value_type = BLE_VAL_INT;
         res = true;
@@ -1421,7 +1542,10 @@ void KnownBTActions(JsonObject& BTdata) {
         createOrUpdateDevice(action.addr, device_flags_connect,
                              TheengsDecoder::BLE_ID_NUM::SBBT, 1);
       }
-    } else if (BTdata["model_id"] == "W070160X") {
+    }
+#endif // OMG_BT_SBBT
+#ifdef OMG_BT_SBCU
+    if (BTdata["model_id"] == "W070160X") {
       if (BTdata.containsKey("position") && BTdata["position"].is<int>()) {
         action.value_type = BLE_VAL_INT;
         res = true;
@@ -1436,6 +1560,7 @@ void KnownBTActions(JsonObject& BTdata) {
                              TheengsDecoder::BLE_ID_NUM::SBCU, 1);
       }
     }
+#endif // OMG_BT_SBCU
     if (res) {
       BLEactions.push_back(action);
       startBTActionTask();
