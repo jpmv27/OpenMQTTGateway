@@ -159,7 +159,7 @@ With Home Assistant, this command is directly available through MQTT auto discov
 
 Once the forced scan has completed, the previous scan interval value will be restored. Forcing a scan command trigger also a BLE connect process after the scan (see below).
 
-The default value `TimeBtwRead` is set into config_BT.h or into your .ini file for platformio users.
+The default value `OMG_BT_TIME_BTW_READ` is set into config_BT.h or into your .ini file for platformio users.
 
 If you want to scan continuously for BLE devices, for example for beacon location you can set the interval to 100ms:
 
@@ -168,7 +168,7 @@ If you want to scan continuously for BLE devices, for example for beacon locatio
 In this case you should deactivate the BLE connection mechanism to avoid concurrency between scan and connections (see chapter below, bleconnect).
 
 ::: tip
-For certain devices like LYWSD03MMC OpenMQTTGateway use a connection (due to the fact that the advertized data are encrypted), this connection mechanism is launched after every `TimeBtwConnect` per default, you can modify it by following the procedure below.
+For certain devices like LYWSD03MMC OpenMQTTGateway use a connection (due to the fact that the advertized data are encrypted), this connection mechanism is launched after every `OMG_BT_TIME_BTW_CONNECT` per default, you can modify it by following the procedure below.
 :::
 
 ## Setting the time between connection attempts (default: 60min, available with HA discovery)
@@ -326,7 +326,7 @@ The gateway can read and write BLE characteristics from devices and provide the 
 These actions will be taken on the next BLE connection, which occurs after scanning and after the scan count is reached, [see above to set this](#setting-the-number-of-scans-between-connection-attempts).
 This can be overridden by providing an (optional) parameter `"immediate": true` within the command. This will cause the BLE scan to stop if currently in progress, allowing the command to be immediately processed. All other connection commands in queue will also be processed for the same device, commands for other devices will be deferred until the next normally scheduled connection.
 
-**Note** Some devices need to have the MAC address type specified. You can find this type by checking the log/MQTT data and looking for "mac_type". The mac_type of your device can be seen by setting `pubadvdata` to `true` with an MQTT command (see Publishing advertisement data), or with the macro `pubBLEAdvData true`. By default the type is 0 but some devices use different type values. You must specify the correct type to connect successfully.  
+**Note** Some devices need to have the MAC address type specified. You can find this type by checking the log/MQTT data and looking for "mac_type". The mac_type of your device can be seen by setting `pubadvdata` to `true` with an MQTT command (see Publishing advertisement data), or with the macro `OMG_BT_PUB_BLE_ADV_DATA true`. By default the type is 0 but some devices use different type values. You must specify the correct type to connect successfully.  
 To specify the MAC address type add the parameter `"mac_type"` to the command. For example `"mac_type": 1` to connect with a device with the MAC address type of 1.
 :::
 

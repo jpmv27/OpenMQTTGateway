@@ -191,7 +191,7 @@
 
 // Uncomment to use a device running TheengsGateway to decode BLE data. (https://github.com/theengs/gateway)
 // Set the topic to the subscribe topic configured in the TheengGateway
-// #define MQTTDecodeTopic "MQTTDecode"
+// #define OMG_BT_MQTT_DECODE_TOPIC "MQTTDecode"
 
 #define ATTEMPTS_BEFORE_BG 10 // Number of wifi connection attempts before going to BG protocol
 #define ATTEMPTS_BEFORE_B  20 // Number of wifi connection attempts before going to B protocol
