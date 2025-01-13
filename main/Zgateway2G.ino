@@ -95,7 +95,7 @@ bool _2GtoX() {
   }
   return false;
 }
-#  if simpleReceiving
+#  if OMG_MQTT_SIMPLE_RECEIVING
 void Xto2G(const char* topicOri, const char* datacallback) {
   String data = datacallback;
   String topic = topicOri;

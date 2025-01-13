@@ -121,7 +121,7 @@ void XtoFASTLED(const char* topicOri, JsonObject& jsonData) {
 }
 #  endif
 
-#  if simpleReceiving
+#  if OMG_MQTT_SIMPLE_RECEIVING
 void XtoFASTLED(const char* topicOri, const char* datacallback) {
   Logger.debug(OMG_LOGID, F("MQTTtoFASTLED: " CR));
   currentLEDState = GENERAL;

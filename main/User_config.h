@@ -66,43 +66,43 @@
 
 /*-------------DEFINE YOUR NETWORK PARAMETERS BELOW----------------*/
 
-//#define NetworkAdvancedSetup true //uncomment if you want to set advanced network parameters, not uncommented you can set the IP and MAC only
-#ifdef NetworkAdvancedSetup
-#  ifndef NET_IP
-#    define NET_IP "192.168.1.99"
+//#define OMG_NETWORK_ADVANCED_SETUP true //uncomment if you want to set advanced network parameters, not uncommented you can set the IP and MAC only
+#ifdef OMG_NETWORK_ADVANCED_SETUP
+#  ifndef OMG_NET_IP
+#    define OMG_NET_IP "192.168.1.99"
 #  endif
-#  ifndef NET_MASK
-#    define NET_MASK "255.255.255.0"
+#  ifndef OMG_NET_MASK
+#    define OMG_NET_MASK "255.255.255.0"
 #  endif
-#  ifndef NET_GW
-#    define NET_GW "192.168.1.1"
+#  ifndef OMG_NET_GW
+#    define OMG_NET_GW "192.168.1.1"
 #  endif
-#  ifndef NET_DNS
-#    define NET_DNS "192.168.1.1"
+#  ifndef OMG_NET_DNS
+#    define OMG_NET_DNS "192.168.1.1"
 #  endif
 #endif
 
 //#  define OMG_ESP_WIFI_MANUAL_SETUP true //uncomment you don't want to use wifimanager for your credential settings on ESP
 
-//#define ESP32_ETHERNET=true // Uncomment to use Ethernet module on ESP32 Ethernet gateway and adapt the settings to your board below, the default parameter are for OLIMEX ESP32 gateway
-#ifdef ESP32_ETHERNET
-#  ifndef ETH_PHY_ADDR
-#    define ETH_PHY_ADDR 0
+//#define OMG_ESP32_ETHERNET=true // Uncomment to use Ethernet module on ESP32 Ethernet gateway and adapt the settings to your board below, the default parameter are for OLIMEX ESP32 gateway
+#ifdef OMG_ESP32_ETHERNET
+#  ifndef OMG_ETH_PHY_ADDR
+#    define OMG_ETH_PHY_ADDR 0
 #  endif
-#  ifndef ETH_PHY_TYPE
-#    define ETH_PHY_TYPE ETH_PHY_LAN8720
+#  ifndef OMG_ETH_PHY_TYPE
+#    define OMG_ETH_PHY_TYPE ETH_PHY_LAN8720
 #  endif
-#  ifndef ETH_PHY_POWER
-#    define ETH_PHY_POWER 12
+#  ifndef OMG_ETH_PHY_POWER
+#    define OMG_ETH_PHY_POWER 12
 #  endif
-#  ifndef ETH_PHY_MDC
-#    define ETH_PHY_MDC 23
+#  ifndef OMG_ETH_PHY_MDC
+#    define OMG_ETH_PHY_MDC 23
 #  endif
-#  ifndef ETH_PHY_MDIO
-#    define ETH_PHY_MDIO 18
+#  ifndef OMG_ETH_PHY_MDIO
+#    define OMG_ETH_PHY_MDIO 18
 #  endif
-#  ifndef ETH_CLK_MODE
-#    define ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT
+#  ifndef OMG_ETH_CLK_MODE
+#    define OMG_ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT
 #  endif
 #endif
 
@@ -115,15 +115,15 @@
 #  endif
 #endif
 
-//#define WM_PWD_FROM_MAC true // enable to set the password from the last 8 digits of the ESP MAC address for enhanced security, enabling this option requires to have access to the MAC address, either through a sticker or with serial monitoring
+//#define OMG_GW_PWD_FROM_MAC true // enable to set the password from the last 8 digits of the ESP MAC address for enhanced security, enabling this option requires to have access to the MAC address, either through a sticker or with serial monitoring
 #ifndef OMG_WIFIMANAGER_SSID
 #  define OMG_WIFIMANAGER_SSID OMG_GATEWAY_NAME //this is the network name of the initial setup access point
 #endif
-#ifndef WifiManager_ConfigPortalTimeOut
-#  define WifiManager_ConfigPortalTimeOut 240 //time in seconds for the setup portal to stay open, default 240s
+#ifndef OMG_WIFIMANAGER_CONFIG_PORTAL_TIMEOUT
+#  define OMG_WIFIMANAGER_CONFIG_PORTAL_TIMEOUT 240 //time in seconds for the setup portal to stay open, default 240s
 #endif
-#ifndef WiFi_TimeOut
-#  define WiFi_TimeOut 30
+#ifndef OMG_WIFI_TIMEOUT
+#  define OMG_WIFI_TIMEOUT 30
 #endif
 #ifndef OMG_WM_DEBUG // WiFi Manager debug
 #  define OMG_WM_DEBUG 1
@@ -131,23 +131,86 @@
 //#define OMG_WIFIMNG_HIDE_MQTT_CONFIG //Uncomment so as to hide MQTT setting from Wifi manager page
 
 /*-------------DEFINE YOUR ADVANCED NETWORK PARAMETERS BELOW----------------*/
-//#define MDNS_SD //uncomment if you  want to use mDNS for discovering automatically your IP server, please note that mDNS with ESP32 can cause the BLE to not work
+//#define OMG_MDNS_SD //uncomment if you  want to use mDNS for discovering automatically your IP server, please note that mDNS with ESP32 can cause the BLE to not work
 #define maxConnectionRetryNetwork 5 //maximum Wifi connection attempts with existing credential at start (used to bypass ESP32 issue on wifi connect)
 #define maxRetryWatchDog          11 //maximum Wifi or MQTT re-connection attempts before restarting
 
 //set minimum quality of signal so it ignores AP's under that quality
 #define MinimumWifiSignalQuality 8
 
+/*-------------DEFINE YOUR OTA PARAMETERS BELOW----------------*/
+
+// Possible values for OMG_OTA_CHECK_OTA_UPDATE
+#define OMG_OTA_NONE    0
+#define OMG_OTA_RELEASE 1
+#define OMG_OTA_DEV     2
+
+#ifndef OMG_OTA_WEBUI_FW_UPDATE
+#  define OMG_OTA_WEBUI_FW_UPDATE true
+#endif
+
+#ifndef OMG_OTA_PASSIVE_FW_UPDATE
+#  define OMG_OTA_PASSIVE_FW_UPDATE true
+#endif
+#if OMG_OTA_PASSIVE_FW_UPDATE
+#  ifndef OMG_OTA_PASSIVE_FW_UPDATE_MDNS_ENABLED
+#    define OMG_OTA_PASSIVE_FW_UPDATE_MDNS_ENABLED true
+#  endif
+#  ifndef OMG_OTA_PASSIVE_FW_UPDATE_PORT
+#    define OMG_OTA_PASSIVE_FW_UPDATE_PORT 8266
+#  endif
+#  ifndef OMG_OTA_PASSIVE_FW_UPDATE_TIMEOUT_MILLIS
+//   timeout for OTA activities
+//   OTA upload with no activity in this period is considered inactive
+//   As long as OTA upload is considered "active", we avoid rebooting e.g.
+//   in case of failures connecting to MQTT
+#    define OMG_OTA_PASSIVE_FW_UPDATE_TIMEOUT_MILLIS 30000
+#  endif
+#endif
+
+#ifndef OMG_OTA_SELF_FW_UPDATE
+#  define OMG_OTA_SELF_FW_UPDATE false
+#endif
+
+#ifndef OMG_OTA_MQTT_HTTPS_FW_UPDATE
+#  define OMG_OTA_MQTT_HTTPS_FW_UPDATE false
+#endif
+
+#ifndef OMG_OTA_FW_UPDATE_USE_PASSWORD
+#  define OMG_OTA_FW_UPDATE_USE_PASSWORD 1 
+#endif
+
+#ifndef OMG_OTA_FW_UPDATE_URL_STYLE
+#  define OMG_OTA_FW_UPDATE_URL_STYLE openmqttgateway
+#endif
+
+#ifndef OMG_OTA_FW_UPDATE_LATEST_STYLE
+#  define OMG_OTA_FW_UPDATE_LATEST_STYLE json
+#endif
+
+#if OMG_OTA_SELF_FW_UPDATE
+#  if !defined(OMG_OTA_CHECK_OTA_UPDATE) || OMG_OTA_CHECK_OTA_UPDATE == OMG_OTA_NONE
+#    undef OMG_OTA_CHECK_OTA_UPDATE
+#    define OMG_OTA_CHECK_OTA_UPDATE OMG_OTA_RELEASE
+#  endif
+#elif OMG_OTA_WEBUI_FW_UPDATE || OMG_OTA_MQTT_HTTPS_FW_UPDATE
+#  ifndef OMG_OTA_CHECK_OTA_UPDATE
+#    define OMG_OTA_CHECK_OTA_UPDATE OMG_OTA_RELEASE // enable to check for the presence of a new version for your environment on Github
+#  endif
+#else
+#  undef OMG_OTA_CHECK_OTA_UPDATE
+#  define OMG_OTA_CHECK_OTA_UPDATE OMG_OTA_NONE
+#endif
+
+#ifndef OMG_GW_PASSWORD
+#  define OMG_GW_PASSWORD ""
+#endif
+
 /*-------------DEFINE YOUR MQTT PARAMETERS BELOW----------------*/
 //MQTT Parameters definition
 #define parameters_size     65
 #define mqtt_topic_max_size 150
 #define mqtt_key_max_size   20
-#ifdef OMG_MQTT_HTTPS_FW_UPDATE
-#  ifndef OTA_CHECK_OTA_UPDATE
-#    define OTA_CHECK_OTA_UPDATE true // enable to check for the presence of a new version for your environment on Github
-#  endif
-#endif
 
 #ifndef JSON_MSG_BUFFER
 #  if defined(ESP32)
@@ -179,8 +242,8 @@
 #  define OMG_MQTT_PORT "1883"
 #endif
 
-#ifndef GeneralTimeOut
-#  define GeneralTimeOut 20 // time out if a task is stuck in seconds (should be more than TimeBetweenReadingRN8209/1000) and more than 3 seconds, the WDT will reset the ESP, used also for MQTT connection
+#ifndef OMG_GENERAL_TIMEOUT
+#  define OMG_GENERAL_TIMEOUT 20 // time out if a task is stuck in seconds (should be more than TimeBetweenReadingRN8209/1000) and more than 3 seconds, the WDT will reset the ESP, used also for MQTT connection
 #endif
 #ifndef QueueSemaphoreTimeOutTask
 #  define QueueSemaphoreTimeOutTask 3000 // time out for semaphore retrieval from a task
@@ -247,27 +310,38 @@
 const char* alpnProtocols[] = {"x-amzn-mqtt-ca", NULL};
 #endif
 
-//#  define OMG_MQTT_HTTPS_FW_UPDATE //uncomment to enable updating via MQTT message.
-
-#ifdef OMG_MQTT_HTTPS_FW_UPDATE
+#ifdef OMG_OTA_MQTT_HTTPS_FW_UPDATE || OMG_OTA_WEBUI_FW_UPDATE || OMG_OTA_SELF_FW_UPDATE
 // If used, this should be set to the root CA certificate of the server hosting the firmware.
-#  ifdef PRIVATE_CERTS
+#  ifdef OMG_MQTT_USE_PRIVATE_CERTS
 #    include "certs/private_ota_cert.h"
 #  else
 #    include "certs/default_ota_cert.h"
 #  endif
 
-#  ifndef OMG_MQTT_HTTPS_FW_UPDATE_USE_PASSWORD
-#    define OMG_MQTT_HTTPS_FW_UPDATE_USE_PASSWORD 1 // Set this to 0 if not using TLS connection to MQTT broker to prevent clear text passwords being sent.
-#  endif
-#  if DEVELOPMENTOTA
-#    define OTA_JSON_URL "https://ota.openmqttgateway.com/binaries/dev/latest_version_dev.json" //OTA url used to discover new versions of the firmware from development nightly builds
-#  else
-#    define OTA_JSON_URL "https://ota.openmqttgateway.com/binaries/latest_version.json" //OTA url used to discover new versions of the firmware
-#  endif
 #  define ENTITY_PICTURE   "https://github.com/1technophile/OpenMQTTGateway/raw/development/docs/img/Openmqttgateway_logo_mini_margins.png"
-#  define RELEASE_LINK_DEV "https://ota.openmqttgateway.com/binaries/dev/"
-#  define RELEASE_LINK     "https://ota.openmqttgateway.com/binaries/"
+
+#  ifndef OMG_OTA_RELEASE_BASE_URL
+#    define OMG_OTA_RELEASE_BASE_URL     "https://ota.openmqttgateway.com/binaries/"
+#  endif
+
+#  ifndef OMG_OTA_DEV_BASE_URL
+#    define OMG_OTA_DEV_BASE_URL OMG_OTA_RELEASE_BASE_URL "dev/"
+#  endif
+
+#  if OMG_OTA_FW_UPDATE_LATEST_STYLE == json
+#    if OMG_OTA_CHECK_OTA_UPDATE == OMG_OTA_DEV
+#      define OMG_OTA_FW_UPDATE_LATEST_URL OMG_OTA_DEV_BASE_URL "latest_version_dev.json" //OTA url used to discover new versions of the firmware from development nightly builds
+#    elif OMG_OTA_CHECK_OTA_UPDATE == OMG_OTA_RELEASE
+#      define OMG_OTA_FW_UPDATE_LATEST_URL OMG_OTA_RELEASE_BASE_URL "latest_version.json" //OTA url used to discover new versions of the firmware
+#    endif
+#  elif OMG_OTA_FW_UPDATE_LATEST_STYLE == filename
+#    if OMG_OTA_CHECK_OTA_UPDATE == OMG_OTA_DEV
+#      define OMG_OTA_FW_UPDATE_LATEST_URL OMG_OTA_DEV_BASE_URL "latest"
+#    elif OMG_OTA_CHECK_OTA_UPDATE == OMG_OTA_RELEASE
+#      define OMG_OTA_FW_UPDATE_LATEST_URL OMG_OTA_RELEASE_BASE_URL "latest"
+#    endif
+#  endif
+
 #else
 const char* OTAserver_cert = "";
 #endif
@@ -276,7 +350,7 @@ const char* OTAserver_cert = "";
 #  define OMG_MQTT_SECURE_SIGNED_CLIENT 0 // If using a signed certificate for the broker and using client certificate/key set this to true or 1
 #endif
 
-#ifdef PRIVATE_CERTS
+#ifdef OMG_MQTT_USE_PRIVATE_CERTS
 #  include "certs/private_client_cert.h"
 #  include "certs/private_client_key.h"
 #  include "certs/private_server_cert.h"
@@ -288,8 +362,8 @@ const char* OTAserver_cert = "";
 
 #include <string>
 
-#ifndef CNT_DEFAULT_INDEX
-#  define CNT_DEFAULT_INDEX 0 // Default set of connection parameters
+#ifndef OMG_MQTT_CNT_DEFAULT_INDEX
+#  define OMG_MQTT_CNT_DEFAULT_INDEX 0 // Default set of connection parameters
 #endif
 
 #if !OMG_MQTT_BROKER_MODE
@@ -422,8 +496,8 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 //example
 // home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4/rssi -63.0
 // home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4/servicedata fe0000000000000000000000000000000000000000
-#ifndef simpleReceiving
-#  define simpleReceiving true //define false if you don't want to use old way reception analysis
+#ifndef OMG_MQTT_SIMPLE_RECEIVING
+#  define OMG_MQTT_SIMPLE_RECEIVING true //define false if you don't want to use old way reception analysis
 #endif
 #ifndef OMG_MQTT_MESSAGE_UTC_TIMESTAMP
 #  define OMG_MQTT_MESSAGE_UTC_TIMESTAMP false //define true if you want messages to be timestamped in ISO8601 UTC format (e.g.: "UTCtime"="2023-12-26T19:10:20Z")
@@ -433,21 +507,6 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #endif
 #ifndef OMG_MQTT_MESSAGE_UNIX_TIMESTAMP
 #  define OMG_MQTT_MESSAGE_UNIX_TIMESTAMP false //define true if you want messages to have an unix timestamp (e.g.: "unixtime"=1679015107)
-#endif
-
-/*-------------DEFINE YOUR OTA PARAMETERS BELOW----------------*/
-#ifndef OMG_GW_PASSWORD
-#  define OMG_GW_PASSWORD ""
-#endif
-#ifndef ota_port
-#  define ota_port 8266
-#endif
-// timeout for OTA activities
-// OTA upload with no activity in this period is considered inactive
-// As long as OTA upload is considered "active", we avoid rebooting e.g.
-// in case of failures connecting to MQTT
-#ifndef ota_timeout_millis
-#  define ota_timeout_millis 30000
 #endif
 
 // LED index depending on state, each state can have a different LED index or be grouped if there is a limited number of LEDs
@@ -669,7 +728,7 @@ bool pub(const char*, const char*);
 Preferences preferences;
 #endif
 
-unsigned long lastDiscovery = 0; // Time of the last discovery to trigger automaticaly to off after DiscoveryAutoOffTimer
+unsigned long lastDiscovery = 0; // Time of the last discovery to trigger automaticaly to off after OMG_MQTT_DISCOVERY_AUTO_OFF_TIMER
 #ifndef DEFAULT_DISCOVERY
 #  define DEFAULT_DISCOVERY true
 #endif

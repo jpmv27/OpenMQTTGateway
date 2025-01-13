@@ -237,22 +237,24 @@ struct GfSun2000Data {};
 #endif
 /*------------------------------------------------------------------------*/
 
-void setupTLS(int index = CNT_DEFAULT_INDEX);
+void setupTLS(int index = OMG_MQTT_CNT_DEFAULT_INDEX);
 
-char g_ota_pass[parameters_size] = OMG_GW_PASSWORD;
+char g_gw_pass[parameters_size] = OMG_GW_PASSWORD;
 #  define MAC_NAME_MAX_LEN 30
 char g_WifiManager_ssid[MAC_NAME_MAX_LEN] = OMG_WIFIMANAGER_SSID;
 int failure_number_ntwk = 0; // number of failure connecting to network
 int failure_number_mqtt = 0; // number of failure connecting to MQTT
 
+#if OMG_OTA_PASSIVE_FW_UPDATE
 static unsigned long last_ota_activity_millis = 0;
+#endif
 // Global struct to store live SYS configuration data
 SYSConfig_s SYSConfig;
 
 bool failSafeMode = false;
 bool ProcessLock = true; // Process lock when we want to use a critical function like OTA for example
 static bool mqttSetupPending = true;
-static int cnt_index = CNT_DEFAULT_INDEX;
+static int cnt_index = OMG_MQTT_CNT_DEFAULT_INDEX;
 
 #ifdef ESP32
 #  include <ArduinoOTA.h>
@@ -272,7 +274,7 @@ bool BTProcessLock = true; // Process lock when we want to use a critical functi
 #    include "soc/rtc_cntl_reg.h"
 #    include "soc/sens_reg.h"
 #  endif
-#  ifdef ESP32_ETHERNET
+#  ifdef OMG_ESP32_ETHERNET
 #    include <ETH.h>
 void WiFiEvent(WiFiEvent_t event);
 #  endif
@@ -281,7 +283,7 @@ void WiFiEvent(WiFiEvent_t event);
 #  include <WiFiMulti.h>
 WiFiMulti wifiMulti;
 #  include <WiFiManager.h>
-#  ifdef MDNS_SD
+#  ifdef OMG_MDNS_SD
 #    include <ESPmDNS.h>
 #  endif
 
@@ -299,7 +301,7 @@ X509List* pClCert = nullptr;
 PrivateKey* pClKey = nullptr;
 #  endif
 ESP8266WiFiMulti wifiMulti;
-#  ifdef MDNS_SD
+#  ifdef OMG_MDNS_SD
 #    include <ESP8266mDNS.h>
 #  endif
 
@@ -313,8 +315,8 @@ void handle_autodiscovery() {
   const unsigned long now = millis();
 
   // at first connection we publish the discovery payloads
-  // or, when we have just re-connected (only when discovery_republish_on_reconnect is enabled)
-  const bool publishDiscovery = SYSConfig.discovery && (!connectedOnce || discovery_republish_on_reconnect);
+  // or, when we have just re-connected (only when OMG_MQTT_DISCOVERY_REPUBLISH_ON_RECONNECT is enabled)
+  const bool publishDiscovery = SYSConfig.discovery && (!connectedOnce || OMG_MQTT_DISCOVERY_REPUBLISH_ON_RECONNECT);
 
   if (publishDiscovery) {
     pubMqttDiscovery();
@@ -793,7 +795,7 @@ void SYSConfig_init() {
 #endif
 #ifdef OMG_MQTT_DISCOVERY
   SYSConfig.discovery = DEFAULT_DISCOVERY;
-  SYSConfig.ohdiscovery = OpenHABDiscovery;
+  SYSConfig.ohdiscovery = OMG_MQTT_OPENHAB_DISCOVERY;
 #endif
 #ifdef LED_ADDRESSABLE
   SYSConfig.rgbbrightness = DEFAULT_ADJ_BRIGHTNESS;
@@ -893,7 +895,7 @@ void SYSConfig_load() {
 void SYSConfig_load() {}
 #endif
 
-#if defined(MDNS_SD)
+#if defined(OMG_MDNS_SD)
 std::pair<String, uint16_t> discoverMQTTbroker() {
   Logger.debug(OMG_LOGID, F("Browsing for MQTT service" CR));
   int n = MDNS.queryService("mqtt", "tcp");
@@ -955,7 +957,7 @@ void setupMQTT() {
     eClient.reset(new WiFiClient);
   }
 
-#  if defined(MDNS_SD)
+#  if defined(OMG_MDNS_SD)
   Logger.debug(OMG_LOGID, F("Connecting to MQTT by mDNS without MQTT hostname" CR));
   const auto discovered_broker = discoverMQTTbroker();
   const auto broker_host = discovered_broker.first.c_str();
@@ -972,7 +974,7 @@ void setupMQTT() {
                                   parameters.mqtt_user, parameters.mqtt_pass,
                                   0, // minimum reconnect attempt interval [ms]
                                   60 * 1000, // keep alive interval [ms]
-                                  (GeneralTimeOut - 1) * 1000 // socket timeout [ms]
+                                  (OMG_GENERAL_TIMEOUT - 1) * 1000 // socket timeout [ms]
                                   ));
 
 #  if AWS_IOT
@@ -1094,18 +1096,20 @@ void setupMQTT() {
       }
 #  endif
       unsigned long millis_since_last_ota;
+#if OMG_OTA_PASSIVE_FW_UPDATE
       while (
           // When
           // ...incomplete OTA in progress
           (last_ota_activity_millis != 0)
           // ...AND last OTA activity fairly recently
-          && ((millis_since_last_ota = millis() - last_ota_activity_millis) < ota_timeout_millis)) {
+          && ((millis_since_last_ota = millis() - last_ota_activity_millis) < OMG_OTA_PASSIVE_FW_UPDATE_TIMEOUT_MILLIS)) {
         // ... We consider that OTA might be still active, and we sleep for a while, and giving
         // OTA chance to proceed (ArduinoOTA.handle())
         Logger.warning(OMG_LOGID, F("OTA might be still active (activity %d ms ago)" CR), millis_since_last_ota);
         ArduinoOTA.handle();
         delay(100);
       }
+#endif
       ESPRestart(1);
     }
   };
@@ -1401,13 +1405,13 @@ void setup() {
 #else
   if (loadConfigFromFlash()) { // Config present
     Logger.notice(OMG_LOGID, F("Config loaded from flash" CR));
-#  ifdef ESP32_ETHERNET
+#  ifdef OMG_ESP32_ETHERNET
     setup_ethernet_esp32();
 #  endif
     // If not in failSafeMode and no connection to the network with Ethernet, launch the wifi manager
     if (!failSafeMode && !ethConnected) setupWiFiManager();
   } else { // No config in flash
-#  ifdef ESP32_ETHERNET
+#  ifdef OMG_ESP32_ETHERNET
     setup_ethernet_esp32();
 #  endif
 
@@ -1438,7 +1442,9 @@ void setup() {
   Logger.debug(OMG_LOGID, F("OpenMQTTGateway validate cert: %s" CR), cnt_parameters_array[cnt_index].isCertValidate ? "true" : "false");
 #endif
 
+#if OMG_OTA_PASSIVE_FW_UPDATE
   setOTA();
+#endif
 
 #if defined(OMG_WEB_UI) && defined(ESP32)
   WebUISetup();
@@ -1638,15 +1644,19 @@ bool wifi_reconnect_bypass() {
   }
 }
 
+#if OMG_OTA_PASSIVE_FW_UPDATE
 void setOTA() {
   // Port defaults to 8266
-  ArduinoOTA.setPort(ota_port);
+  ArduinoOTA.setPort(OMG_OTA_PASSIVE_FW_UPDATE_PORT);
 
   // Hostname defaults to esp8266-[ChipID]
   ArduinoOTA.setHostname(g_gateway_name);
 
   // No authentication by default
-  ArduinoOTA.setPassword(g_ota_pass);
+  ArduinoOTA.setPassword(g_gw_pass);
+
+  // mDNS enabled by default
+  ArduinoOTA.setMdnsEnabled(OMG_OTA_PASSIVE_FW_UPDATE_MDNS_ENABLED);
 
   ArduinoOTA.onStart([]() {
     Logger.debug(OMG_LOGID, F("Start OTA, lock other functions" CR));
@@ -1688,6 +1698,7 @@ void setOTA() {
   });
   ArduinoOTA.begin();
 }
+#endif // OMG_OTA_PASSIVE_FW_UPDATE
 
 #if !OMG_MQTT_BROKER_MODE
 void setupTLS(int index) {
@@ -1814,15 +1825,15 @@ void setupWiFiFromBuild() {
 
   // We start by connecting to a WiFi network
 
-#  ifdef NetworkAdvancedSetup
+#  ifdef OMG_NETWORK_ADVANCED_SETUP
   IPAddress ip_adress;
   IPAddress gateway_adress;
   IPAddress subnet_adress;
   IPAddress dns_adress;
-  ip_adress.fromString(NET_IP);
-  gateway_adress.fromString(NET_GW);
-  subnet_adress.fromString(NET_MASK);
-  dns_adress.fromString(NET_DNS);
+  ip_adress.fromString(OMG_NET_IP);
+  gateway_adress.fromString(OMG_NET_GW);
+  subnet_adress.fromString(OMG_NET_MASK);
+  dns_adress.fromString(OMG_NET_DNS);
 
   if (!WiFi.config(ip_adress, gateway_adress, subnet_adress, dns_adress)) {
     Logger.error(OMG_LOGID, F("Wifi STA Failed to configure" CR));
@@ -2014,7 +2025,7 @@ void saveConfig() {
   json["discovery_prefix"] = discovery_prefix;
 #  endif
   json["gateway_name"] = g_gateway_name;
-  json["ota_pass"] = g_ota_pass;
+  json["gw_pass"] = g_gw_pass;
 #  if OMG_LOG_TO_SYSLOG
   json["syslog_server"] = g_syslog_server;
   json["syslog_port"] = g_syslog_port;
@@ -2136,8 +2147,8 @@ bool loadConfigFromFlash() {
           strcat(key, index_suffix);
           if (json.containsKey(key)) {
             cnt_parameters_array[i].validConnection = json[key].as<bool>();
-          } else if (i == CNT_DEFAULT_INDEX) {
-            // For backward compatibility, if valid_cnt is not found, we assume the connection is valid for CNT_DEFAULT_INDEX
+          } else if (i == OMG_MQTT_CNT_DEFAULT_INDEX) {
+            // For backward compatibility, if valid_cnt is not found, we assume the connection is valid for OMG_MQTT_CNT_DEFAULT_INDEX
             Logger.warning(OMG_LOGID, F("valid_cnt not found, assuming connection is valid" CR));
             cnt_parameters_array[i].validConnection = true;
           }
@@ -2154,14 +2165,14 @@ bool loadConfigFromFlash() {
 #  endif
         if (json.containsKey("gateway_name"))
           strcpy(g_gateway_name, json["gateway_name"]);
-        if (json.containsKey("ota_pass")) {
-          strcpy(g_ota_pass, json["ota_pass"]);
-#  ifdef WM_PWD_FROM_MAC // From ESP Mac Address, last 8 digits as the password
-          // Compare the existing g_ota_pass if g_ota_pass = OTAPASSWORD then replace with the last 8 digits of the mac address
+        if (json.containsKey("gw_pass")) {
+          strcpy(g_gw_pass, json["gw_pass"]);
+#  ifdef OMG_GW_PWD_FROM_MAC // From ESP Mac Address, last 8 digits as the password
+          // Compare the existing g_gw_pass if g_gw_pass = OTAPASSWORD then replace with the last 8 digits of the mac address
           // This enable user migrating from previous version to have the same WiFi portal password as previously unless they changed it
-          if (strcmp(g_ota_pass, "OTAPASSWORD") == 0) {
+          if (strcmp(g_gw_pass, "OTAPASSWORD") == 0) {
             String s = WiFi.macAddress();
-            sprintf(g_ota_pass, "%.2s%.2s%.2s%.2s",
+            sprintf(g_gw_pass, "%.2s%.2s%.2s%.2s",
                     s.c_str() + 6, s.c_str() + 9, s.c_str() + 12, s.c_str() + 15);
           }
 #  endif
@@ -2186,8 +2197,8 @@ bool loadConfigFromFlash() {
             s.c_str(), s.c_str() + 3, s.c_str() + 6, s.c_str() + 9, s.c_str() + 12, s.c_str() + 15);
     Log.notice(F("Gateway Name: %s.local" CR), g_gateway_name);
 #  endif
-#  ifdef WM_PWD_FROM_MAC // From ESP Mac Address, last 8 digits as the password
-    sprintf(g_ota_pass, "%.2s%.2s%.2s%.2s",
+#  ifdef OMG_GW_PWD_FROM_MAC // From ESP Mac Address, last 8 digits as the password
+    sprintf(g_gw_pass, "%.2s%.2s%.2s%.2s",
             s.c_str() + 6, s.c_str() + 9, s.c_str() + 12, s.c_str() + 15);
 #  endif
   }
@@ -2213,12 +2224,12 @@ void setupWiFiManager() {
   // id/name placeholder/prompt default
 #  ifndef OMG_WIFIMNG_HIDE_MQTT_CONFIG
 #    if !OMG_MQTT_BROKER_MODE
-  WiFiManagerParameter custom_mqtt_server("server", "mqtt server", cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_server, parameters_size, " minlength='1' maxlength='64' required");
-  WiFiManagerParameter custom_mqtt_port("port", "mqtt port", cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_port, 6, " minlength='1' maxlength='5' required");
-  WiFiManagerParameter custom_mqtt_user("user", "mqtt user", cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_user, parameters_size, " maxlength='64'");
+  WiFiManagerParameter custom_mqtt_server("server", "mqtt server", cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].mqtt_server, parameters_size, " minlength='1' maxlength='64' required");
+  WiFiManagerParameter custom_mqtt_port("port", "mqtt port", cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].mqtt_port, 6, " minlength='1' maxlength='5' required");
+  WiFiManagerParameter custom_mqtt_user("user", "mqtt user", cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].mqtt_user, parameters_size, " maxlength='64'");
   WiFiManagerParameter custom_mqtt_pass("pass", "mqtt pass", OMG_MQTT_PASS, parameters_size, " input type='password' maxlength='64'");
-  WiFiManagerParameter custom_mqtt_secure("secure", "<br/>mqtt secure", "1", 2, cnt_parameters_array[CNT_DEFAULT_INDEX].isConnectionSecure ? "type=\"checkbox\" checked" : "type=\"checkbox\"");
-  WiFiManagerParameter custom_validate_cert("validate", "<br/>validate cert", "1", 2, cnt_parameters_array[CNT_DEFAULT_INDEX].isCertValidate ? "type=\"checkbox\" checked" : "type=\"checkbox\"");
+  WiFiManagerParameter custom_mqtt_secure("secure", "<br/>mqtt secure", "1", 2, cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].isConnectionSecure ? "type=\"checkbox\" checked" : "type=\"checkbox\"");
+  WiFiManagerParameter custom_validate_cert("validate", "<br/>validate cert", "1", 2, cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].isCertValidate ? "type=\"checkbox\" checked" : "type=\"checkbox\"");
   WiFiManagerParameter custom_mqtt_cert("cert", "<br/>mqtt server cert", "", 4096);
   WiFiManagerParameter custom_ota_server_cert("ota_cert", "<br/>ota server cert", "", 4096);
 #      if OMG_MQTT_SECURE_SIGNED_CLIENT
@@ -2228,29 +2239,29 @@ void setupWiFiManager() {
 #    endif
   WiFiManagerParameter custom_mqtt_topic("topic", "mqtt base topic", mqtt_topic, mqtt_topic_max_size, " minlength='1' maxlength='64' required");
   WiFiManagerParameter custom_gateway_name("name", "gateway name", g_gateway_name, parameters_size, " minlength='1' maxlength='64' required");
-  WiFiManagerParameter custom_ota_pass("ota", "gateway password", g_ota_pass, parameters_size, " input type='password' minlength='8' maxlength='64' required");
+  WiFiManagerParameter custom_gateway_password("password", "gateway password", g_gw_pass, parameters_size, " input type='password' minlength='8' maxlength='64' required");
 #  endif
   //WiFiManager
   //Local intialization. Once its business is done, there is no need to keep it around
 
-  wifiManager.setConnectTimeout(WiFi_TimeOut);
+  wifiManager.setConnectTimeout(OMG_WIFI_TIMEOUT);
   //Set timeout before going to portal
-  wifiManager.setConfigPortalTimeout(WifiManager_ConfigPortalTimeOut);
+  wifiManager.setConfigPortalTimeout(OMG_WIFIMANAGER_CONFIG_PORTAL_TIMEOUT);
 
   //set config save notify callback
   wifiManager.setSaveConfigCallback(saveConfigCallback);
 
 //set static IP
-#  ifdef NetworkAdvancedSetup
+#  ifdef OMG_NETWORK_ADVANCED_SETUP
   Logger.debug(OMG_LOGID, F("Adv wifi cfg" CR));
   IPAddress ip_adress;
   IPAddress gateway_adress;
   IPAddress subnet_adress;
   IPAddress dns_adress;
-  ip_adress.fromString(NET_IP);
-  gateway_adress.fromString(NET_GW);
-  subnet_adress.fromString(NET_MASK);
-  dns_adress.fromString(NET_DNS);
+  ip_adress.fromString(OMG_NET_IP);
+  gateway_adress.fromString(OMG_NET_GW);
+  subnet_adress.fromString(OMG_NET_MASK);
+  dns_adress.fromString(OMG_NET_DNS);
   wifiManager.setSTAStaticIPConfig(ip_adress, gateway_adress, subnet_adress, dns_adress);
 #  endif
 
@@ -2272,7 +2283,7 @@ void setupWiFiManager() {
 #    endif
   wifiManager.addParameter(&custom_gateway_name);
   wifiManager.addParameter(&custom_mqtt_topic);
-  wifiManager.addParameter(&custom_ota_pass);
+  wifiManager.addParameter(&custom_gateway_password);
 #  endif
   //set minimum quality of signal so it ignores AP's under that quality
   wifiManager.setMinimumSignalQuality(MinimumWifiSignalQuality);
@@ -2287,18 +2298,18 @@ void setupWiFiManager() {
     }
   }
 
-#  ifdef ESP32_ETHERNET
+#  ifdef OMG_ESP32_ETHERNET
   wifiManager.setBreakAfterConfig(true); // If ethernet is used, we don't want to block the connection by keeping the portal up
 #  endif
 
   if (!SYSConfig.offline && !wifi_reconnect_bypass()) // if we didn't connect with saved credential we start Wifimanager web portal
   {
-    Logger.notice(OMG_LOGID, F("Connect your phone to WIFI AP: %s with PWD: %s" CR), g_WifiManager_ssid, g_ota_pass);
+    Logger.notice(OMG_LOGID, F("Connect your phone to WIFI AP: %s with PWD: %s" CR), g_WifiManager_ssid, g_gw_pass);
     gatewayState = GatewayState::ONBOARDING;
     //fetches ssid and pass and tries to connect
     //if it does not connect it starts an access point with the specified name
     //and goes into a blocking loop awaiting configuration
-    if (!wifiManager.autoConnect(g_WifiManager_ssid, g_ota_pass)) {
+    if (!wifiManager.autoConnect(g_WifiManager_ssid, g_gw_pass)) {
       Logger.warning(OMG_LOGID, F("failed to connect and hit timeout" CR));
       delay(3000);
 
@@ -2332,7 +2343,7 @@ void setupWiFiManager() {
 
   if (shouldSaveConfig) {
     //read updated parameters
-    cnt_index = CNT_DEFAULT_INDEX;
+    cnt_index = OMG_MQTT_CNT_DEFAULT_INDEX;
 #  ifndef OMG_WIFIMNG_HIDE_MQTT_CONFIG
 #    if !OMG_MQTT_BROKER_MODE
     strcpy(cnt_parameters_array[cnt_index].mqtt_server, custom_mqtt_server.getValue());
@@ -2366,7 +2377,7 @@ void setupWiFiManager() {
 #      endif
 #    endif
     strcpy(g_gateway_name, custom_gateway_name.getValue());
-    strcpy(g_ota_pass, custom_ota_pass.getValue());
+    strcpy(g_gw_pass, custom_gateway_password.getValue());
 #  endif
 
 #  if !OMG_MQTT_BROKER_MODE
@@ -2378,19 +2389,19 @@ void setupWiFiManager() {
     saveConfig();
   }
 }
-#  ifdef ESP32_ETHERNET
+#  ifdef OMG_ESP32_ETHERNET
 void setup_ethernet_esp32() {
   bool ethBeginSuccess = false;
   WiFi.onEvent(WiFiEvent);
-#    ifdef NetworkAdvancedSetup
+#    ifdef OMG_NETWORK_ADVANCED_SETUP
   IPAddress ip_adress;
   IPAddress gateway_adress;
   IPAddress subnet_adress;
   IPAddress dns_adress;
-  ip.fromString(NET_IP);
-  gateway.fromString(NET_GW);
-  subnet.fromString(NET_MASK);
-  Dns.fromString(NET_DNS);
+  ip.fromString(OMG_NET_IP);
+  gateway.fromString(OMG_NET_GW);
+  subnet.fromString(OMG_NET_MASK);
+  Dns.fromString(OMG_NET_DNS);
 
   Logger.debug(OMG_LOGID, F("Adv eth cfg" CR));
   ETH.config(ip, gateway, subnet, Dns);
@@ -2534,7 +2545,7 @@ void loop() {
 #endif
 #endif
       if (!timer_sys_checks) { // Update check at start up only
-#if (defined(ESP32) && defined(OMG_MQTT_HTTPS_FW_UPDATE)) || defined(OMG_LOCAL_OTA_FW_UPDATE)
+#if defined(ESP32) && OMG_OTA_CHECK_OTA_UPDATE != OMG_OTA_NONE
         checkForUpdates();
 #endif
       }
@@ -2548,9 +2559,9 @@ void loop() {
       failure_number_ntwk = 0;
 
 #ifdef OMG_MQTT_DISCOVERY
-      // Deactivate autodiscovery after DiscoveryAutoOffTimer.
-      // Exception: when discovery_republish_on_reconnect is enabled, we never never automatically disable discovery
-      if (!discovery_republish_on_reconnect && SYSConfig.discovery && (now > lastDiscovery + DiscoveryAutoOffTimer))
+      // Deactivate autodiscovery after OMG_MQTT_DISCOVERY_AUTO_OFF_TIMER.
+      // Exception: when OMG_MQTT_DISCOVERY_REPUBLISH_ON_RECONNECT is enabled, we never never automatically disable discovery
+      if (!OMG_MQTT_DISCOVERY_REPUBLISH_ON_RECONNECT && SYSConfig.discovery && (now > lastDiscovery + OMG_MQTT_DISCOVERY_AUTO_OFF_TIMER))
         SYSConfig.discovery = false;
 #endif
     }
@@ -2828,7 +2839,7 @@ String stateMeasures() {
 
   SYSdata["eth"] = ethConnected;
   if (ethConnected) {
-#ifdef ESP32_ETHERNET
+#ifdef OMG_ESP32_ETHERNET
     SYSdata["mac"] = (char*)ETH.macAddress().c_str();
     SYSdata["ip"] = TheengsUtils::ip2CharArray(ETH.localIP());
     ETH.fullDuplex() ? SYSdata["fd"] = (bool)"true" : SYSdata["fd"] = (bool)"false";
@@ -3043,7 +3054,7 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
 #  ifdef OMG_GATEWAY_SERIAL
     XtoSERIAL(strTopicOri.c_str(), jsondata);
 #  endif
-#  ifdef OMG_MQTT_HTTPS_FW_UPDATE
+#  if OMG_OTA_MQTT_HTTPS_FW_UPDATE
     MQTTHttpsFWUpdate(strTopicOri.c_str(), jsondata);
 #  endif
 #  if defined(OMG_WEB_UI) && defined(ESP32)
@@ -3053,7 +3064,7 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
 
     XtoSYS(strTopicOri.c_str(), jsondata);
   } else { // not a json object --> simple decoding
-#if simpleReceiving
+#if OMG_MQTT_SIMPLE_RECEIVING
 #  ifdef OMG_GATEWAY_LORA
     XtoLORA(strTopicOri.c_str(), datacallback);
 #  endif
@@ -3085,23 +3096,24 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
   }
 }
 
-#if OMG_MQTT_HTTPS_FW_UPDATE
+#if OMG_OTA_MQTT_HTTPS_FW_UPDATE || OMG_OTA_WEBUI_FW_UPDATE || OMG_OTA_SELF_FW_UPDATE
 String latestVersion;
 #  ifdef ESP32
 #    include <HTTPClient.h>
 
 #    include "zzHTTPUpdate.h"
 
-#    if OTA_CHECK_OTA_UPDATE
+#    if OMG_OTA_CHECK_OTA_UPDATE != OMG_OTA_NONE
 /**
  * Check on a server the latest version information to build a releaseLink
  * The release link will be used when the user trigger an OTA update command
  * Only available for ESP32
  */
 bool checkForUpdates() {
+#if OMG_OTA_FW_UPDATE_LATEST_STYLE == json && OMG_OTA_FW_UPDATE_URL_STYLE == openmqttgateway
   Logger.notice(OMG_LOGID, F("Update check, free heap: %d"), ESP.getFreeHeap());
   HTTPClient http;
-  http.setTimeout((GeneralTimeOut - 1) * 1000); // -1 to avoid WDT
+  http.setTimeout((OMG_GENERAL_TIMEOUT - 1) * 1000); // -1 to avoid WDT
   http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
 
   std::string ota_cert;
@@ -3116,7 +3128,7 @@ bool checkForUpdates() {
     ota_cert = OTAserver_cert;
   }
 
-  http.begin(OTA_JSON_URL, ota_cert.c_str());
+  http.begin(OMG_OTA_FW_UPDATE_LATEST_URL, ota_cert.c_str());
   int httpCode = http.GET();
   StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
   JsonObject jsondata = jsonBuffer.to<JsonObject>();
@@ -3152,17 +3164,119 @@ bool checkForUpdates() {
     Logger.debug(OMG_LOGID, F("No update file found on server" CR));
     return false;
   }
-}
+#elif OMG_OTA_FW_UPDATE_LATEST_STYLE == filename && OMG_OTA_FW_UPDATE_URL_STYLE == version_in_name
+  HTTPClient http;
+  int httpResponseCode = -1;
+  const String uri_latest = OMG_OTA_FW_UPDATE_LATEST_URL;
+  String payload = "";
 
-#    else
-bool checkForUpdates() {
-  return false;
+  Logger.notice(OMG_LOGID, F("Update check, free heap: %d"), ESP.getFreeHeap());
+  http.setTimeout((OMG_GENERAL_TIMEOUT - 1) * 1000); // -1 to avoid WDT
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+
+  http.begin(uri_latest);
+  httpResponseCode = http.GET();
+  Logger.debug(OMG_LOGID, F("HTTP Response Code: %d" CR), httpResponseCode);
+
+  if (httpResponseCode > 0) {
+    payload = http.getString();
+    Logger.debug(OMG_LOGID, F("Payload: %s" CR), payload.c_str());
+  } else {
+    Logger.error(OMG_LOGID, F("Error %d on GET request for \"%s\""), httpResponseCode, uri_latest.c_str());
+    gatewayState = GatewayState::ERROR;
+  }
+  http.end(); //Free the resources
+  Logger.notice(OMG_LOGID, F("Update check done, free heap: %d"), ESP.getFreeHeap());
+
+  // Firmware filename format: "${PIOENV}-v${UNIX_TIME}-firmware.bin"
+
+  int first_dash_ix = -1;
+  int second_dash_ix = -1;
+
+  first_dash_ix = payload.indexOf('-');
+  if (first_dash_ix >= 0) {
+    second_dash_ix = payload.indexOf('-', first_dash_ix + 1);
+  }
+
+  String pioenv = "";
+  String version = "";
+  String suffix = "";
+
+  if ((first_dash_ix >= 0) && (second_dash_ix >= 0)) {
+    pioenv = payload.substring(0, first_dash_ix);
+    version = payload.substring(first_dash_ix + 1, second_dash_ix);
+    suffix = payload.substring(second_dash_ix + 1);
+  }
+  Logger.debug(OMG_LOGID, F("Pioenv: %s" CR), pioenv.c_str());
+  Logger.debug(OMG_LOGID, F("Version: %s" CR), version.c_str());
+  Logger.debug(OMG_LOGID, F("Suffix: %s" CR), suffix.c_str());
+
+  // Check that the filename is valid
+  if ((pioenv != ENV_NAME || suffix != "firmware.bin")) {
+    Logger.warning(OMG_LOGID, F("Invalid update file \"%s\" found on server" CR), payload.c_str());
+    return false;
+  }
+
+#    if OMG_OTA_CHECK_OTA_UPDATE == OMG_OTA_DEV
+  const String url_firmware = OMG_OTA_DEV_BASE_URL + payload;
+#    elif OMG_OTA_CHECK_OTA_UPDATE == OMG_OTA_RELEASE
+  const String url_firmware = OMG_OTA_RELEASE_BASE_URL + payload;
+#    endif
+
+  // Advertise the update we found, if the version is different
+  // from the current version
+  if (version != OMG_VERSION) {
+    StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
+    JsonObject jsondata = jsonBuffer.to<JsonObject>();
+
+    jsondata["origin"] = subjectRLStoMQTT;
+    jsondata["retain"] = true;
+    jsondata["installed_version"] = OMG_VERSION;
+    jsondata["version"] = version;
+    jsondata["url"] = url_firmware;
+    jsondata["release_summary"] = "Update file found on server";
+    jsondata["password"] = g_gw_pass;
+    enqueueJsonObject(jsondata);
+
+#  if OMG_OTA_SELF_FW_UPDATE
+
+    Logger.debug(OMG_LOGID, F("Update file found on server, upgrading" CR));
+    MQTTHttpsFWUpdate(subjectMQTTtoSYSupdate, jsondata);
+
+#  else // OMG_OTA_SELF_FW_UPDATE
+
+    Logger.debug(OMG_LOGID, F("Update file found on server" CR));
+
+#  endif // OMG_OTA_SELF_FW_UPDATE
+
+    return true;
+  } else {
+    Logger.debug(OMG_LOGID, F("No update file found on server" CR));
+    return false;
+  }
+#else
+#  error Invalid or unsupported comnination of OMG_OTA_FW_UPDATE_LATEST_STYLE and OMG_OTA_FW_UPDATE_URL_STYLE
+#endif
 }
 #    endif
 #  elif ESP8266
 #    include <ESP8266httpUpdate.h>
 #  endif
 
+// JSON Data
+//
+//   One of ["url"] or ["version"] is required, with ["url"] taking precedence.
+//
+//     ["url"]: URL of firmware to download. Must end in ".bin"
+//
+//     ["version"]: "latest"  - Latest release version on the server
+//                  "dev"     - Latest development version on the server
+//                  "vXXXXX"  - Specified release version on the server
+//
+//   ["password"]: Mandatory if ["url"] is specified and OMG_OTA_FW_UPDATE_USE_PASSWORD > 0
+//
+//   ["ota_server_cert"]: Optional. If not supplied, a stored certificate will be used.
+//
 void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
   if (strstr(topicOri, subjectMQTTtoSYSupdate) != NULL) {
     const char* version = HttpsFwUpdateData["version"] | "latest";
@@ -3175,10 +3289,10 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
           gatewayState = GatewayState::ERROR;
           return;
         }
-#  if OMG_MQTT_HTTPS_FW_UPDATE_USE_PASSWORD > 0
+#  if OMG_OTA_FW_UPDATE_USE_PASSWORD > 0
         const char* pwd = HttpsFwUpdateData["password"];
         if (pwd) {
-          if (strcmp(pwd, g_ota_pass) != 0) {
+          if (strcmp(pwd, g_gw_pass) != 0) {
             Logger.error(OMG_LOGID, F("Invalid OTA password" CR));
             gatewayState = GatewayState::ERROR;
             return;
@@ -3191,15 +3305,27 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
 #  endif
 #  ifdef ESP32
       } else if (strcmp(version, "latest") == 0) {
-        systemUrl = RELEASE_LINK + latestVersion + "/" + ENV_NAME + "-firmware.bin";
+#    if OMG_OTA_FW_UPDATE_URL_STYLE == openmqttgateway
+        systemUrl = OMG_OTA_RELEASE_BASE_URL + latestVersion + "/" + ENV_NAME + "-firmware.bin";
+#    elif OMG_OTA_FW_UPDATE_URL_STYLE_STYLE == version_in_name
+        systemUrl = OMG_OTA_RELEASE_BASE_URL + ENV_NAME + "-" + latestVersion + "-firmware.bin";
+#    else
+#      error Invalid value for OMG_OTA_FW_UPDATE_URL_STYLE
+#    endif
         url = systemUrl.c_str();
         Logger.notice(OMG_LOGID, F("Using system OTA url with latest version %s" CR), url);
       } else if (strcmp(version, "dev") == 0) {
-        systemUrl = String(RELEASE_LINK_DEV) + ENV_NAME + "-firmware.bin";
+        systemUrl = String(OMG_OTA_DEV_BASE_URL) + ENV_NAME + "-firmware.bin";
         url = systemUrl.c_str();
         Logger.notice(OMG_LOGID, F("Using system OTA url with dev version %s" CR), url);
       } else if (version[0] == 'v') {
-        systemUrl = String(RELEASE_LINK) + version + "/" + ENV_NAME + "-firmware.bin";
+#    if OMG_OTA_FW_UPDATE_URL_STYLE == openmqttgateway
+        systemUrl = String(OMG_OTA_RELEASE_BASE_URL) + version + "/" + ENV_NAME + "-firmware.bin";
+#    elif OMG_OTA_FW_UPDATE_URL_STYLE_STYLE == version_in_name
+        systemUrl = String(OMG_OTA_RELEASE_BASE_URL) + ENV_NAME + "-" + version + "-firmware.bin";
+#    else
+#      error Invalid value for OMG_OTA_FW_UPDATE_URL_STYLE
+#    endif
         url = systemUrl.c_str();
         Logger.notice(OMG_LOGID, F("Using system OTA url with defined version %s" CR), url);
 #  endif
@@ -3313,181 +3439,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
     }
   }
 }
-#endif // OMG_MQTT_HTTPS_FW_UPDATE
-
-#ifdef OMG_LOCAL_OTA_FW_UPDATE
-#ifdef ESP32
-#  include <HTTPClient.h>
-#  include "zzHTTPUpdate.h"
-#else
-#error Platform not supported yet
-#endif
-
-void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
-  if (strstr(topicOri, subjectMQTTtoSYSupdate) == NULL) {
-    return;
-  }
-
-  const char* version = HttpsFwUpdateData["version"];
-  if (!version || (strcmp(version, OMG_VERSION) == 0)) {
-    return;
-  }
-
-  const char* url = HttpsFwUpdateData["url"];
-  String systemUrl;
-  if (!url) {
-    Logger.error(OMG_LOGID, F("No firmware URL specified" CR));
-    gatewayState = GatewayState::ERROR;
-    return;
-  }
-
-  if (!strstr((url + (strlen(url) - 5)), ".bin")) {
-    Logger.error(OMG_LOGID, F("Invalid firmware extension" CR));
-    gatewayState = GatewayState::ERROR;
-    return;
-  }
-
-  ProcessLock = true;
-
-#    ifdef OMG_GATEWAY_BT
-  stopProcessing();
-#    endif
-
-  Logger.warning(OMG_LOGID, F("Starting firmware update" CR));
-  gatewayState = GatewayState::REMOTE_OTA_IN_PROGRESS;
-
-  StaticJsonDocument<JSON_MSG_BUFFER> jsondata;
-  jsondata["release_summary"] = "Update in progress ...";
-  jsondata["origin"] = subjectRLStoMQTT;
-  enqueueJsonObject(jsondata);
-
-  t_httpUpdate_return result = HTTP_UPDATE_FAILED;
-  WiFiClient update_client;
-  httpUpdate.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
-  result = httpUpdate.update(update_client, url);
-
-  switch (result) {
-    case HTTP_UPDATE_FAILED:
-      Logger.error(OMG_LOGID, F("HTTP_UPDATE_FAILED Error (%d): %s\n" CR), httpUpdate.getLastError(), httpUpdate.getLastErrorString().c_str());
-      gatewayState = GatewayState::ERROR;
-      break;
-
-    case HTTP_UPDATE_NO_UPDATES:
-      Logger.notice(OMG_LOGID, F("HTTP_UPDATE_NO_UPDATES" CR));
-      break;
-
-    case HTTP_UPDATE_OK:
-      Logger.notice(OMG_LOGID, F("HTTP_UPDATE_OK" CR));
-      jsondata["release_summary"] = "Update success !";
-      jsondata["installed_version"] = version;
-      jsondata["origin"] = subjectRLStoMQTT;
-      enqueueJsonObject(jsondata);
-
-#  ifndef OMG_ESP_WIFI_MANUAL_SETUP
-      saveConfig();
-#  endif
-
-      ESPRestart(6);
-      break;
-  }
-
-  ESPRestart(6);
-}
-
-/**
- * Check on a server the latest available version of firmware. If the version
- * is different from our version, an upgrade is triggered.
- */
-bool checkForUpdates() {
-  HTTPClient http;
-  int httpResponseCode = -1;
-  const String uri_latest = OMG_LOCAL_OTA_BASE_URI "latest";
-  String payload = "";
-
-  Logger.notice(OMG_LOGID, F("Update check, free heap: %d"), ESP.getFreeHeap());
-  http.setTimeout((GeneralTimeOut - 1) * 1000); // -1 to avoid WDT
-  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
-  http.addHeader("Accept", "text/plain");
-
-  http.begin(uri_latest);
-  httpResponseCode = http.GET();
-  Logger.debug(OMG_LOGID, F("HTTP Response Code: %d" CR), httpResponseCode);
-
-  if (httpResponseCode > 0) {
-    payload = http.getString();
-    Logger.debug(OMG_LOGID, F("Payload: %s" CR), payload.c_str());
-  } else {
-    Logger.error(OMG_LOGID, F("Error %d on GET request for \"%s\""), httpResponseCode, uri_latest.c_str());
-    gatewayState = GatewayState::ERROR;
-  }
-  http.end(); //Free the resources
-  Logger.notice(OMG_LOGID, F("Update check done, free heap: %d"), ESP.getFreeHeap());
-
-  // Firmware filename format: "${PIOENV}-${UNIX_TIME}-firmware.bin"
-
-  int first_dash_ix = -1;
-  int second_dash_ix = -1;
-
-  first_dash_ix = payload.indexOf('-');
-  if (first_dash_ix >= 0) {
-    second_dash_ix = payload.indexOf('-', first_dash_ix + 1);
-  }
-
-  String pioenv = "";
-  String version = "";
-  String suffix = "";
-
-  if ((first_dash_ix >= 0) && (second_dash_ix >= 0)) {
-    pioenv = payload.substring(0, first_dash_ix);
-    version = payload.substring(first_dash_ix + 1, second_dash_ix);
-    suffix = payload.substring(second_dash_ix + 1);
-  }
-  Logger.debug(OMG_LOGID, F("Pioenv: %s" CR), pioenv.c_str());
-  Logger.debug(OMG_LOGID, F("Version: %s" CR), version.c_str());
-  Logger.debug(OMG_LOGID, F("Suffix: %s" CR), suffix.c_str());
-
-  // Check that the filename is valid
-  if ((pioenv != ENV_NAME || suffix != "firmware.bin")) {
-    Logger.warning(OMG_LOGID, F("Invalid update file \"%s\" found on server" CR), payload.c_str());
-    return false;
-  }
-
-  const String url_firmware = OMG_LOCAL_OTA_BASE_URI + payload;
-
-  // Advertise the update we found, if the version is different
-  // from the current version
-  if (version != OMG_VERSION) {
-    StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
-    JsonObject jsondata = jsonBuffer.to<JsonObject>();
-
-    jsondata["origin"] = subjectRLStoMQTT;
-    jsondata["retain"] = true;
-    jsondata["installed_version"] = OMG_VERSION;
-    jsondata["version"] = version;
-    jsondata["url"] = url_firmware;
-    jsondata["release_summary"] = "Update file found on server";
-    enqueueJsonObject(jsondata);
-
-#ifdef OMG_LOCAL_OTA_AUTOMATIC
-
-    Logger.debug(OMG_LOGID, F("Update file found on server, upgrading" CR));
-
-    MQTTHttpsFWUpdate(subjectMQTTtoSYSupdate, jsondata);
-
-#else // OMG_LOCAL_OTA_AUTOMATIC
-
-    Logger.debug(OMG_LOGID, F("Update file found on server" CR));
-
-#endif // OMG_LOCAL_OTA_AUTOMATIC
-
-    return true;
-  } else {
-    Logger.debug(OMG_LOGID, F("No update file found on server" CR));
-    return false;
-  }
-}
-
-#endif // OMG_LOCAL_OTA_FW_UPDATE
+#endif // OMG_OTA_MQTT_HTTPS_FW_UPDATE || OMG_OTA_WEBUI_FW_UPDATE || OMG_OTA_SELF_FW_UPDATE
 
 #if !OMG_MQTT_BROKER_MODE
 /**
@@ -3580,7 +3532,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
 #if defined(WifiGMode) || defined(WifiPower)
       setESPWifiProtocolTxPower();
 #endif
-      WiFi.waitForConnectResult(WiFi_TimeOut * 1000);
+      WiFi.waitForConnectResult(OMG_WIFI_TIMEOUT * 1000);
 
       if (WiFi.status() != WL_CONNECTED) {
         Logger.warning(OMG_LOGID, F("Failed to connect to new AP; falling back" CR));
@@ -3593,41 +3545,46 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       restartESP = true;
     }
 
-    if ((SYSdata.containsKey("mqtt_topic") && SYSdata["mqtt_topic"].is<const char*>()) ||
+    bool config_updated = false;
+
+    if (SYSdata.containsKey("mqtt_topic") && SYSdata["mqtt_topic"].is<const char*>()) {
+      strncpy(mqtt_topic, SYSdata["mqtt_topic"], parameters_size);
+      config_updated = true;
+    }
+
 #ifdef OMG_MQTT_DISCOVERY
-        (SYSdata.containsKey("discovery_prefix") && SYSdata["discovery_prefix"].is<const char*>()) ||
+    if (SYSdata.containsKey("discovery_prefix") && SYSdata["discovery_prefix"].is<const char*>()) {
+      strncpy(discovery_prefix, SYSdata["discovery_prefix"], parameters_size);
+      config_updated = true;
+    }
 #endif
+
 #if OMG_LOG_TO_SYSLOG
-        (SYSdata.containsKey("syslog_server") && SYSdata["syslog_server"].is<const char*>()) ||
-        (SYSdata.containsKey("syslog_port") && SYSdata["syslog_port"].is<const char*>()) ||
+    if (SYSdata.containsKey("syslog_server") && SYSdata["syslog_server"].is<const char*>()) {
+      strncpy(g_syslog_server, SYSdata["syslog_server"], parameters_size);
+      config_updated = true;
+      restartESP = true;
+    }
+
+    if (SYSdata.containsKey("syslog_port") && SYSdata["syslog_port"].is<const char*>()) {
+      strncpy(g_syslog_port, SYSdata["syslog_port"], parameters_size);
+      config_updated = true;
+      restartESP = true;
+    }
 #endif
-        (SYSdata.containsKey("gateway_name") && SYSdata["gateway_name"].is<const char*>()) ||
-        (SYSdata.containsKey("gw_pass") && SYSdata["gw_pass"].is<const char*>())) {
-      if (SYSdata.containsKey("mqtt_topic")) {
-        strncpy(mqtt_topic, SYSdata["mqtt_topic"], parameters_size);
-      }
-#ifdef OMG_MQTT_DISCOVERY
-      if (SYSdata.containsKey("discovery_prefix")) {
-        strncpy(discovery_prefix, SYSdata["discovery_prefix"], parameters_size);
-      }
-#endif
-      if (SYSdata.containsKey("gateway_name")) {
-        strncpy(g_gateway_name, SYSdata["gateway_name"], parameters_size);
-      }
-      if (SYSdata.containsKey("gw_pass")) {
-        strncpy(g_ota_pass, SYSdata["gw_pass"], parameters_size);
-        restartESP = true;
-      }
-#if OMG_LOG_TO_SYSLOG
-      if (SYSdata.containsKey("syslog_server")) {
-        strncpy(g_syslog_server, SYSdata["syslog_server"], parameters_size);
-        restartESP = true;
-      }
-      if (SYSdata.containsKey("syslog_port")) {
-        strncpy(g_syslog_port, SYSdata["syslog_port"], parameters_size);
-        restartESP = true;
-      }
-#endif
+
+    if (SYSdata.containsKey("gateway_name") && SYSdata["gateway_name"].is<const char*>()) {
+      strncpy(g_gateway_name, SYSdata["gateway_name"], parameters_size);
+      config_updated = true;
+    }
+
+    if (SYSdata.containsKey("gw_pass") && SYSdata["gw_pass"].is<const char*>()) {
+      strncpy(g_gw_pass, SYSdata["gw_pass"], parameters_size);
+      config_updated = true;
+      restartESP = true;
+    }
+
+    if (config_updated) {
 #ifndef OMG_ESP_WIFI_MANUAL_SETUP
       saveConfig();
 #endif

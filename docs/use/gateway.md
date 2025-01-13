@@ -82,7 +82,7 @@ mosquitto_pub -t "home/OpenMQTTGateway/commands/MQTTtoSYS/config" -m
 By default this function is not available on the pre built binary of RFBridge, in order to have less code size and enable to have OTA update working properly. So as to enable it remove from the rf bridge env:
 ```
 build_flags = '-UOMG_MQTT_SET_MQTT'
-``` 
+```
 :::
 
 ::: tip
@@ -105,8 +105,8 @@ This will change the subscribed and published mqtt_topic/gateway_name that the g
 ## Switching brokers and using signed and client certificates
 
 In the `user_config.h` file it is possible to specify multiple MQTT brokers and client certificates.
-Additionally, support for multiple brokers and client certificates has been added. To use this, it is required that the server certificate, client certificate, and client key are provided as their own constant string value as demonstrated in the file.  
-To add more than one broker and switch between them it is necessary to provide all of the relevant certificates/keys and add their respective variable names in the `cnt_parameters_array` structure, as shown in `user_config.h`..  
+Additionally, support for multiple brokers and client certificates has been added. To use this, it is required that the server certificate, client certificate, and client key are provided as their own constant string value as demonstrated in the file.
+To add more than one broker and switch between them it is necessary to provide all of the relevant certificates/keys and add their respective variable names in the `cnt_parameters_array` structure, as shown in `user_config.h`..
 
 To switch between these connections with an MQTT command message, the format is as follows:
 ```
@@ -247,7 +247,7 @@ mosquitto_pub -t "home/OpenMQTTGateway_ESP32_BLE/commands/MQTTtoSYS/firmware_upd
   "ota_server_cert": "-----BEGIN CERTIFICATE----- MIIDrzCCApegAwIBAgIQCDvgVpBCRrGhdWrJWZHHSjANBgkqhkiG9w0BAQUFADBh CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4= -----END CERTIFICATE-----"}'
 ```
 
-A bash script is available [here also](ota_command_cert.zip) to simplify the use of the `server_cert` parameter.  
+A bash script is available [here also](ota_command_cert.zip) to simplify the use of the `server_cert` parameter.
 
 
 Alternatively the OTA certificate can also be saved with the cnt_index for future use:
@@ -264,7 +264,7 @@ The other connection parameters corresponding to the index need to be valid for 
 To enable this functionality, `MQTT_HTTPS_FW_UPDATE` will need to be defined or the line that defines in in user_config.h will need to be uncommented.
 
 ::: tip
-If using an unsecure MQTT broker it is **highly recommended** to disable the password checking by setting the macro `MQTT_HTTPS_FW_UPDATE_USE_PASSWORD` to 0 (default is 1 (enabled)), otherwise a clear text password may be sent over the network.  
+If using an unsecure MQTT broker it is **highly recommended** to disable the password checking by setting the macro `MQTT_HTTPS_FW_UPDATE_USE_PASSWORD` to 0 (default is 1 (enabled)), otherwise a clear text password may be sent over the network.
 
 The `server_cert` parameter is optional. If the update server has changed or certificate updated or not set in `user_config.h` then you can provide the certificate here.
 :::

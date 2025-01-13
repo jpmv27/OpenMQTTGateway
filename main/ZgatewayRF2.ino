@@ -131,7 +131,7 @@ void rf2Callback(unsigned int period, unsigned long address, unsigned long group
   rf2rd.hasNewData = true;
 }
 
-#  if simpleReceiving
+#  if OMG_MQTT_SIMPLE_RECEIVING
 void XtoRF2(const char* topicOri, const char* datacallback) {
   NewRemoteReceiver::disable();
   pinMode(RF_EMITTER_GPIO, OUTPUT);

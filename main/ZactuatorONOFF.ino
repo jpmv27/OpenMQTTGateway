@@ -206,7 +206,7 @@ void XtoONOFF(const char* topicOri, JsonObject& ONOFFdata) {
 }
 #  endif
 
-#  if simpleReceiving
+#  if OMG_MQTT_SIMPLE_RECEIVING
 void XtoONOFF(const char* topicOri, const char* datacallback) {
   if ((cmpToMainTopic(topicOri, subjectMQTTtoONOFF))) {
     Logger.debug(OMG_LOGID, F("MQTTtoONOFF" CR));

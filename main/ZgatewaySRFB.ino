@@ -144,7 +144,7 @@ void _rfbAck() {
   Serial.println();
 }
 
-#  if simpleReceiving
+#  if OMG_MQTT_SIMPLE_RECEIVING
 void XtoSRFB(const char* topicOri, const char* datacallback) {
   // RF DATA ANALYSIS
   String topic = topicOri;

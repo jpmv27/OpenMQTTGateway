@@ -34,7 +34,7 @@ lib_deps =
   ${libraries.wifimanager}  ; Add another library dependency on top of them
 build_flags =
   ${env.build_flags}        ; Inherit all the build flags from [env]
-  '-DsimpleReceiving=true'  ; Add some of our own build flags
+  '-DOMG_MQTT_SIMPLE_RECEIVING=true'  ; Add some of our own build flags
   '-DOMG_MQTT_DISCOVERY="HADiscovery"'
   ;'-DCORE_DEBUG_LEVEL=4'
 ```
@@ -88,7 +88,7 @@ build_flags =
   '-DLED_RECEIVE_ON=LOW'             ; Comment 2
   '-DRF_RECEIVER_GPIO=13'
   '-DRF_EMITTER_GPIO=15'
-  '-DsimpleReceiving=false'
+  '-DOMG_MQTT_SIMPLE_RECEIVING=false'
   '-UOMG_MQTT_DISCOVERY'                 ; Disable HA discovery
 monitor_speed = 115200
 
@@ -109,13 +109,13 @@ for the credentials to be registered correctly.
 
 ::: warning Note
 Manual network configuration (IP, netmask, gateway, DNS) requires to define
-`'-DNetworkAdvancedSetup=true'`
+`'-DOMG_NETWORK_ADVANCED_SETUP=true'`
 and related network parameters, e.g.:
 ```
-'-DNET_IP="192.168.1.99"'
-'-DNET_MASK="255.255.255.0"'
-'-DNET_GW="192.168.1.1"'
-'-DNET_DNS="1.1.1.1"'
+'-DOMG_NET_IP="192.168.1.99"'
+'-DOMG_NET_MASK="255.255.255.0"'
+'-DOMG_NET_GW="192.168.1.1"'
+'-DOMG_NET_DNS="1.1.1.1"'
 ```
 :::
 
@@ -215,7 +215,7 @@ You can deactivate Json or simple mode following theses instructions:
 //example
 // home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4/rssi -63.0
 // home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4/servicedata fe0000000000000000000000000000000000000000
-#define simpleReceiving true //define false if you don't want to use old way reception analysis
+#define OMG_MQTT_SIMPLE_RECEIVING true //define false if you don't want to use old way reception analysis
 #define jsonReceiving true //define false if you don't want to use Json  reception analysis
 ```
 
@@ -223,7 +223,7 @@ If you are using platformio you can also comment the definitions above and defin
 ```cpp
   '-DOMG_MQTT_JSON_PUBLISHING=true'
   '-DjsonReceiving=true'
-  '-DsimpleReceiving=true'
+  '-DOMG_MQTT_SIMPLE_RECEIVING=true'
   '-DOMG_MQTT_SIMPLE_PUBLISHING=true'
 ```
 
@@ -243,7 +243,7 @@ Added to that auto discovery box should be selected into your Home Assistant MQT
 With an ESP if you did not set your network and MQTT parameters manually you can now open the [web portal configuration](portal.md).
 
 ::: warning Note
-simpleReceiving on Arduino boards doesn't accept 64 bits MQTT values, you can only send 32bits values from the MQTT broker.
+OMG_MQTT_SIMPLE_RECEIVING on Arduino boards doesn't accept 64 bits MQTT values, you can only send 32bits values from the MQTT broker.
 :::
 
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fdocs.openmqttgateway.com%2Fupload%2Fbuilds.html&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)

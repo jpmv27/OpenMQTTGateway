@@ -63,7 +63,7 @@ const uint16_t TOPSZ = 151; // Max number of characters in topic string
 uint8_t masterlog_level; // Master log level used to override set log level
 bool reset_web_log_flag = false; // Reset web console log
 
-const char* www_username = OMG_WEBUI_LOGIN;
+const char* g_www_username = OMG_WEBUI_LOGIN;
 String authFailResponse = "Authentication Failed";
 bool webUISecure = OMG_WEBUI_AUTH;
 boolean displayMetric = OMG_DISPLAY_METRIC;
@@ -791,34 +791,34 @@ void handleMQ() {
 #  if !OMG_MQTT_BROKER_MODE
       if (server.hasArg("mh")) {
         WEBtoSYS["mqtt_server"] = server.arg("mh");
-        if (strncmp(cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_server, server.arg("mh").c_str(), parameters_size)) {
+        if (strncmp(cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].mqtt_server, server.arg("mh").c_str(), parameters_size)) {
           update = true;
         }
       }
 
       if (server.hasArg("ml")) {
         WEBtoSYS["mqtt_port"] = server.arg("ml");
-        if (strncmp(cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_port, server.arg("ml").c_str(), 6)) {
+        if (strncmp(cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].mqtt_port, server.arg("ml").c_str(), 6)) {
           update = true;
         }
       }
 
       if (server.hasArg("mu")) {
         WEBtoSYS["mqtt_user"] = server.arg("mu");
-        if (strncmp(cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_user, server.arg("mu").c_str(), parameters_size)) {
+        if (strncmp(cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].mqtt_user, server.arg("mu").c_str(), parameters_size)) {
           update = true;
         }
       }
 
       if (server.hasArg("mp")) {
         WEBtoSYS["mqtt_pass"] = server.arg("mp");
-        if (strncmp(cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_pass, server.arg("mp").c_str(), parameters_size)) {
+        if (strncmp(cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].mqtt_pass, server.arg("mp").c_str(), parameters_size)) {
           update = true;
         }
       }
 
       // SC - Secure Connection argument is only present when true
-      if (cnt_parameters_array[CNT_DEFAULT_INDEX].isConnectionSecure != server.hasArg("sc")) {
+      if (cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].isConnectionSecure != server.hasArg("sc")) {
         update = true;
       }
       WEBtoSYS["mqtt_secure"] = server.hasArg("sc");
@@ -856,7 +856,7 @@ void handleMQ() {
 #  ifndef OMG_ESP_WIFI_MANUAL_SETUP
       if (update) {
         Logger.warning(OMG_LOGID, F("[WebUI] Save MQTT and Reconnect" CR));
-        WEBtoSYS["cnt_index"] = CNT_DEFAULT_INDEX;
+        WEBtoSYS["cnt_index"] = OMG_MQTT_CNT_DEFAULT_INDEX;
         WEBtoSYS["save_cnt"] = true;
         char jsonChar[100];
         serializeJson(modules, jsonChar, measureJson(modules) + 1);
@@ -902,9 +902,9 @@ void handleMQ() {
 #    endif
 #  else
 #    ifdef OMG_MQTT_DISCOVERY
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, g_gateway_name, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_server, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_port, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_user, (cnt_parameters_array[CNT_DEFAULT_INDEX].isConnectionSecure ? "checked" : ""), g_gateway_name, mqtt_topic, discovery_prefix);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, g_gateway_name, cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].mqtt_server, cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].mqtt_port, cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].mqtt_user, (cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].isConnectionSecure ? "checked" : ""), g_gateway_name, mqtt_topic, discovery_prefix);
 #    else
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, g_gateway_name, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_server, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_port, cnt_parameters_array[CNT_DEFAULT_INDEX].mqtt_user, (cnt_parameters_array[CNT_DEFAULT_INDEX].isConnectionSecure ? "checked" : ""), g_gateway_name, mqtt_topic);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_mqtt_body, jsonChar, g_gateway_name, cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].mqtt_server, cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].mqtt_port, cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].mqtt_user, (cnt_parameters_array[OMG_MQTT_CNT_DEFAULT_INDEX].isConnectionSecure ? "checked" : ""), g_gateway_name, mqtt_topic);
 #    endif
 #  endif
   response += String(buffer);
@@ -932,9 +932,9 @@ void handleCG() {
     for (uint8_t i = 0; i < server.args(); i++) {
       WEBUI_TRACE_LOG(F("handleCG Arg: %d, %s=%s" CR), i, server.argName(i).c_str(), server.arg(i).c_str());
     }
-    if (server.hasArg("save") && server.hasArg("gp") && strcmp(g_ota_pass, server.arg("gp").c_str())) {
-      strncpy(g_ota_pass, server.arg("gp").c_str(), parameters_size);
-      WEBtoSYS["gw_pass"] = g_ota_pass;
+    if (server.hasArg("save") && server.hasArg("gp") && strcmp(g_gw_pass, server.arg("gp").c_str())) {
+      strncpy(g_gw_pass, server.arg("gp").c_str(), parameters_size);
+      WEBtoSYS["gw_pass"] = g_gw_pass;
       update = true;
     }
   }
@@ -973,7 +973,7 @@ void handleCG() {
   String response = String(buffer);
   response += String(script);
   response += String(style);
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_gateway_body, jsonChar, g_gateway_name, g_ota_pass);
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_gateway_body, jsonChar, g_gateway_name, g_gw_pass);
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);
@@ -1368,7 +1368,7 @@ void handleCL() {
   }
 
   requestToken = esp_random();
-#    ifdef ESP32_ETHERNET
+#    ifdef OMG_ESP32_ETHERNET
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_cloud_body, jsonChar, g_gateway_name, " cloud checked", " Not", (String(CLOUDGATEWAY) + "token/start").c_str(), (char*)ETH.macAddress().c_str(), ("http://" + String(TheengsUtils::ip2CharArray(ETH.localIP())) + "/").c_str(), g_gateway_name, uptime(), requestToken);
 #    else
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_cloud_body, jsonChar, g_gateway_name, cloudEnabled, deviceToken, (String(CLOUDGATEWAY) + "token/start").c_str(), (char*)WiFi.macAddress().c_str(), ("http://" + String(TheengsUtils::ip2CharArray(WiFi.localIP())) + "/").c_str(), g_gateway_name, uptime(), requestToken);
@@ -1510,7 +1510,7 @@ void handleFavicon() {
   server.send_P(200, "image/x-icon", reinterpret_cast<const char*>(Openmqttgateway_logo_mini_ico), sizeof(Openmqttgateway_logo_mini_ico));
 }
 
-#  if defined(ESP32) && defined(OMG_MQTT_HTTPS_FW_UPDATE)
+#  if defined(ESP32) && OMG_OTA_WEBUI_FW_UPDATE
 /**
  * @brief /UP - Firmware Upgrade Page
  * 
@@ -1528,7 +1528,7 @@ void handleUP() {
     if (server.hasArg("o")) {
       WEBtoSYS["url"] = server.arg("o");
       WEBtoSYS["version"] = "test";
-      WEBtoSYS["password"] = g_ota_pass;
+      WEBtoSYS["password"] = g_gw_pass;
 
       {
         sendRestartPage();
@@ -1545,7 +1545,7 @@ void handleUP() {
       uint32_t le = server.arg("le").toInt();
       if (le != 0) {
         WEBtoSYS["version"] = (le == 1 ? "latest" : (le == 2 ? "dev" : "unknown"));
-        WEBtoSYS["password"] = g_ota_pass;
+        WEBtoSYS["password"] = g_gw_pass;
         {
           sendRestartPage();
 
@@ -1569,14 +1569,18 @@ void handleUP() {
   String response = String(buffer);
   response += String(script);
   response += String(style);
-  String systemUrl = RELEASE_LINK + latestVersion + "/" + ENV_NAME + "-firmware.bin";
+#if OMG_OTA_FW_UPDATE_URL_STYLE == openmqttgateway
+  String systemUrl = OMG_OTA_RELEASE_BASE_URL + latestVersion + "/" + ENV_NAME + "-firmware.bin";
+#elif OMG_OTA_FW_UPDATE_URL_STYLE_STYLE == version_in_name
+  String systemUrl = OMG_OTA_RELEASE_BASE_URL + ENV_NAME + "-" + latestVersion + "-firmware.bin";
+#endif
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, upgrade_body, jsonChar, g_gateway_name, systemUrl.c_str());
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);
   server.send(200, "text/html", response);
 }
-#  endif
+#  endif // defined(ESP32) && OMG_OTA_WEBUI_FW_UPDATE
 
 void sendRestartPage() {
   char jsonChar[100];
@@ -1713,7 +1717,7 @@ void WebUISetup() {
 
   server.on("/in", handleIN); // Information
   server.on("/cs", handleCS); // Console
-#  if defined(ESP32) && defined(OMG_MQTT_HTTPS_FW_UPDATE)
+#  if defined(ESP32) && OMG_OTA_WEBUI_FW_UPDATE
   server.on("/up", handleUP); // Firmware Upgrade
 #  endif
   server.on("/cn", handleCN); // Configuration

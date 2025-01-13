@@ -112,37 +112,37 @@ void announceDeviceTrigger(bool use_gateway_info,
                            char* device_model,
                            char* device_mac);
 
-#ifdef discovery_Topic //Deprecated - use discovery_Prefix instead
-#  pragma message("compiler directive discovery_Topic is deprecated, use discovery_Prefix instead")
-#  define discovery_Prefix discovery_Topic
+#ifdef discovery_Topic //Deprecated - use OMG_MQTT_DISCOVERY_PREFIX instead
+#  pragma message("compiler directive discovery_Topic is deprecated, use OMG_MQTT_DISCOVERY_PREFIX instead")
+#  define OMG_MQTT_DISCOVERY_PREFIX discovery_Topic
 #endif
-#ifndef discovery_Prefix
-#  define discovery_Prefix "homeassistant"
+#ifndef OMG_MQTT_DISCOVERY_PREFIX
+#  define OMG_MQTT_DISCOVERY_PREFIX "homeassistant"
 #endif
-char discovery_prefix[parameters_size + 1] = discovery_Prefix;
+char discovery_prefix[parameters_size + 1] = OMG_MQTT_DISCOVERY_PREFIX;
 
-// discovery_republish_on_reconnect false to publish discovery topics over MQTT only with first connect
-// discovery_republish_on_reconnect true to always republish discovery topics over MQTT when connection is re-established
-#ifndef discovery_republish_on_reconnect
-#  define discovery_republish_on_reconnect false
-#endif
-
-#ifndef DiscoveryAutoOffTimer
-#  define DiscoveryAutoOffTimer 1800000 // Timer (ms) that trigger auto discovery to off after activation, the goal is to avoid the discovery of entities that are not expected
+// OMG_MQTT_DISCOVERY_REPUBLISH_ON_RECONNECT false to publish discovery topics over MQTT only with first connect
+// OMG_MQTT_DISCOVERY_REPUBLISH_ON_RECONNECT true to always republish discovery topics over MQTT when connection is re-established
+#ifndef OMG_MQTT_DISCOVERY_REPUBLISH_ON_RECONNECT
+#  define OMG_MQTT_DISCOVERY_REPUBLISH_ON_RECONNECT false
 #endif
 
-#ifndef GATEWAY_MANUFACTURER
-#  define GATEWAY_MANUFACTURER "OMG_community"
+#ifndef OMG_MQTT_DISCOVERY_AUTO_OFF_TIMER
+#  define OMG_MQTT_DISCOVERY_AUTO_OFF_TIMER 1800000 // Timer (ms) that trigger auto discovery to off after activation, the goal is to avoid the discovery of entities that are not expected
 #endif
 
-#ifndef ForceDeviceName
-#  define ForceDeviceName false // Set to true to force the device name to be from the name of the device and not the model
+#ifndef OMG_MQTT_DISCOVERY_GW_MANUFACTURER
+#  define OMG_MQTT_DISCOVERY_GW_MANUFACTURER "OMG_community"
+#endif
+
+#ifndef OMG_MQTT_DISCOVERY_FORCE_DEVICE_NAME
+#  define OMG_MQTT_DISCOVERY_FORCE_DEVICE_NAME false // Set to true to force the device name to be from the name of the device and not the model
 #endif
 
 /*-------------- Auto discovery macros-----------------*/
 // Set the line below to true so as to have autodiscovery working with OpenHAB
-#ifndef OpenHABDiscovery
-#  define OpenHABDiscovery false
+#ifndef OMG_MQTT_OPENHAB_DISCOVERY
+#  define OMG_MQTT_OPENHAB_DISCOVERY false
 #endif
 
 // Home assistant autodiscovery value key definition
@@ -269,9 +269,9 @@ const char* availableHASSUnits[] = {"W",
                                     "cm"};
 
 // Define the command used to update through OTA depending if we want to update from dev nightly or latest release
-#if DEVELOPMENTOTA
+#if OMG_OTA_CHECK_OTA_UPDATE == OMG_OTA_DEV
 #  define LATEST_OR_DEV "{\"version\":\"dev\"}"
-#else
+#elif OMG_OTA_CHECK_OTA_UPDATE == OMG_OTA_RELEASE
 #  define LATEST_OR_DEV "{\"version\":\"latest\"}"
 #endif
 #endif // OMG_CONFIG_MQTTDISCOVERY_H

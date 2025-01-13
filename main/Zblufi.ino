@@ -98,7 +98,7 @@ void receivingCommandTask(void* pvParameters) {
     } else {
       Logger.notice(OMG_LOGID, F("No target found in the received command using SYS target, default index and save command" CR));
       if (!json.containsKey("cnt_index")) {
-        json["cnt_index"] = CNT_DEFAULT_INDEX;
+        json["cnt_index"] = OMG_MQTT_CNT_DEFAULT_INDEX;
         json["save_cnt"] = true;
       }
       char topic[(parameters_size)*2 + strlen(subjectMQTTtoSYSset) + 1];

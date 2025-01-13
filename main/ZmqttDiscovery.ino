@@ -148,7 +148,7 @@ void announceDeviceTrigger(bool use_gateway_info, char* topic, char* type, char*
     device["model"] = GATEWAY_MODEL;
 #  endif
 
-    device["manufacturer"] = GATEWAY_MANUFACTURER;
+    device["manufacturer"] = OMG_MQTT_DISCOVERY_GW_MANUFACTURER;
     device["sw_version"] = OMG_VERSION;
     identifiers.add(getMacAddress());
 
@@ -405,9 +405,9 @@ void createDiscovery(const char* sensor_type,
 #  else
     device["mdl"] = GATEWAY_MODEL;
 #  endif
-    device["mf"] = GATEWAY_MANUFACTURER;
+    device["mf"] = OMG_MQTT_DISCOVERY_GW_MANUFACTURER;
     if (ethConnected) {
-#  ifdef ESP32_ETHERNET
+#  ifdef OMG_ESP32_ETHERNET
       device["cu"] = String("http://") + String(ETH.localIP().toString()) + String("/"); //configuration_url
 #  endif
     } else {
@@ -438,7 +438,7 @@ void createDiscovery(const char* sensor_type,
 
     // generate unique device name by adding the second half of the device_id only if device_name and device_id are different and we don't want to use the BLE name
     if (device_name[0]) {
-      if (strcmp(device_id, device_name) != 0 && device_id[0] && !ForceDeviceName) {
+      if (strcmp(device_id, device_name) != 0 && device_id[0] && !OMG_MQTT_DISCOVERY_FORCE_DEVICE_NAME) {
         device["name"] = device_name + String("-") + String(device_id + 6);
       } else {
         device["name"] = device_name;
@@ -637,7 +637,7 @@ void pubMqttDiscovery() {
   );
 #  endif
 
-#  ifndef ESP32_ETHERNET
+#  ifndef OMG_ESP32_ETHERNET
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTT, "SYS: RSSI", (char*)getUniqueId("rssi", "").c_str(), //set state_topic,name,uniqueId
                   will_Topic, "signal_strength", "{{ value_json.rssi }}", //set availability_topic,device_class,value_template,
@@ -744,7 +744,7 @@ void pubMqttDiscovery() {
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
-#  ifdef OMG_MQTT_HTTPS_FW_UPDATE
+#  if OMG_OTA_MQTT_HTTPS_FW_UPDATE
   createDiscovery("update", //set Type
                   subjectRLStoMQTT, "SYS: Firmware Update", (char*)getUniqueId("update", "").c_str(), //set state_topic,name,uniqueId
                   will_Topic, "firmware", "", //set availability_topic,device_class,value_template,

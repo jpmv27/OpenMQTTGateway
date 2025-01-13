@@ -171,7 +171,7 @@ bool RFM69toX(void) {
   }
 }
 
-#  if simpleReceiving
+#  if OMG_MQTT_SIMPLE_RECEIVING
 void XtoRFM69(const char* topicOri, const char* datacallback) {
   if (cmpToMainTopic(topicOri, subjectMQTTtoRFM69)) {
     Logger.debug(OMG_LOGID, F("MQTTtoRFM69 data analysis" CR));

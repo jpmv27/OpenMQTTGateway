@@ -159,7 +159,7 @@ void RFtoX() {
   }
 }
 
-#  if simpleReceiving
+#  if OMG_MQTT_SIMPLE_RECEIVING
 void XtoRF(const char* topicOri, const char* datacallback) {
 #    ifdef OMG_RADIO_CC1101 // set Receive off and Transmitt on
   disableCurrentReceiver();

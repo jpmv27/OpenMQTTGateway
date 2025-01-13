@@ -535,7 +535,7 @@ void XtoLORA(const char* topicOri, JsonObject& LORAdata) { // json object decodi
   }
 }
 #  endif
-#  if simpleReceiving
+#  if OMG_MQTT_SIMPLE_RECEIVING
 void XtoLORA(const char* topicOri, const char* LORAarray) { // json object decoding
   if (cmpToMainTopic(topicOri, subjectMQTTtoLORA)) {
     LoRa.beginPacket();

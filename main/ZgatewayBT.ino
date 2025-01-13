@@ -1008,7 +1008,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
         Logger.debug(OMG_LOGID, F("properties: %s" CR), properties.c_str());
         std::string brand = decoder.getTheengAttribute(p->sensorModel_id, "brand");
         std::string model = decoder.getTheengAttribute(p->sensorModel_id, "model");
-#    ifdef ForceDeviceName
+#    ifdef OMG_MQTT_DISCOVERY_FORCE_DEVICE_NAME
         if (p->name[0] != '\0') {
           model = p->name;
         }
