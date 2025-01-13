@@ -41,82 +41,82 @@ extern String stateBTMeasures(bool);
 #define subjectMQTTtoBTset "/commands/MQTTtoBT/config"
 #define subjectMQTTtoBT    "/commands/MQTTtoBT"
 // Uncomment to send undecoded device data to another gateway device for decoding
-// #define MQTTDecodeTopic    "undecoded"
-#ifndef UseExtDecoder
-#  ifdef MQTTDecodeTopic
-#    define UseExtDecoder true
+// #define OMG_BT_MQTT_DECODE_TOPIC    "undecoded"
+#ifndef OMG_BT_USE_EXT_DECODER
+#  ifdef OMG_BT_MQTT_DECODE_TOPIC
+#    define OMG_BT_USE_EXT_DECODER true
 #  else
-#    define UseExtDecoder false
+#    define OMG_BT_USE_EXT_DECODER false
 #  endif
 #endif
-#ifndef MQTTDecodeTopic
-#  define MQTTDecodeTopic "undecoded"
+#ifndef OMG_BT_MQTT_DECODE_TOPIC
+#  define OMG_BT_MQTT_DECODE_TOPIC "undecoded"
 #endif
 
-#ifndef AttemptBLEConnect
-#  define AttemptBLEConnect true //do we by default attempt a BLE connection to sensors with ESP32
+#ifndef OMG_BT_ATTEMPT_BLE_CONNECT
+#  define OMG_BT_ATTEMPT_BLE_CONNECT true //do we by default attempt a BLE connection to sensors with ESP32
 #endif
 
-#ifndef BLE_FILTER_CONNECTABLE
-#  define BLE_FILTER_CONNECTABLE 0 // Sets whether to filter publishing of scanned devices that require a connection.
+#ifndef OMG_BLE_FILTER_CONNECTABLE
+#  define OMG_BLE_FILTER_CONNECTABLE 0 // Sets whether to filter publishing of scanned devices that require a connection.
 #endif // Setting this to 1 prevents overwriting the publication of the device connection data with the advertised data (Recommended for use with OpenHAB).
 
-#ifndef MinimumRSSI
-#  define MinimumRSSI -100 //default minimum rssi value, all the devices below -100 will not be reported
+#ifndef OMG_BT_MINIMUM_RSSI
+#  define OMG_BT_MINIMUM_RSSI -100 //default minimum rssi value, all the devices below -100 will not be reported
 #endif
 
-#ifndef Scan_duration
-#  define Scan_duration 10000 //define the duration for a scan; in milliseconds
+#ifndef OMG_BT_SCAN_DURATION
+#  define OMG_BT_SCAN_DURATION 10000 //define the duration for a scan; in milliseconds
 #endif
-#ifndef MinScanDuration
-#  define MinScanDuration 1000 //minimum duration for a scan; in milliseconds
+#ifndef OMG_BT_MIN_SCAN_DURATION
+#  define OMG_BT_MIN_SCAN_DURATION 1000 //minimum duration for a scan; in milliseconds
 #endif
-#ifndef BLEScanInterval
-#  define BLEScanInterval 52 // How often the scan occurs / switches channels; in milliseconds,
+#ifndef OMG_BT_BLE_SCAN_INTERVAL
+#  define OMG_BT_BLE_SCAN_INTERVAL 52 // How often the scan occurs / switches channels; in milliseconds,
 #endif
-#ifndef BLEScanWindow
-#  define BLEScanWindow 30 // How long to scan during the interval; in milliseconds.
+#ifndef OMG_BT_BLE_SCAN_WINDOW
+#  define OMG_BT_BLE_SCAN_WINDOW 30 // How long to scan during the interval; in milliseconds.
 #endif
-#ifndef AdaptiveBLEScan
-#  define AdaptiveBLEScan true // Sets adaptive scanning, this will automatically decide on the best passive and active scanning intervals
+#ifndef OMG_BT_ADAPTIVE_BLE_SCAN
+#  define OMG_BT_ADAPTIVE_BLE_SCAN true // Sets adaptive scanning, this will automatically decide on the best passive and active scanning intervals
 #endif
-#ifndef TimeBtwActive
-#  define TimeBtwActive 55555 //define default time between two BLE active scans when general passive scanning is selected; in milliseconds
+#ifndef OMG_BT_TIME_BTW_ACTIVE
+#  define OMG_BT_TIME_BTW_ACTIVE 55555 //define default time between two BLE active scans when general passive scanning is selected; in milliseconds
 #endif
-#ifndef MinTimeBtwScan
-#  define MinTimeBtwScan 100 //define the time between two scans; in milliseconds
+#ifndef OMG_BT_MIN_TIME_BTW_SCAN
+#  define OMG_BT_MIN_TIME_BTW_SCAN 100 //define the time between two scans; in milliseconds
 #endif
-#ifndef TimeBtwConnect
-#  define TimeBtwConnect 3600000 //define default time between BLE connection attempt (not used for immediate actions); in milliseconds
+#ifndef OMG_BT_TIME_BTW_CONNECT
+#  define OMG_BT_TIME_BTW_CONNECT 3600000 //define default time between BLE connection attempt (not used for immediate actions); in milliseconds
 #endif
-#ifndef PresenceAwayTimer
-#  define PresenceAwayTimer 120000 //define the time between Offline Status update for the tracker sensors
+#ifndef OMG_BT_PRESENCE_AWAY_TIMER
+#  define OMG_BT_PRESENCE_AWAY_TIMER 120000 //define the time between Offline Status update for the tracker sensors
 #endif
-#ifndef MovingTimer
-#  define MovingTimer 60000 //define the time between Offline Status update for the moving sensors with an accelerometer
-#endif
-
-#ifndef BLEScanDuplicateCacheSize
-#  define BLEScanDuplicateCacheSize 200
-#endif
-#ifndef TimeBtwRead
-#  define TimeBtwRead 55555 //define default time between 2 scans; in milliseconds
+#ifndef OMG_BT_MOVING_TIMER
+#  define OMG_BT_MOVING_TIMER 60000 //define the time between Offline Status update for the moving sensors with an accelerometer
 #endif
 
-#ifndef PublishOnlySensors
-#  define PublishOnlySensors false //false if we publish all BLE devices discovered or true only the identified sensors (like temperature sensors)
+#ifndef OMG_BT_BLE_SCAN_DUPLICATE_CACHE_SIZE
+#  define OMG_BT_BLE_SCAN_DUPLICATE_CACHE_SIZE 200
+#endif
+#ifndef OMG_BT_TIME_BTW_READ
+#  define OMG_BT_TIME_BTW_READ 55555 //define default time between 2 scans; in milliseconds
 #endif
 
-#ifndef PublishRandomMACs
-#  define PublishRandomMACs false //false to not publish devices which randomly change their MAC addresses
+#ifndef OMG_BT_PLUBLISH_ONLY_SENSORS
+#  define OMG_BT_PLUBLISH_ONLY_SENSORS false //false if we publish all BLE devices discovered or true only the identified sensors (like temperature sensors)
 #endif
 
-#ifndef HassPresence
-#  define HassPresence false //true if we publish into Home Assistant presence topic
+#ifndef OMG_BT_PUBLISH_RANDOM_MACS
+#  define OMG_BT_PUBLISH_RANDOM_MACS false //false to not publish devices which randomly change their MAC addresses
 #endif
 
-#ifndef EnableBT
-#  define EnableBT true
+#ifndef OMG_BT_HASS_PRESENCE
+#  define OMG_BT_HASS_PRESENCE false //true if we publish into Home Assistant presence topic
+#endif
+
+#ifndef OMG_BT_GW_ENABLE
+#  define OMG_BT_GW_ENABLE true
 #endif
 
 #ifndef OMG_BLE_DECODER
@@ -124,9 +124,9 @@ extern String stateBTMeasures(bool);
 #endif
 
 #if !OMG_BLE_DECODER
-#  define UNKWNON_MODEL -1
+#  define UNKNOWN_MODEL -1
 #else
-#  define UNKWNON_MODEL TheengsDecoder::BLE_ID_NUM::UNKNOWN_MODEL
+#  define UNKNOWN_MODEL TheengsDecoder::BLE_ID_NUM::UNKNOWN_MODEL
 #endif
 
 #ifndef BLE_CNCT_TIMEOUT
@@ -135,19 +135,19 @@ extern String stateBTMeasures(bool);
 
 unsigned long scanCount = 0;
 
-#ifndef pubBLEAdvData
-#  define pubBLEAdvData false // define true if you want to publish all advertisement data
+#ifndef OMG_BT_PUB_BLE_ADV_DATA
+#  define OMG_BT_PUB_BLE_ADV_DATA false // define true if you want to publish all advertisement data
 #endif
 
-#ifndef useBeaconUuidForTopic
-#  define useBeaconUuidForTopic false // define true to use iBeacon UUID as topic, instead of sender (random) MAC address
+#ifndef OMG_BT_USE_BEACON_UUID_FOR_TOPIC
+#  define OMG_BT_USE_BEACON_UUID_FOR_TOPIC false // define true to use iBeacon UUID as topic, instead of sender (random) MAC address
 #endif
 
 /*--------------HOME ASSISTANT ROOM PRESENCE--------------*/
-#define subjectHomePresence "presence/" // will send Home Assistant room presence message to this topic (first part is same for all rooms, second is room name)
+#define OMG_BT_SUBJECT_HOME_PRESENCE "presence/" // will send Home Assistant room presence message to this topic (first part is same for all rooms, second is room name)
 
-#ifndef useBeaconUuidForPresence
-#  define useBeaconUuidForPresence false // //define true to use iBeacon UUID as for presence, instead of sender MAC (random) address
+#ifndef OMG_BT_USE_BEACON_UUID_FOR_PRESENCE
+#  define OMG_BT_USE_BEACON_UUID_FOR_PRESENCE false // //define true to use iBeacon UUID as for presence, instead of sender MAC (random) address
 #endif
 
 /*----------------CONFIGURABLE PARAMETERS-----------------*/

@@ -77,32 +77,32 @@ static BLEdevice NO_BT_DEVICE_FOUND = {{0},
                                        false,
                                        false,
                                        false,
-                                       UNKWNON_MODEL};
+                                       UNKNOWN_MODEL};
 static bool oneWhite = false;
 
 void BTConfig_init() {
-  BTConfig.bleConnect = AttemptBLEConnect;
-  BTConfig.BLEinterval = TimeBtwRead;
-  BTConfig.adaptiveScan = AdaptiveBLEScan;
-  BTConfig.intervalActiveScan = TimeBtwActive;
-  BTConfig.intervalConnect = TimeBtwConnect;
-  BTConfig.scanDuration = Scan_duration;
-  BTConfig.pubOnlySensors = PublishOnlySensors;
-  BTConfig.pubRandomMACs = PublishRandomMACs;
-  BTConfig.presenceEnable = HassPresence;
-  BTConfig.presenceTopic = subjectHomePresence;
-  BTConfig.presenceUseBeaconUuid = useBeaconUuidForPresence;
-  BTConfig.minRssi = MinimumRSSI;
-  BTConfig.extDecoderEnable = UseExtDecoder;
-  BTConfig.extDecoderTopic = MQTTDecodeTopic;
-  BTConfig.filterConnectable = BLE_FILTER_CONNECTABLE;
-  BTConfig.pubAdvData = pubBLEAdvData;
-  BTConfig.pubBeaconUuidForTopic = useBeaconUuidForTopic;
+  BTConfig.bleConnect = OMG_BT_ATTEMPT_BLE_CONNECT;
+  BTConfig.BLEinterval = OMG_BT_TIME_BTW_READ;
+  BTConfig.adaptiveScan = OMG_BT_ADAPTIVE_BLE_SCAN;
+  BTConfig.intervalActiveScan = OMG_BT_TIME_BTW_ACTIVE;
+  BTConfig.intervalConnect = OMG_BT_TIME_BTW_CONNECT;
+  BTConfig.scanDuration = OMG_BT_SCAN_DURATION;
+  BTConfig.pubOnlySensors = OMG_BT_PLUBLISH_ONLY_SENSORS;
+  BTConfig.pubRandomMACs = OMG_BT_PUBLISH_RANDOM_MACS;
+  BTConfig.presenceEnable = OMG_BT_HASS_PRESENCE;
+  BTConfig.presenceTopic = OMG_BT_SUBJECT_HOME_PRESENCE;
+  BTConfig.presenceUseBeaconUuid = OMG_BT_USE_BEACON_UUID_FOR_PRESENCE;
+  BTConfig.minRssi = OMG_BT_MINIMUM_RSSI;
+  BTConfig.extDecoderEnable = OMG_BT_USE_EXT_DECODER;
+  BTConfig.extDecoderTopic = OMG_BT_MQTT_DECODE_TOPIC;
+  BTConfig.filterConnectable = OMG_BLE_FILTER_CONNECTABLE;
+  BTConfig.pubAdvData = OMG_BT_PUB_BLE_ADV_DATA;
+  BTConfig.pubBeaconUuidForTopic = OMG_BT_USE_BEACON_UUID_FOR_TOPIC;
   BTConfig.ignoreWBlist = false;
-  BTConfig.presenceAwayTimer = PresenceAwayTimer;
-  BTConfig.movingTimer = MovingTimer;
+  BTConfig.presenceAwayTimer = OMG_BT_PRESENCE_AWAY_TIMER;
+  BTConfig.movingTimer = OMG_BT_MOVING_TIMER;
   BTConfig.forcePassiveScan = false;
-  BTConfig.enabled = EnableBT;
+  BTConfig.enabled = OMG_BT_GW_ENABLE;
 }
 
 unsigned long timeBetweenConnect = 0;
@@ -164,13 +164,13 @@ void BTConfig_fromJson(JsonObject& BTdata, bool startup = false) {
     }
 
     if (BTdata.containsKey("adaptivescan") && BTdata["adaptivescan"] == false && BTConfig.adaptiveScan == true) {
-      BTdata["interval"] = MinTimeBtwScan;
-      BTdata["intervalacts"] = MinTimeBtwScan;
-      BTdata["scanduration"] = MinScanDuration;
+      BTdata["interval"] = OMG_BT_MIN_TIME_BTW_SCAN;
+      BTdata["intervalacts"] = OMG_BT_MIN_TIME_BTW_SCAN;
+      BTdata["scanduration"] = OMG_BT_MIN_SCAN_DURATION;
     } else if (BTdata.containsKey("adaptivescan") && BTdata["adaptivescan"] == true && BTConfig.adaptiveScan == false) {
-      BTdata["interval"] = TimeBtwRead;
-      BTdata["intervalacts"] = TimeBtwActive;
-      BTdata["scanduration"] = Scan_duration;
+      BTdata["interval"] = OMG_BT_TIME_BTW_READ;
+      BTdata["intervalacts"] = OMG_BT_TIME_BTW_ACTIVE;
+      BTdata["scanduration"] = OMG_BT_SCAN_DURATION;
     }
     // Identify if the gateway is enabled or not and stop start accordingly
     if (BTdata.containsKey("enabled") && BTdata["enabled"] == false && BTConfig.enabled == true) {
@@ -345,7 +345,7 @@ bool updateWorB(JsonObject& BTdata, bool isWhite) {
   for (int i = 0; i < size; i++) {
     const char* mac = BTdata[jsonKey][i];
     createOrUpdateDevice(mac, (isWhite ? device_flags_isWhiteL : device_flags_isBlackL),
-                         UNKWNON_MODEL);
+                         UNKNOWN_MODEL);
   }
 
   return true;
@@ -392,7 +392,7 @@ void createOrUpdateDevice(const char* mac, uint8_t flags, int model, int mac_typ
       device->connect = true;
     }
 
-    if (model != UNKWNON_MODEL) {
+    if (model != UNKNOWN_MODEL) {
       device->sensorModel_id = model;
     }
 
@@ -724,8 +724,8 @@ void BLEscan() {
   } else {
     pBLEScan->setActiveScan(false);
   }
-  pBLEScan->setInterval(BLEScanInterval);
-  pBLEScan->setWindow(BLEScanWindow);
+  pBLEScan->setInterval(OMG_BT_BLE_SCAN_INTERVAL);
+  pBLEScan->setWindow(OMG_BT_BLE_SCAN_WINDOW);
   BLEScanResults foundDevices = pBLEScan->start(BTConfig.scanDuration / 1000, false);
   if (foundDevices.getCount())
     scanCount++;
@@ -811,7 +811,7 @@ void BLEconnect() {
             GENERIC_connect BLEclient(addr);
             if (BLEclient.processActions(BLEactions)) {
               // If we don't regularly connect to this, disable connections so advertisements
-              // won't be filtered if BLE_FILTER_CONNECTABLE is set.
+              // won't be filtered if OMG_BLE_FILTER_CONNECTABLE is set.
               p->connect = false;
             }
           }
@@ -887,7 +887,7 @@ void coreTask(void* pvParameters) {
     if (!BTProcessLock) {
       if (xSemaphoreTake(semaphoreBLEOperation, pdMS_TO_TICKS(30000)) == pdTRUE) {
         BLEscan();
-        // Launching a connect every TimeBtwConnect
+        // Launching a connect every OMG_BT_TIME_BTW_CONNECT
         if (millis() > (timeBetweenConnect + BTConfig.intervalConnect) && BTConfig.bleConnect) {
           timeBetweenConnect = millis();
           BLEconnect();
@@ -915,7 +915,7 @@ void coreTask(void* pvParameters) {
 }
 
 void setupBTTasksAndBLE() {
-  BLEDevice::setScanDuplicateCacheSize(BLEScanDuplicateCacheSize);
+  BLEDevice::setScanDuplicateCacheSize(OMG_BT_BLE_SCAN_DUPLICATE_CACHE_SIZE);
   BLEDevice::init("");
   xTaskCreatePinnedToCore(
       procBLETask, /* Function to implement the task */
@@ -1024,7 +1024,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
 
         String discovery_topic = String(subjectBTtoMQTT) + "/" + macWOdots;
         if (!BTConfig.extDecoderEnable && // Do not decode if an external decoder is configured
-            p->sensorModel_id > UNKWNON_MODEL &&
+            p->sensorModel_id > UNKNOWN_MODEL &&
             p->sensorModel_id < TheengsDecoder::BLE_ID_NUM::BLE_ID_MAX
 #ifdef OMG_BT_HHCCJCY01HHCC
             && p->sensorModel_id != TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC // Exception on HHCCJCY01HHCC and BM2 as these ones are discoverable and connectable
@@ -1281,20 +1281,20 @@ void process_bledata(JsonObject& BLEdata) {
         createOrUpdateDevice(mac, device_flags_connect, model_id, mac_type, deviceName);
       } else {
         createOrUpdateDevice(mac, device_flags_init, model_id, mac_type, deviceName);
-        if (BTConfig.adaptiveScan == true && (BTConfig.BLEinterval != MinTimeBtwScan || BTConfig.intervalActiveScan != MinTimeBtwScan)) {
+        if (BTConfig.adaptiveScan == true && (BTConfig.BLEinterval != OMG_BT_MIN_TIME_BTW_SCAN || BTConfig.intervalActiveScan != OMG_BT_MIN_TIME_BTW_SCAN)) {
           if (BLEdata.containsKey("acts") && BLEdata.containsKey("cont")) {
             if (BLEdata["acts"] && BLEdata["cont"]) {
-              BTConfig.BLEinterval = MinTimeBtwScan;
-              BTConfig.intervalActiveScan = MinTimeBtwScan;
-              BTConfig.scanDuration = MinScanDuration;
+              BTConfig.BLEinterval = OMG_BT_MIN_TIME_BTW_SCAN;
+              BTConfig.intervalActiveScan = OMG_BT_MIN_TIME_BTW_SCAN;
+              BTConfig.scanDuration = OMG_BT_MIN_SCAN_DURATION;
               Logger.notice(OMG_LOGID, F("Active and continuous scanning required, paramaters adapted" CR));
               stateBTMeasures(false);
             }
-          } else if (BLEdata.containsKey("cont") && BTConfig.BLEinterval != MinTimeBtwScan) {
+          } else if (BLEdata.containsKey("cont") && BTConfig.BLEinterval != OMG_BT_MIN_TIME_BTW_SCAN) {
             if (BLEdata["cont"]) {
-              BTConfig.BLEinterval = MinTimeBtwScan;
+              BTConfig.BLEinterval = OMG_BT_MIN_TIME_BTW_SCAN;
               if ((BLEdata["type"].as<string>()).compare("CTMO") == 0) {
-                BTConfig.scanDuration = MinScanDuration;
+                BTConfig.scanDuration = OMG_BT_MIN_SCAN_DURATION;
               }
               Logger.notice(OMG_LOGID, F("Passive continuous scanning required, paramaters adapted" CR));
               stateBTMeasures(false);
@@ -1623,7 +1623,7 @@ void XtoBTAction(JsonObject& BTdata) {
   }
 
   createOrUpdateDevice(action.addr, device_flags_connect,
-                       UNKWNON_MODEL,
+                       UNKNOWN_MODEL,
                        action.addr_type);
 
   BLEactions.push_back(action);
