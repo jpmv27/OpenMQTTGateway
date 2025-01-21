@@ -22,7 +22,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "User_config.h"
-#if defined(OMG_WEB_UI) && defined(ESP32)
+#if defined(OMG_WEBUI) && defined(ESP32)
 #  include <ArduinoJson.h>
 #  include <SPIFFS.h>
 #  include <WebServer.h> // Docs for this are here - https://github.com/espressif/arduino-esp32/tree/master/libraries/WebServer

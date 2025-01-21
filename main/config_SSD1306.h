@@ -51,7 +51,7 @@
 #  define OMG_LOG_TO_OLED false // Default to not display log messages on display
 #endif
 
-#ifndef OMG_WEB_UI
+#ifndef OMG_WEBUI
 #  ifndef OMG_JSON_TO_OLED
 #    define OMG_JSON_TO_OLED true // Default to displaying JSON messages on the display
 #  endif

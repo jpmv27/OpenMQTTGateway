@@ -104,7 +104,7 @@ struct webUIQueueMessage {
 
 /*------------------- Global Functions and Variables ----------------------*/
 
-#ifdef OMG_WEB_UI
+#ifdef OMG_WEBUI
 #  define pubWebUI(...) webUIPubPrint(__VA_ARGS__)
 void webUIPubPrint(const char*, JsonObject&);
 #endif

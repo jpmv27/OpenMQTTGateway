@@ -121,7 +121,7 @@ struct GfSun2000Data {};
 #endif
 
 // Modules config inclusion
-#if defined(OMG_WEB_UI) && defined(ESP32)
+#if defined(OMG_WEBUI) && defined(ESP32)
 #  include "config_WebUI.h"
 #endif
 #if defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_RF2) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_ACTUATOR_SOMFY) || defined(OMG_GATEWAY_RTL_433)
@@ -776,7 +776,7 @@ void delayWithOTA(long waitMillis) {
     checkButton(); // check if a reset of wifi/mqtt settings is asked
 #endif
     ArduinoOTA.handle();
-#if defined(OMG_WEB_UI) && defined(ESP32)
+#if defined(OMG_WEBUI) && defined(ESP32)
     WebUILoop();
 #endif
 #ifdef ESP32
@@ -1446,9 +1446,9 @@ void setup() {
   setOTA();
 #endif
 
-#if defined(OMG_WEB_UI) && defined(ESP32)
+#if defined(OMG_WEBUI) && defined(ESP32)
   WebUISetup();
-  modules.add(OMG_WEB_UI);
+  modules.add(OMG_WEBUI);
 #endif
 
   delay(1500);
@@ -2551,7 +2551,7 @@ void loop() {
       }
       timer_sys_checks = millis();
     }
-#if defined(OMG_WEB_UI) && defined(ESP32)
+#if defined(OMG_WEBUI) && defined(ESP32)
     WebUILoop();
 #endif
     mqtt->loop();
@@ -2593,7 +2593,7 @@ void loop() {
 #if defined(OMG_GATEWAY_RTL_433) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_RF2) || defined(OMG_ACTUATOR_SOMFY)
       stateRFMeasures();
 #endif
-#if defined(OMG_WEB_UI) && defined(ESP32)
+#if defined(OMG_WEBUI) && defined(ESP32)
       stateWebUIStatus();
 #endif
     }
@@ -3057,7 +3057,7 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
 #  if OMG_OTA_MQTT_HTTPS_FW_UPDATE
     MQTTHttpsFWUpdate(strTopicOri.c_str(), jsondata);
 #  endif
-#  if defined(OMG_WEB_UI) && defined(ESP32)
+#  if defined(OMG_WEBUI) && defined(ESP32)
     XtoWebUI(strTopicOri.c_str(), jsondata);
 #  endif
 #endif
