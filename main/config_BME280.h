@@ -40,65 +40,82 @@
 extern void setupZsensorBME280();
 extern void MeasureTempHumAndPressure();
 
-#ifndef bme280_always
-#  define bme280_always true // if false when the current value of the parameter is the same as previous one don't send it by MQTT
+#ifndef OMG_BME280_ALWAYS_SEND
+#  define OMG_BME280_ALWAYS_SEND true // if false when the current value of the parameter is the same as previous one don't send it by MQTT
 #endif
-#ifndef TimeBetweenReadingbme280
-#  define TimeBetweenReadingbme280 30000
+#ifndef OMG_BME280_TIME_BTW_READINGS
+#  define OMG_BME280_TIME_BTW_READINGS 30000
 #endif
 
 /*----------------------------USER PARAMETERS-----------------------------*/
 /*-------------DEFINE YOUR MQTT PARAMETERS BELOW----------------*/
-#ifndef BMETOPIC
-#  define BMETOPIC "/CLIMAtoMQTT/bme"
+#ifndef OMG_MQTT_BME_TOPIC
+#  define OMG_MQTT_BME_TOPIC "/CLIMAtoMQTT/bme"
 #endif
 
 //Time used to wait for an interval before resending measured values
 unsigned long timebme280 = 0;
-int BME280_i2c_addr = 0x76; // Bosch BME280 I2C Address
+
+#ifndef OMG_BME280_I2C_ADDRESS
+#  define OMG_BME280_I2C_ADDRESS 0x76
+#endif
+
+int BME280_i2c_addr = OMG_BME280_I2C_ADDRESS; // Bosch BME280 I2C Address
 
 // Only supported for ESP
-#ifndef BME280_PIN_SDA
-#  define BME280_PIN_SDA SDA
+#ifndef OMG_BME280_PIN_SDA
+#  define OMG_BME280_PIN_SDA SDA
 #endif
-#ifndef BME280_PIN_SCL
-#  define BME280_PIN_SCL SCL
+#ifndef OMG_BME280_PIN_SCL
+#  define OMG_BME280_PIN_SCL SCL
 #endif
 
 // Oversampling for BME280/BMP280 devices
 
-#ifndef BME280TemperatureOversample
-// BME280TemperatureOversample - Values:
+#ifndef OMG_BME280_TEMPERATURE_OVERSAMPLING
+// OMG_BME280_TEMPERATURE_OVERSAMPLING - Values:
 // ------------------------
 //  0, skipped
 //  1 through 5, oversampling *1, *2, *4, *8, *16 respectively
-#  define BME280TemperatureOversample 1
+#  define OMG_BME280_TEMPERATURE_OVERSAMPLING 1
 #endif
 
-#ifndef BME280PressureOversample
-// BME280PressureOversample - Values:
+#ifndef OMG_BME280_PRESSURE_OVERSAMPLING
+// OMG_BME280_PRESSURE_OVERSAMPLING - Values:
 // -------------------------
 //  0, skipped
 //  1 through 5, oversampling *1, *2, *4, *8, *16 respectively
-#  define BME280PressureOversample 1
+#  define OMG_BME280_PRESSURE_OVERSAMPLING 1
 #endif
 
-#ifndef BME280HumidityOversample
-// BME280HumidityOversample - Values:
+#ifndef OMG_BME280_HUMIDITY_OVERSAMPLING
+// OMG_BME280_HUMIDITY_OVERSAMPLING - Values:
 // -------------------------
 //  0, skipped
 //  1 through 5, oversampling *1, *2, *4, *8, *16 respectively
-#  define BME280HumidityOversample 1
+#  define OMG_BME280_HUMIDITY_OVERSAMPLING 1
+#endif
+
+#ifndef OMG_BME280_FIR_FILTER_COEFFS
+// Filter can be off or number of FIR coefficients - Values:
+// ---------------------------------------------------------
+//  0, filter off
+//  1 through 4, coefficients = 2, 4, 8, 16 respectively
+#  define OMG_BME280_FIR_FILTER_COEFFS 4
 #endif
 
 // Temperature correction for BME280/BMP280 devices
 
-#ifndef BME280Correction
-// BME280Correction - Correction in Celsius of temperature reported by BME280/BMP280 sensor. Both Celsius and Fahrenheit temperatures are adjusted.
+#ifndef OMG_BME280_TEMPERATURE_CORRECTION
+// OMG_BME280_TEMPERATURE_CORRECTION - Correction in Celsius of temperature reported by BME280/BMP280 sensor. Both Celsius and Fahrenheit temperatures are adjusted.
 // -------------------------
 // Value is a float
-// ie Compiler Directive '-DBME280Correction=-3.4'
-#  define BME280Correction 0
+// ie Compiler Directive '-DOMG_BME280_TEMPERATURE_CORRECTION=-3.4'
+#  define OMG_BME280_TEMPERATURE_CORRECTION 0
+#endif
+
+#ifndef OMG_BME280_METRIC_UNITS_ONLY
+#  define OMG_BME280_METRIC_UNITS_ONLY false
 #endif
 
 #endif // OMG_CONFIG_BME280_H

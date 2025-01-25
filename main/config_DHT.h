@@ -31,24 +31,34 @@ extern void MeasureTempAndHum();
 
 /*----------------------------USER PARAMETERS-----------------------------*/
 /*-------------DEFINE YOUR MQTT PARAMETERS BELOW----------------*/
-#define DHTTOPIC              "/DHTtoMQTT/dht1"
-#define dht_always            true // if false when the current value for temp or hum is the same as previous one don't send it by MQTT
-#define TimeBetweenReadingDHT 30000 // time between 2 DHT readings
+#ifndef OMG_MQTT_DHT_TOPIC
+#  define OMG_MQTT_DHT_TOPIC              "/DHTtoMQTT/dht1"
+#endif
+#ifndef OMG_DHT_ALWAYS_SEND
+#  define OMG_DHT_ALWAYS_SEND            true // if false when the current value for temp or hum is the same as previous one don't send it by MQTT
+#endif
+#ifndef OMG_DHT_TIME_BTW_READINGS
+#  define OMG_DHT_TIME_BTW_READINGS 30000 // time between 2 DHT readings
+#endif
 /*-------------DHT SENSOR TYPE-------------*/
-//#define DHT_SENSOR_TYPE DHT11 //uncomment for DHT11 Sensor
-//#define DHT_SENSOR_TYPE DHT21 //uncomment for DHT21 Sensor
-#ifndef DHT_SENSOR_TYPE
-#  define DHT_SENSOR_TYPE DHT22 //uncomment for DHT22 Sensor (default for backwards compatibility)
+//#define OMG_DHT_SENSOR_TYPE DHT11 //uncomment for DHT11 Sensor
+//#define OMG_DHT_SENSOR_TYPE DHT21 //uncomment for DHT21 Sensor
+#ifndef OMG_DHT_SENSOR_TYPE
+#  define OMG_DHT_SENSOR_TYPE DHT22 //uncomment for DHT22 Sensor (default for backwards compatibility)
 #endif
 /*-------------------PIN DEFINITIONS----------------------*/
-#ifndef DHT_RECEIVER_GPIO
+#ifndef OMG_DHT_DATA_GPIO
 #  if defined(ESP8266)
-#    define DHT_RECEIVER_GPIO 5 //5 = D1 you can put 14 = D5 if you don't use HCSR501 sensor and the RFM69
+#    define OMG_DHT_DATA_GPIO 5 //5 = D1 you can put 14 = D5 if you don't use HCSR501 sensor and the RFM69
 #  elif defined(ESP32)
-#    define DHT_RECEIVER_GPIO 16
+#    define OMG_DHT_DATA_GPIO 16
 #  else
-#    define DHT_RECEIVER_GPIO 8
+#    define OMG_DHT_DATA_GPIO 8
 #  endif
+#endif
+
+#ifndef OMG_DHT_METRIC_UNITS_ONLY
+#  define OMG_DHT_METRIC_UNITS_ONLY false
 #endif
 
 #endif // OMG_CONFIG_DHT_H

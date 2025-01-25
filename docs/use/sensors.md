@@ -8,11 +8,11 @@ The value is between 0 and 1024 and is transmitted via MQTT when it changes.
 `home/OpenMQTTGateway/ADCtoMQTT {"value":543}`
 
 ### DHT
-You will receive every TimeBetweenReadingDHT (set into config_DHT.h) the DHT measurement (30s per default).
+You will receive every OMG_DHT_TIME_BTW_READINGS (set into config_DHT.h) the DHT measurement (30s per default).
 
 `home/OpenMQTTGateway/DHTtoMQTT {"tempc":21,"tempf":69.8,"hum":51}`
 
-If you want to don't resend value when it is the same you can set dht_always = false in config_DHT.h
+If you want to don't resend value when it is the same you can set OMG_DHT_ALWAYS_SEND = false in config_DHT.h
 
 ### HTU21
 You will receive the HTU21 sensor readings every TimeBetweenReadinghtu21 (set into config_HTU21.h) (30s by default).

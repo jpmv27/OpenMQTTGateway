@@ -770,7 +770,7 @@ void pubMqttDiscovery() {
 
   for (int i = 0; i < BMEparametersCount; i++) {
     createDiscovery(BMEsensor[i][0],
-                    BMETOPIC, BMEsensor[i][1], (char*)getUniqueId(BMEsensor[i][1], BMEsensor[i][2]).c_str(),
+                    OMG_MQTT_BME_TOPIC, BMEsensor[i][1], (char*)getUniqueId(BMEsensor[i][1], BMEsensor[i][2]).c_str(),
                     will_Topic, BMEsensor[i][3], BMEsensor[i][4],
                     BMEsensor[i][5], BMEsensor[i][6], BMEsensor[i][7],
                     0, Gateway_AnnouncementMsg, will_Message, true, "",
@@ -850,7 +850,7 @@ void pubMqttDiscovery() {
   for (int i = 0; i < DHTparametersCount; i++) {
     //trc(DHTsensor[i][1]);
     createDiscovery(DHTsensor[i][0],
-                    DHTTOPIC, DHTsensor[i][1], (char*)getUniqueId(DHTsensor[i][1], DHTsensor[i][2]).c_str(),
+                    OMG_MQTT_DHT_TOPIC, DHTsensor[i][1], (char*)getUniqueId(DHTsensor[i][1], DHTsensor[i][2]).c_str(),
                     will_Topic, DHTsensor[i][3], DHTsensor[i][4],
                     DHTsensor[i][5], DHTsensor[i][6], DHTsensor[i][7],
                     0, Gateway_AnnouncementMsg, will_Message, true, "",

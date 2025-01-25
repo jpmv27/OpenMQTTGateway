@@ -33,17 +33,17 @@
 #  include <DHT.h>
 #  include <DHT_U.h>
 
-DHT dht(DHT_RECEIVER_GPIO, DHT_SENSOR_TYPE);
+DHT dht(OMG_DHT_DATA_GPIO, OMG_DHT_SENSOR_TYPE);
 
 //Time used to wait for an interval before resending temp and hum
 unsigned long timedht = 0;
 
 void setupDHT() {
-  Logger.notice(OMG_LOGID, F("Reading DHT on pin: %d" CR), DHT_RECEIVER_GPIO);
+  Logger.notice(OMG_LOGID, F("Reading DHT on pin: %d" CR), OMG_DHT_DATA_GPIO);
 }
 
 void MeasureTempAndHum() {
-  if (millis() > (timedht + TimeBetweenReadingDHT)) { //retrieving value of temperature and humidity of the box from DHT every xUL
+  if (millis() > (timedht + OMG_DHT_TIME_BTW_READINGS)) { //retrieving value of temperature and humidity of the box from DHT every xUL
     timedht = millis();
     static float persistedh;
     static float persistedt;
@@ -57,18 +57,20 @@ void MeasureTempAndHum() {
       Logger.debug(OMG_LOGID, F("Creating DHT buffer" CR));
       StaticJsonDocument<JSON_MSG_BUFFER> DHTdataBuffer;
       JsonObject DHTdata = DHTdataBuffer.to<JsonObject>();
-      if (h != persistedh || dht_always) {
-        DHTdata["hum"] = (float)h;
+      if (h != persistedh || OMG_DHT_ALWAYS_SEND) {
+        DHTdata["humidity_pct"] = (float)h;
       } else {
         Logger.debug(OMG_LOGID, F("Same hum don't send it" CR));
       }
-      if (t != persistedt || dht_always) {
-        DHTdata["tempc"] = (float)t;
-        DHTdata["tempf"] = dht.convertCtoF(t);
+      if (t != persistedt || OMG_DHT_ALWAYS_SEND) {
+        DHTdata["temperature_c"] = (float)t;
+#if !OMG_DHT_METRIC_UNITS_ONLY
+        DHTdata["temperature_f"] = dht.convertCtoF(t);
+#endif
       } else {
         Logger.debug(OMG_LOGID, F("Same temp don't send it" CR));
       }
-      DHTdata["origin"] = DHTTOPIC;
+      DHTdata["origin"] = OMG_MQTT_DHT_TOPIC;
       enqueueJsonObject(DHTdata);
     }
     persistedh = h;

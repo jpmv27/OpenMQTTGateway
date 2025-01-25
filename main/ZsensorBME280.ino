@@ -50,7 +50,7 @@ BME280 mySensor;
 
 void setupZsensorBME280() {
   // Allow custom pins on ESP Platforms
-  Wire.begin(BME280_PIN_SDA, BME280_PIN_SCL);
+  Wire.begin(OMG_BME280_PIN_SDA, OMG_BME280_PIN_SCL);
 
   mySensor.settings.commInterface = I2C_MODE;
   mySensor.settings.I2CAddress = BME280_i2c_addr;
@@ -83,31 +83,31 @@ void setupZsensorBME280() {
   //  2, coefficients = 4
   //  3, coefficients = 8
   //  4, coefficients = 16
-  mySensor.settings.filter = 4;
+  mySensor.settings.filter = OMG_BME280_FIR_FILTER_COEFFS;
 
   // tempOverSample - Values:
   // ------------------------
   //  0, skipped
   //  1 through 5, oversampling *1, *2, *4, *8, *16 respectively
-  mySensor.settings.tempOverSample = BME280TemperatureOversample;
+  mySensor.settings.tempOverSample = OMG_BME280_TEMPERATURE_OVERSAMPLING;
 
   // pressOverSample - Values:
   // -------------------------
   //  0, skipped
   //  1 through 5, oversampling *1, *2, *4, *8, *16 respectively
-  mySensor.settings.pressOverSample = BME280PressureOversample;
+  mySensor.settings.pressOverSample = OMG_BME280_PRESSURE_OVERSAMPLING;
 
   // humidOverSample - Values:
   // -------------------------
   //  0, skipped
   //  1 through 5, oversampling *1, *2, *4, *8, *16 respectively
-  mySensor.settings.humidOverSample = BME280HumidityOversample;
+  mySensor.settings.humidOverSample = OMG_BME280_HUMIDITY_OVERSAMPLING;
 
   // tempCorrection - Correction in celcius of temperature reported by BME280/BMP280 sensor. Both Celcius and Farenheit temperatures are adjusted.
   // -------------------------
   // Value is a float
-  // ie Compiler Directive '-DBME280Correction=-3.4'
-  mySensor.settings.tempCorrection = BME280Correction;
+  // ie Compiler Directive '-DOMG_BME280_TEMPERATURE_CORRECTION=-3.4'
+  mySensor.settings.tempCorrection = OMG_BME280_TEMPERATURE_CORRECTION;
 
   delay(10); // Gives the Sensor enough time to turn on (The BME280/BMP280 requires 2ms to start up)
 
@@ -122,81 +122,94 @@ void setupZsensorBME280() {
 }
 
 void MeasureTempHumAndPressure() {
-  if (millis() > (timebme280 + TimeBetweenReadingbme280)) {
+  if (millis() > (timebme280 + OMG_BME280_TIME_BTW_READINGS)) {
     timebme280 = millis();
     static float persisted_bme_tempc;
-    static float persisted_bme_tempf;
     static float persisted_bme_hum;
     static float persisted_bme_pa;
     static float persisted_bme_altim;
+#if !OMG_BME280_METRIC_UNITS_ONLY
+    static float persisted_bme_tempf;
     static float persisted_bme_altift;
+#endif
 
     float BmeTempC = mySensor.readTempC();
-    float BmeTempF = mySensor.readTempF();
     float BmeHum = mySensor.readFloatHumidity();
     float BmePa = mySensor.readFloatPressure();
     float BmeAltiM = mySensor.readFloatAltitudeMeters();
+#if !OMG_BME280_METRIC_UNITS_ONLY
     float BmeAltiFt = mySensor.readFloatAltitudeFeet();
+    float BmeTempF = mySensor.readTempF();
+#endif
 
     // Check if reads failed and exit early (to try again).
-    if (isnan(BmeTempC) || isnan(BmeTempF) || isnan(BmeHum) || isnan(BmePa) || isnan(BmeAltiM) || isnan(BmeAltiFt)) {
+    if (isnan(BmeTempC) || isnan(BmeHum) || isnan(BmePa) || isnan(BmeAltiM)
+#if !OMG_BME280_METRIC_UNITS_ONLY
+        || isnan(BmeTempF) || isnan(BmeAltiFt)
+#endif
+        ) {
       Logger.error(OMG_LOGID, F("Failed to read from BME280/BMP280!" CR));
     } else {
       Logger.debug(OMG_LOGID, F("Creating BME280/BMP280 buffer" CR));
       StaticJsonDocument<JSON_MSG_BUFFER> BME280dataBuffer;
       JsonObject BME280data = BME280dataBuffer.to<JsonObject>();
       // Generate Temperature in degrees C
-      if (BmeTempC != persisted_bme_tempc || bme280_always) {
-        BME280data["tempc"] = (float)BmeTempC;
+      if (BmeTempC != persisted_bme_tempc || OMG_BME280_ALWAYS_SEND) {
+        BME280data["temperature_c"] = (float)BmeTempC;
       } else {
         Logger.debug(OMG_LOGID, F("Same Degrees C don't send it" CR));
       }
 
-      // Generate Temperature in degrees F
-      if (BmeTempF != persisted_bme_tempf || bme280_always) {
-        BME280data["tempf"] = (float)BmeTempF;
-      } else {
-        Logger.debug(OMG_LOGID, F("Same Degrees F don't send it" CR));
-      }
-
       // Generate Humidity in percent
-      if (BmeHum != persisted_bme_hum || bme280_always) {
-        BME280data["hum"] = (float)BmeHum;
+      if (BmeHum != persisted_bme_hum || OMG_BME280_ALWAYS_SEND) {
+        BME280data["humidity_pct"] = (float)BmeHum;
       } else {
         Logger.debug(OMG_LOGID, F("Same Humidity don't send it" CR));
       }
 
       // Generate Pressure in Pa
-      if (BmePa != persisted_bme_pa || bme280_always) {
-        BME280data["pa"] = (float)BmePa;
+      if (BmePa != persisted_bme_pa || OMG_BME280_ALWAYS_SEND) {
+        BME280data["pressure_pa"] = (float)BmePa;
       } else {
         Logger.debug(OMG_LOGID, F("Same Pressure don't send it" CR));
       }
 
       // Generate Altitude in Meter
-      if (BmeAltiM != persisted_bme_altim || bme280_always) {
+      if (BmeAltiM != persisted_bme_altim || OMG_BME280_ALWAYS_SEND) {
         Logger.debug(OMG_LOGID, F("Sending Altitude Meter to MQTT" CR));
-        BME280data["altim"] = (float)BmeAltiM;
+        BME280data["altitude_m"] = (float)BmeAltiM;
       } else {
         Logger.debug(OMG_LOGID, F("Same Altitude Meter don't send it" CR));
       }
 
+#if !OMG_BME280_METRIC_UNITS_ONLY
+      // Generate Temperature in degrees F
+      if (BmeTempF != persisted_bme_tempf || OMG_BME280_ALWAYS_SEND) {
+        BME280data["temperature_f"] = (float)BmeTempF;
+      } else {
+        Logger.debug(OMG_LOGID, F("Same Degrees F don't send it" CR));
+      }
+
       // Generate Altitude in Feet
-      if (BmeAltiFt != persisted_bme_altift || bme280_always) {
-        BME280data["altift"] = (float)BmeAltiFt;
+      if (BmeAltiFt != persisted_bme_altift || OMG_BME280_ALWAYS_SEND) {
+        BME280data["altitude_ft"] = (float)BmeAltiFt;
       } else {
         Logger.debug(OMG_LOGID, F("Same Altitude Feet don't send it" CR));
       }
-      BME280data["origin"] = BMETOPIC;
+#endif
+
+      BME280data["origin"] = OMG_MQTT_BME_TOPIC;
       enqueueJsonObject(BME280data);
     }
 
     persisted_bme_tempc = BmeTempC;
-    persisted_bme_tempf = BmeTempF;
     persisted_bme_hum = BmeHum;
     persisted_bme_pa = BmePa;
     persisted_bme_altim = BmeAltiM;
+#if !OMG_BME280_METRIC_UNITS_ONLY
+    persisted_bme_tempf = BmeTempF;
     persisted_bme_altift = BmeAltiFt;
+#endif
   }
 }
 
