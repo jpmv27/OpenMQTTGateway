@@ -62,6 +62,10 @@ unsigned long timer_sys_measures = 0;
 // Time used to wait before system checkings
 unsigned long timer_sys_checks = 0;
 
+// Used to measure loop time
+unsigned long g_last_loop_time = 0UL;
+unsigned long g_max_loop_time = 0UL;
+
 // First Start of offline mode modules
 bool firstStart = true;
 
@@ -1610,6 +1614,8 @@ void setup() {
   serializeJson(modules, jsonChar, measureJson(modules) + 1);
   Logger.notice(OMG_LOGID, F("OpenMQTTGateway modules: %s" CR), jsonChar);
   Logger.notice(OMG_LOGID, F("************** Setup OpenMQTTGateway end **************" CR));
+
+  g_last_loop_time = millis();
 }
 
 // Bypass for ESP not reconnecting automaticaly the second time https://github.com/espressif/arduino-esp32/issues/2501
@@ -2497,6 +2503,13 @@ void sleep() {}
 #endif
 
 void loop() {
+  unsigned long const now = millis();
+  unsigned long const loop_time = now - g_last_loop_time;
+  if (loop_time > g_max_loop_time) {
+    g_max_loop_time = loop_time;
+  }
+  g_last_loop_time = now;
+
 #ifndef OMG_ESP_WIFI_MANUAL_SETUP
   checkButton(); // check if a reset of wifi/mqtt settings is asked
 #endif
@@ -2525,7 +2538,6 @@ void loop() {
     firstStart = false;
 #endif
   }
-  unsigned long now = millis();
 
 #ifdef OMG_GATEWAY_SERIAL // Serial is a module and a communication layer so it's always processed
   SERIALtoX();
@@ -2788,6 +2800,9 @@ void erase(bool restart) {
 
 String stateMeasures() {
   StaticJsonDocument<JSON_MSG_BUFFER> SYSdata;
+
+  SYSdata["maxlooptime"] = g_max_loop_time;
+  g_max_loop_time = 0UL;
 
   SYSdata["uptime"] = uptime();
 
