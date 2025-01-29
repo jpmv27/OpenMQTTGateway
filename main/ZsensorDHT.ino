@@ -51,7 +51,7 @@ void MeasureTempAndHum() {
     // Read temperature as Celsius (the default)
     float t = dht.readTemperature();
     // Check if any reads failed and exit early (to try again).
-    if (isnan(h) || isnan(t)) {
+    if (isnan(h) || isnan(t) || h > 100.0) {
       Logger.error(OMG_LOGID, F("Failed to read from DHT sensor!" CR));
     } else {
       Logger.debug(OMG_LOGID, F("Creating DHT buffer" CR));
