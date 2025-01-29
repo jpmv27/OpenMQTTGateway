@@ -47,13 +47,19 @@ void MeasureTempAndHum() {
     timedht = millis();
     static float persistedh;
     static float persistedt;
+    static int consecutive_errors = 0;
     float h = dht.readHumidity();
     // Read temperature as Celsius (the default)
     float t = dht.readTemperature();
     // Check if any reads failed and exit early (to try again).
     if (isnan(h) || isnan(t) || h > 100.0) {
-      Logger.error(OMG_LOGID, F("Failed to read from DHT sensor!" CR));
+
+      if (++consecutive_errors >= OMG_DHT_LOG_AFTER_N_CONSECUTIVE_ERRORS) {
+        Logger.error(OMG_LOGID, F("Failed to read from DHT sensor!" CR));
+        consecutive_errors = 0;
+      }
     } else {
+      consecutive_errors = 0;
       Logger.debug(OMG_LOGID, F("Creating DHT buffer" CR));
       StaticJsonDocument<JSON_MSG_BUFFER> DHTdataBuffer;
       JsonObject DHTdata = DHTdataBuffer.to<JsonObject>();

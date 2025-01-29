@@ -61,4 +61,8 @@ extern void MeasureTempAndHum();
 #  define OMG_DHT_METRIC_UNITS_ONLY false
 #endif
 
+#ifndef OMG_DHT_LOG_AFTER_N_CONSECUTIVE_ERRORS
+#  define OMG_DHT_LOG_AFTER_N_CONSECUTIVE_ERRORS 5
+#endif
+
 #endif // OMG_CONFIG_DHT_H
