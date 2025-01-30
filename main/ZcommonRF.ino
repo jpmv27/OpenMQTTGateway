@@ -53,6 +53,9 @@ void initCC1101() {
 }
 
 void setupCommonRF() {
+#ifdef OMG_GATEWAY_RTL_433
+  rtl_433.initLogging();
+#endif
   RFConfig_init();
   RFConfig_load();
 }

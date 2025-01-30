@@ -1316,7 +1316,7 @@ void setup() {
     Logger.error(OMG_LOGID, F("Invalid syslog configuration, skipping registration" CR));
   }
 #endif
-  Logger.notice(OMG_LOGID, F(CR "************* WELCOME TO OpenMQTTGateway **************" CR));
+  Logger.always(OMG_LOGID, F("************* WELCOME TO OpenMQTTGateway **************" CR));
 #if defined(TRIGGER_GPIO) && !defined(OMG_ESP_WIFI_MANUAL_SETUP)
   pinMode(TRIGGER_GPIO, INPUT_PULLUP);
   checkButton();
@@ -1364,7 +1364,7 @@ void setup() {
 #  endif
 #endif
 
-  Logger.notice(OMG_LOGID, F("OpenMQTTGateway Version: " OMG_VERSION CR));
+  Logger.always(OMG_LOGID, F("OpenMQTTGateway Version: " OMG_VERSION CR));
 
 #ifdef ESP32_EXT0_WAKE_PIN
   Logger.notice(OMG_LOGID, F("Setting EXT0 Wakeup for deep sleep." CR));
@@ -1612,8 +1612,8 @@ void setup() {
   SYSConfig.offline ? Logger.notice(OMG_LOGID, F("Offline enabled" CR)) : Logger.notice(0, F("Offline disabled" CR));
   char jsonChar[100];
   serializeJson(modules, jsonChar, measureJson(modules) + 1);
-  Logger.notice(OMG_LOGID, F("OpenMQTTGateway modules: %s" CR), jsonChar);
-  Logger.notice(OMG_LOGID, F("************** Setup OpenMQTTGateway end **************" CR));
+  Logger.always(OMG_LOGID, F("OpenMQTTGateway modules: %s" CR), jsonChar);
+  Logger.always(OMG_LOGID, F("************** Setup OpenMQTTGateway end **************" CR));
 
   g_last_loop_time = millis();
 }
