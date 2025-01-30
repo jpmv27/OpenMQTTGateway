@@ -357,6 +357,18 @@ extern int getRTLMessageCount() {
   return rtl_433.messageCount;
 }
 
+extern int getAndResetRTLPulseTrainsOverruns() {
+  int ret = rtl_433.pulseTrainsOverruns;
+  rtl_433.pulseTrainsOverruns = 0;
+  return ret;
+}
+
+extern int getAndResetRTL433QueueOverflows() {
+  int ret = rtl_433.rtl433QueueOverflows;
+  rtl_433.rtl433QueueOverflows = 0;
+  return ret;
+}
+
 #  if defined(RF_SX1276) || defined(RF_SX1278)
 extern int getOOKThresh() {
   return rtl_433.OokFixedThreshold;

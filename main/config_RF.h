@@ -65,6 +65,8 @@ extern int getRTLCurrentRSSI();
 extern int getRTLMessageCount();
 extern int getRTLAverageRSSI();
 extern int getOOKThresh();
+extern int getAndResetRTLPulseTrainsOverruns();
+extern int getAndResetRTL433QueueOverflows();
 
 #  ifdef OMG_MQTT_DISCOVERY
 extern void launchRTL_433Discovery(bool overrideDiscovery);
