@@ -43,7 +43,7 @@
 #  include "math.h"
 
 void setupZsensorTEMT6000() {
-  Logger.notice(OMG_LOGID, F("Setup TEMT6000 on pin: %i" CR), TEMT6000LIGHTSENSORPIN);
+  Logger.notice(OMG_LOGID, F("Setup TEMT6000 on pin: %i"), TEMT6000LIGHTSENSORPIN);
   pinMode(TEMT6000LIGHTSENSORPIN, INPUT);
 }
 
@@ -52,7 +52,7 @@ void MeasureLightIntensityTEMT6000() {
     static uint32_t persisted_lux;
     timetemt6000 = millis();
 
-    Logger.debug(OMG_LOGID, F("Creating TEMT6000 buffer" CR));
+    Logger.debug(OMG_LOGID, F("Creating TEMT6000 buffer"));
     StaticJsonDocument<JSON_MSG_BUFFER> TEMT6000dataBuffer;
     JsonObject TEMT6000data = TEMT6000dataBuffer.to<JsonObject>();
 
@@ -70,7 +70,7 @@ void MeasureLightIntensityTEMT6000() {
       TEMT6000data["origin"] = subjectTEMT6000toMQTT;
       enqueueJsonObject(TEMT6000data);
     } else {
-      Logger.debug(OMG_LOGID, F("Same lux value, do not send" CR));
+      Logger.debug(OMG_LOGID, F("Same lux value, do not send"));
     }
   }
 }

@@ -58,7 +58,7 @@ RF2rxd rf2rd;
 #  ifdef OMG_MQTT_DISCOVERY
 //Register for autodiscover in Home Assistant
 void RF2toMQTTdiscovery(JsonObject& data) {
-  Logger.debug(OMG_LOGID, F("switchRF2Discovery" CR));
+  Logger.debug(OMG_LOGID, F("switchRF2Discovery"));
   String payloadonstr;
   String payloadoffstr;
 
@@ -85,7 +85,7 @@ void RF2toMQTTdiscovery(JsonObject& data) {
   // component type,name,availability topic,device class,value template,payload
   // on, payload off, unit of measurement
 
-  Logger.debug(OMG_LOGID, F("CreateDiscoverySwitch: %s" CR), switchRF[1]);
+  Logger.debug(OMG_LOGID, F("CreateDiscoverySwitch: %s"), switchRF[1]);
 
   // As RF2 433Mhz switches do not render their state, no state topic should be
   // provided in the discovery. This will cause the switch to be in optimistic
@@ -107,7 +107,7 @@ void RF2toX() {
     JsonObject RF2data = RF2dataBuffer.to<JsonObject>();
     rf2rd.hasNewData = false;
 
-    Logger.debug(OMG_LOGID, F("Rcv. RF2" CR));
+    Logger.debug(OMG_LOGID, F("Rcv. RF2"));
     RF2data["unit"] = (int)rf2rd.unit;
     RF2data["groupBit"] = (int)rf2rd.groupBit;
     RF2data["period"] = (int)rf2rd.period;
@@ -154,35 +154,35 @@ void XtoRF2(const char* topicOri, const char* datacallback) {
   if (pos != -1) {
     pos = pos + +strlen(RF2codeKey);
     valueCODE = (topic.substring(pos, pos + 8)).toInt();
-    Logger.notice(OMG_LOGID, F("RF2 code: %l" CR), valueCODE);
+    Logger.notice(OMG_LOGID, F("RF2 code: %l"), valueCODE);
   }
   int pos2 = topic.lastIndexOf(RF2periodKey);
   if (pos2 != -1) {
     pos2 = pos2 + strlen(RF2periodKey);
     valuePERIOD = (topic.substring(pos2, pos2 + 3)).toInt();
-    Logger.notice(OMG_LOGID, F("RF2 Period: %d" CR), valuePERIOD);
+    Logger.notice(OMG_LOGID, F("RF2 Period: %d"), valuePERIOD);
   }
   int pos3 = topic.lastIndexOf(RF2unitKey);
   if (pos3 != -1) {
     pos3 = pos3 + strlen(RF2unitKey);
     valueUNIT = (topic.substring(pos3, topic.indexOf("/", pos3))).toInt();
-    Logger.notice(OMG_LOGID, F("Unit: %d" CR), valueUNIT);
+    Logger.notice(OMG_LOGID, F("Unit: %d"), valueUNIT);
   }
   int pos4 = topic.lastIndexOf(RF2groupKey);
   if (pos4 != -1) {
     pos4 = pos4 + strlen(RF2groupKey);
     valueGROUP = (topic.substring(pos4, pos4 + 1)).toInt();
-    Logger.notice(OMG_LOGID, F("RF2 Group: %d" CR), valueGROUP);
+    Logger.notice(OMG_LOGID, F("RF2 Group: %d"), valueGROUP);
   }
   int pos5 = topic.lastIndexOf(RF2dimKey);
   if (pos5 != -1) {
     isDimCommand = true;
     valueDIM = atoi(datacallback);
-    Logger.notice(OMG_LOGID, F("RF2 Dim: %d" CR), valueDIM);
+    Logger.notice(OMG_LOGID, F("RF2 Dim: %d"), valueDIM);
   }
 
   if ((topic == subjectMQTTtoRF2) || (valueCODE != 0) || (valueUNIT != -1) || (valuePERIOD != 0)) {
-    Logger.debug(OMG_LOGID, F("MQTTtoRF2" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoRF2"));
     if (valueCODE == 0)
       valueCODE = 8233378;
     if (valueUNIT == -1)
@@ -190,9 +190,9 @@ void XtoRF2(const char* topicOri, const char* datacallback) {
     if (valuePERIOD == 0)
       valuePERIOD = 272;
     NewRemoteReceiver::disable();
-    Logger.debug(OMG_LOGID, F("Creating transmitter" CR));
+    Logger.debug(OMG_LOGID, F("Creating transmitter"));
     NewRemoteTransmitter transmitter(valueCODE, RF_EMITTER_GPIO, valuePERIOD, RF2_EMITTER_REPEAT);
-    Logger.debug(OMG_LOGID, F("Sending data" CR));
+    Logger.debug(OMG_LOGID, F("Sending data"));
     if (valueGROUP) {
       if (isDimCommand) {
         transmitter.sendGroupDim(valueDIM);
@@ -206,7 +206,7 @@ void XtoRF2(const char* topicOri, const char* datacallback) {
         transmitter.sendUnit(valueUNIT, boolSWITCHTYPE);
       }
     }
-    Logger.debug(OMG_LOGID, F("Data sent" CR));
+    Logger.debug(OMG_LOGID, F("Data sent"));
     NewRemoteReceiver::enable();
 
     // Publish state change back to MQTT
@@ -224,7 +224,7 @@ void XtoRF2(const char* topicOri, const char* datacallback) {
     MQTTswitchType = String(boolSWITCHTYPE);
     MQTTdimLevel = String(valueDIM);
     String MQTTRF2string;
-    Logger.debug(OMG_LOGID, F("Adv data XtoRF2 push state via RF2toMQTT" CR));
+    Logger.debug(OMG_LOGID, F("Adv data XtoRF2 push state via RF2toMQTT"));
     if (isDimCommand) {
       MQTTRF2string = subjectRF2toMQTT + String("/") + RF2codeKey + MQTTAddress + String("/") + RF2unitKey + MQTTunit + String("/") + RF2groupKey + MQTTgroupBit + String("/") + RF2dimKey + String("/") + RF2periodKey + MQTTperiod;
       pub((char*)MQTTRF2string.c_str(), (char*)MQTTdimLevel.c_str());
@@ -244,14 +244,14 @@ void XtoRF2(const char* topicOri, const char* datacallback) {
 void XtoRF2(const char* topicOri, JsonObject& RF2data) { // json object decoding
 
   if (cmpToMainTopic(topicOri, subjectMQTTtoRF2)) {
-    Logger.debug(OMG_LOGID, F("MQTTtoRF2 json" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoRF2 json"));
     int boolSWITCHTYPE = RF2data["switchType"] | 99;
     bool success = false;
     if (boolSWITCHTYPE != 99) {
       NewRemoteReceiver::disable();
       pinMode(RF_EMITTER_GPIO, OUTPUT);
       initCC1101();
-      Logger.debug(OMG_LOGID, F("MQTTtoRF2 switch type ok" CR));
+      Logger.debug(OMG_LOGID, F("MQTTtoRF2 switch type ok"));
       bool isDimCommand = boolSWITCHTYPE == 2;
       unsigned long valueCODE = RF2data["address"];
       int valueUNIT = RF2data["unit"] | -1;
@@ -259,7 +259,7 @@ void XtoRF2(const char* topicOri, JsonObject& RF2data) { // json object decoding
       int valueGROUP = RF2data["group"];
       int valueDIM = RF2data["dim"] | -1;
       if ((valueCODE != 0) || (valueUNIT != -1) || (valuePERIOD != 0)) {
-        Logger.debug(OMG_LOGID, F("MQTTtoRF2" CR));
+        Logger.debug(OMG_LOGID, F("MQTTtoRF2"));
         if (valueCODE == 0)
           valueCODE = 8233378;
         if (valueUNIT == -1)
@@ -268,7 +268,7 @@ void XtoRF2(const char* topicOri, JsonObject& RF2data) { // json object decoding
           valuePERIOD = 272;
         NewRemoteReceiver::disable();
         NewRemoteTransmitter transmitter(valueCODE, RF_EMITTER_GPIO, valuePERIOD, RF2_EMITTER_REPEAT);
-        Logger.debug(OMG_LOGID, F("Sending" CR));
+        Logger.debug(OMG_LOGID, F("Sending"));
         if (valueGROUP) {
           if (isDimCommand) {
             transmitter.sendGroupDim(valueDIM);
@@ -282,7 +282,7 @@ void XtoRF2(const char* topicOri, JsonObject& RF2data) { // json object decoding
             transmitter.sendUnit(valueUNIT, boolSWITCHTYPE);
           }
         }
-        Logger.notice(OMG_LOGID, F("MQTTtoRF2 OK" CR));
+        Logger.notice(OMG_LOGID, F("MQTTtoRF2 OK"));
         NewRemoteReceiver::enable();
 
         success = true;
@@ -294,7 +294,7 @@ void XtoRF2(const char* topicOri, JsonObject& RF2data) { // json object decoding
       enqueueJsonObject(RF2data);
     } else {
       pub(subjectGTWRF2toMQTT, "{\"Status\": \"Error\"}"); // Fail feedback
-      Logger.error(OMG_LOGID, F("MQTTtoRF2 failed json read" CR));
+      Logger.error(OMG_LOGID, F("MQTTtoRF2 failed json read"));
     }
     enableActiveReceiver();
   }
@@ -302,20 +302,20 @@ void XtoRF2(const char* topicOri, JsonObject& RF2data) { // json object decoding
 #  endif
 
 void disableRF2Receive() {
-  Logger.debug(OMG_LOGID, F("disableRF2Receive" CR));
+  Logger.debug(OMG_LOGID, F("disableRF2Receive"));
   NewRemoteReceiver::disable();
 }
 
 void enableRF2Receive() {
-  Logger.debug(OMG_LOGID, F("enableRF2Receive" CR));
+  Logger.debug(OMG_LOGID, F("enableRF2Receive"));
   NewRemoteReceiver::init(RF_RECEIVER_GPIO, 2, rf2Callback);
 
-  Logger.notice(OMG_LOGID, F("RF_EMITTER_GPIO: %d " CR), RF_EMITTER_GPIO);
-  Logger.notice(OMG_LOGID, F("RF_RECEIVER_GPIO: %d " CR), RF_RECEIVER_GPIO);
-  Logger.debug(OMG_LOGID, F("ZgatewayRF2 command topic: %s%s%s" CR), mqtt_topic, g_gateway_name, subjectMQTTtoRF2);
+  Logger.notice(OMG_LOGID, F("RF_EMITTER_GPIO: %d "), RF_EMITTER_GPIO);
+  Logger.notice(OMG_LOGID, F("RF_RECEIVER_GPIO: %d "), RF_RECEIVER_GPIO);
+  Logger.debug(OMG_LOGID, F("ZgatewayRF2 command topic: %s%s%s"), mqtt_topic, g_gateway_name, subjectMQTTtoRF2);
   pinMode(RF_EMITTER_GPIO, OUTPUT);
   digitalWrite(RF_EMITTER_GPIO, LOW);
-  Logger.debug(OMG_LOGID, F("ZgatewayRF2 setup done " CR));
+  Logger.debug(OMG_LOGID, F("ZgatewayRF2 setup done "));
 }
 
 #endif

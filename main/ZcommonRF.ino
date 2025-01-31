@@ -37,12 +37,12 @@ void initCC1101() {
   int delayMaxMS = 500;
   for (int i = 0; i < 10; i++) {
     if (ELECHOUSE_cc1101.getCC1101()) {
-      Logger.notice(OMG_LOGID, F("C1101 spi Connection OK" CR));
+      Logger.notice(OMG_LOGID, F("C1101 spi Connection OK"));
       ELECHOUSE_cc1101.Init();
       ELECHOUSE_cc1101.SetRx(RFConfig.frequency);
       break;
     } else {
-      Logger.error(OMG_LOGID, F("C1101 spi Connection Error" CR));
+      Logger.error(OMG_LOGID, F("C1101 spi Connection Error"));
       delay(delayMS);
     }
     // truncated exponential backoff
@@ -94,14 +94,14 @@ bool validReceiver(int receiver) {
       return true;
 #    endif
     default:
-      Logger.error(OMG_LOGID, F("ERROR: stored receiver %d not available" CR), receiver);
+      Logger.error(OMG_LOGID, F("ERROR: stored receiver %d not available"), receiver);
   }
   return false;
 }
 #  endif
 
 void disableCurrentReceiver() {
-  Logger.debug(OMG_LOGID, F("disableCurrentReceiver: %d" CR), currentReceiver);
+  Logger.debug(OMG_LOGID, F("disableCurrentReceiver: %d"), currentReceiver);
   switch (currentReceiver) {
     case ACTIVE_NONE:
       break;
@@ -126,12 +126,12 @@ void disableCurrentReceiver() {
       break;
 #  endif
     default:
-      Logger.error(OMG_LOGID, F("ERROR: unsupported receiver %d" CR), RFConfig.activeReceiver);
+      Logger.error(OMG_LOGID, F("ERROR: unsupported receiver %d"), RFConfig.activeReceiver);
   }
 }
 
 void enableActiveReceiver() {
-  Logger.debug(OMG_LOGID, F("enableActiveReceiver: %d" CR), RFConfig.activeReceiver);
+  Logger.debug(OMG_LOGID, F("enableActiveReceiver: %d"), RFConfig.activeReceiver);
   switch (RFConfig.activeReceiver) {
 #  ifdef OMG_GATEWAY_PILIGHT
     case ACTIVE_PILIGHT:
@@ -162,10 +162,10 @@ void enableActiveReceiver() {
       break;
 #  endif
     case ACTIVE_RECERROR:
-      Logger.error(OMG_LOGID, F("ERROR: no receiver selected" CR));
+      Logger.error(OMG_LOGID, F("ERROR: no receiver selected"));
       break;
     default:
-      Logger.error(OMG_LOGID, F("ERROR: unsupported receiver %d" CR), RFConfig.activeReceiver);
+      Logger.error(OMG_LOGID, F("ERROR: unsupported receiver %d"), RFConfig.activeReceiver);
   }
 }
 
@@ -206,17 +206,17 @@ void RFConfig_fromJson(JsonObject& RFdata) {
   bool success = false;
   if (RFdata.containsKey("frequency") && validFrequency(RFdata["frequency"])) {
     Config_update(RFdata, "frequency", RFConfig.frequency);
-    Logger.notice(OMG_LOGID, F("RF Receive mhz: %F" CR), RFConfig.frequency);
+    Logger.notice(OMG_LOGID, F("RF Receive mhz: %F"), RFConfig.frequency);
     success = true;
   }
   if (RFdata.containsKey("active")) {
-    Logger.notice(OMG_LOGID, F("RF receiver active: %d" CR), RFConfig.activeReceiver);
+    Logger.notice(OMG_LOGID, F("RF receiver active: %d"), RFConfig.activeReceiver);
     Config_update(RFdata, "active", RFConfig.activeReceiver);
     success = true;
   }
 #  ifdef OMG_GATEWAY_RTL_433
   if (RFdata.containsKey("rssithreshold")) {
-    Logger.notice(OMG_LOGID, F("RTL_433 RSSI Threshold : %d " CR), RFConfig.rssiThreshold);
+    Logger.notice(OMG_LOGID, F("RTL_433 RSSI Threshold : %d "), RFConfig.rssiThreshold);
     Config_update(RFdata, "rssithreshold", RFConfig.rssiThreshold);
     rtl_433.setRSSIThreshold(RFConfig.rssiThreshold);
     success = true;
@@ -224,18 +224,18 @@ void RFConfig_fromJson(JsonObject& RFdata) {
 #    if defined(RF_SX1276) || defined(RF_SX1278)
   if (RFdata.containsKey("ookthreshold")) {
     Config_update(RFdata, "ookthreshold", RFConfig.newOokThreshold);
-    Logger.notice(OMG_LOGID, F("RTL_433 ookThreshold %d" CR), RFConfig.newOokThreshold);
+    Logger.notice(OMG_LOGID, F("RTL_433 ookThreshold %d"), RFConfig.newOokThreshold);
     rtl_433.setOOKThreshold(RFConfig.newOokThreshold);
     success = true;
   }
 #    endif
   if (RFdata.containsKey("status")) {
-    Logger.notice(OMG_LOGID, F("RF get status:" CR));
+    Logger.notice(OMG_LOGID, F("RF get status:"));
     rtl_433.getStatus();
     success = true;
   }
   if (!success) {
-    Logger.error(OMG_LOGID, F("MQTTtoRF Fail json" CR));
+    Logger.error(OMG_LOGID, F("MQTTtoRF Fail json"));
   }
 #  endif
   disableCurrentReceiver();
@@ -246,11 +246,11 @@ void RFConfig_fromJson(JsonObject& RFdata) {
     preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
     if (preferences.isKey("RFConfig")) {
       int result = preferences.remove("RFConfig");
-      Logger.notice(OMG_LOGID, F("RF config erase result: %d" CR), result);
+      Logger.notice(OMG_LOGID, F("RF config erase result: %d"), result);
       preferences.end();
       return; // Erase prevails on save, so skipping save
     } else {
-      Logger.notice(OMG_LOGID, F("RF config not found" CR));
+      Logger.notice(OMG_LOGID, F("RF config not found"));
       preferences.end();
     }
   }
@@ -270,7 +270,7 @@ void RFConfig_fromJson(JsonObject& RFdata) {
     preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
     int result = preferences.putString("RFConfig", conf);
     preferences.end();
-    Logger.notice(OMG_LOGID, F("RF Config_save: %s, result: %d" CR), conf.c_str(), result);
+    Logger.notice(OMG_LOGID, F("RF Config_save: %s, result: %d"), conf.c_str(), result);
   }
 #  endif
 }
@@ -290,19 +290,19 @@ void RFConfig_load() {
     auto error = deserializeJson(jsonBuffer, preferences.getString("RFConfig", "{}"));
     preferences.end();
     if (error) {
-      Logger.error(OMG_LOGID, F("RF Config deserialization failed: %s, buffer capacity: %u" CR), error.c_str(), jsonBuffer.capacity());
+      Logger.error(OMG_LOGID, F("RF Config deserialization failed: %s, buffer capacity: %u"), error.c_str(), jsonBuffer.capacity());
       return;
     }
     if (jsonBuffer.isNull()) {
-      Logger.warning(OMG_LOGID, F("RF Config is null" CR));
+      Logger.warning(OMG_LOGID, F("RF Config is null"));
       return;
     }
     JsonObject jo = jsonBuffer.as<JsonObject>();
     RFConfig_fromJson(jo);
-    Logger.notice(OMG_LOGID, F("RF Config loaded" CR));
+    Logger.notice(OMG_LOGID, F("RF Config loaded"));
   } else {
     preferences.end();
-    Logger.notice(OMG_LOGID, F("RF Config not found using default" CR));
+    Logger.notice(OMG_LOGID, F("RF Config not found using default"));
     enableActiveReceiver();
   }
 #  else
@@ -312,7 +312,7 @@ void RFConfig_load() {
 
 void XtoRFset(const char* topicOri, JsonObject& RFdata) {
   if (cmpToMainTopic(topicOri, subjectMQTTtoRFset)) {
-    Logger.debug(OMG_LOGID, F("MQTTtoRF json set" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoRF json set"));
 
     /*
      * Configuration modifications priorities:

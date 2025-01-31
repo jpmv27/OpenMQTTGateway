@@ -375,9 +375,9 @@ void Config_update(JsonObject& data, const char* key, T& var) {
   if (data.containsKey(key)) {
     if (var != data[key].as<T>()) {
       var = data[key].as<T>();
-      Logger.notice(OMG_LOGID, F("Config %s changed to: %T" CR), key, data[key].as<T>());
+      Logger.notice(OMG_LOGID, F("Config %s changed to: %T"), key, data[key].as<T>());
     } else {
-      Logger.notice(OMG_LOGID, F("Config %s unchanged, currently: %T" CR), key, data[key].as<T>());
+      Logger.notice(OMG_LOGID, F("Config %s unchanged, currently: %T"), key, data[key].as<T>());
     }
   }
 }
@@ -416,7 +416,7 @@ bool jsonDispatch(JsonObject& data) {
 #endif
     gatewayState = previousGatewayState; // restore the previous state
   } else {
-    Logger.error(OMG_LOGID, F("No origin or topic in JSON filtered" CR));
+    Logger.error(OMG_LOGID, F("No origin or topic in JSON filtered"));
     gatewayState = GatewayState::ERROR;
   }
   return res;
@@ -426,22 +426,22 @@ bool jsonDispatch(JsonObject& data) {
 boolean enqueueJsonObject(const StaticJsonDocument<JSON_MSG_BUFFER>& jsonDoc, int timeout) {
   receivedMessages++;
   if (jsonDoc.size() == 0) {
-    Logger.error(OMG_LOGID, F("Empty JSON, skipping" CR));
+    Logger.error(OMG_LOGID, F("Empty JSON, skipping"));
     gatewayState = GatewayState::ERROR;
     return true;
   }
   if (queueLength >= QueueSize) {
-    Logger.warning(OMG_LOGID, F("%d Doc(s) in queue, doc blocked" CR), queueLength);
+    Logger.warning(OMG_LOGID, F("%d Doc(s) in queue, doc blocked"), queueLength);
     blockedMessages++;
     return false;
   }
-  Logger.debug(OMG_LOGID, F("Enqueue JSON" CR));
+  Logger.debug(OMG_LOGID, F("Enqueue JSON"));
   std::string jsonString;
   serializeJson(jsonDoc, jsonString);
 #ifdef ESP32
   // Semaphore check before enqueueing a document
   if (xSemaphoreTake(xQueueMutex, pdMS_TO_TICKS(timeout)) == pdFALSE) {
-    Logger.error(OMG_LOGID, F("xQueueMutex not taken" CR));
+    Logger.error(OMG_LOGID, F("xQueueMutex not taken"));
     gatewayState = GatewayState::ERROR;
     blockedMessages++;
     return false;
@@ -451,7 +451,7 @@ boolean enqueueJsonObject(const StaticJsonDocument<JSON_MSG_BUFFER>& jsonDoc, in
 #ifdef ESP32
   xSemaphoreGive(xQueueMutex);
 #endif
-  Logger.debug(OMG_LOGID, F("Queue length: %d" CR), jsonQueue.size());
+  Logger.debug(OMG_LOGID, F("Queue length: %d"), jsonQueue.size());
   return true;
 }
 
@@ -486,7 +486,7 @@ std::string generateHash(const std::string& input) {
 */
 void buildTopicFromId(JsonObject& Jsondata, const char* origin) {
   if (!Jsondata.containsKey("id")) {
-    Logger.error(OMG_LOGID, F("No id in Jsondata" CR));
+    Logger.error(OMG_LOGID, F("No id in Jsondata"));
     gatewayState = GatewayState::ERROR;
     return;
   }
@@ -504,7 +504,7 @@ void buildTopicFromId(JsonObject& Jsondata, const char* origin) {
     if (Jsondata.containsKey("uuid")) {
       topic = Jsondata["uuid"].as<std::string>();
     } else {
-      Logger.error(OMG_LOGID, F("No uuid in Jsondata" CR));
+      Logger.error(OMG_LOGID, F("No uuid in Jsondata"));
       gatewayState = GatewayState::ERROR;
     }
   }
@@ -517,7 +517,7 @@ void buildTopicFromId(JsonObject& Jsondata, const char* origin) {
 
   Jsondata["origin"] = topic;
 
-  Logger.debug(OMG_LOGID, F("Origin: %s" CR), Jsondata["origin"].as<const char*>());
+  Logger.debug(OMG_LOGID, F("Origin: %s"), Jsondata["origin"].as<const char*>());
 }
 
 // Empty the documents queue
@@ -529,12 +529,12 @@ void emptyQueue() {
   if (queueLength == 0) {
     return;
   }
-  Logger.debug(OMG_LOGID, F("Dequeue JSON" CR));
+  Logger.debug(OMG_LOGID, F("Dequeue JSON"));
   DynamicJsonDocument jsonBuffer(JSON_MSG_BUFFER);
   JsonObject obj = jsonBuffer.to<JsonObject>();
 #ifdef ESP32
   if (xSemaphoreTake(xQueueMutex, pdMS_TO_TICKS(QueueSemaphoreTimeOutTask)) == pdFALSE) {
-    Logger.error(OMG_LOGID, F("xQueueMutex not taken" CR));
+    Logger.error(OMG_LOGID, F("xQueueMutex not taken"));
     gatewayState = GatewayState::ERROR;
     return;
   }
@@ -545,7 +545,7 @@ void emptyQueue() {
   xSemaphoreGive(xQueueMutex);
 #endif
   if (error) {
-    Logger.error(OMG_LOGID, F("deserialize jsonQueue.front() failed: %s, buffer capacity: %u" CR), error.c_str(), jsonBuffer.capacity());
+    Logger.error(OMG_LOGID, F("deserialize jsonQueue.front() failed: %s, buffer capacity: %u"), error.c_str(), jsonBuffer.capacity());
     gatewayState = GatewayState::ERROR;
   } else {
     if (jsonDispatch(obj))
@@ -579,7 +579,7 @@ bool pub(JsonObject& data) {
     data.remove("retain");
   }
   if (data.size() == 0) {
-    Logger.error(OMG_LOGID, F("Empty JSON, not published" CR));
+    Logger.error(OMG_LOGID, F("Empty JSON, not published"));
     gatewayState = GatewayState::ERROR;
     return res;
   }
@@ -591,7 +591,7 @@ bool pub(JsonObject& data) {
     topic = data["topic"].as<const char*>();
     data.remove("topic");
   } else {
-    Logger.error(OMG_LOGID, F("No topic or origin in JSON, not published" CR));
+    Logger.error(OMG_LOGID, F("No topic or origin in JSON, not published"));
     gatewayState = GatewayState::ERROR;
     return res;
   }
@@ -618,7 +618,7 @@ bool pub(JsonObject& data) {
 #endif
 
 #if OMG_MQTT_SIMPLE_PUBLISHING
-  Logger.debug(OMG_LOGID, F("simplePub - ON" CR));
+  Logger.debug(OMG_LOGID, F("simplePub - ON"));
   // Loop through all the key-value pairs in obj
   for (JsonPair p : data) {
 #  if defined(ESP8266)
@@ -675,22 +675,22 @@ bool pubMQTT(const char* topic, const char* payload, bool retainFlag) {
   if (SYSConfig.mqtt && !SYSConfig.offline) {
 #ifdef ESP32
     if (xSemaphoreTake(xMqttMutex, pdMS_TO_TICKS(QueueSemaphoreTimeOutTask)) == pdFALSE) {
-      Logger.error(OMG_LOGID, F("xMqttMutex not taken" CR));
+      Logger.error(OMG_LOGID, F("xMqttMutex not taken"));
       gatewayState = GatewayState::ERROR;
       return res;
     }
 #endif
     if (mqtt && mqtt->connected()) {
-      Logger.notice(OMG_LOGID, F("[ OMG->MQTT ] topic: %s msg: %s " CR), topic, payload);
+      Logger.notice(OMG_LOGID, F("[ OMG->MQTT ] topic: %s msg: %s "), topic, payload);
       res = mqtt->publish(topic, payload, 0, retainFlag);
     } else {
-      Logger.warning(OMG_LOGID, F("MQTT not connected, aborting the publication" CR));
+      Logger.warning(OMG_LOGID, F("MQTT not connected, aborting the publication"));
     }
 #ifdef ESP32
     xSemaphoreGive(xMqttMutex);
 #endif
   } else {
-    Logger.notice(OMG_LOGID, F("[ OMG->MQTT deactivated or offline] topic: %s msg: %s " CR), topic, payload);
+    Logger.notice(OMG_LOGID, F("[ OMG->MQTT deactivated or offline] topic: %s msg: %s "), topic, payload);
   }
   return res;
 }
@@ -847,7 +847,7 @@ void SYSConfig_save() {
   preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
   int result = preferences.putString("SYSConfig", conf);
   preferences.end();
-  Logger.notice(OMG_LOGID, F("SYS Config_save: %s, result: %d" CR), conf.c_str(), result);
+  Logger.notice(OMG_LOGID, F("SYS Config_save: %s, result: %d"), conf.c_str(), result);
 }
 #else // Function not available for ESP8266
 void SYSConfig_save() {}
@@ -879,20 +879,20 @@ void SYSConfig_load() {
     auto error = deserializeJson(jsonBuffer, preferences.getString("SYSConfig", "{}"));
     preferences.end();
     if (error) {
-      Logger.error(OMG_LOGID, F("SYS config deserialization failed: %s, buffer capacity: %u" CR), error.c_str(), jsonBuffer.capacity());
+      Logger.error(OMG_LOGID, F("SYS config deserialization failed: %s, buffer capacity: %u"), error.c_str(), jsonBuffer.capacity());
       gatewayState = GatewayState::ERROR;
       return;
     }
     if (jsonBuffer.isNull()) {
-      Logger.warning(OMG_LOGID, F("SYS config is null" CR));
+      Logger.warning(OMG_LOGID, F("SYS config is null"));
       return;
     }
     JsonObject jo = jsonBuffer.as<JsonObject>();
     SYSConfig_fromJson(jo);
-    Logger.notice(OMG_LOGID, F("SYS config loaded" CR));
+    Logger.notice(OMG_LOGID, F("SYS config loaded"));
   } else {
     preferences.end();
-    Logger.notice(OMG_LOGID, F("SYS config not found" CR));
+    Logger.notice(OMG_LOGID, F("SYS config not found"));
   }
 }
 #else // Function not available for ESP8266
@@ -901,21 +901,21 @@ void SYSConfig_load() {}
 
 #if defined(OMG_MDNS_SD)
 std::pair<String, uint16_t> discoverMQTTbroker() {
-  Logger.debug(OMG_LOGID, F("Browsing for MQTT service" CR));
+  Logger.debug(OMG_LOGID, F("Browsing for MQTT service"));
   int n = MDNS.queryService("mqtt", "tcp");
   if (n == 0) {
-    Logger.warning(OMG_LOGID, F("no services found" CR));
+    Logger.warning(OMG_LOGID, F("no services found"));
   } else {
-    Logger.debug(OMG_LOGID, F("%d service(s) found" CR), n);
+    Logger.debug(OMG_LOGID, F("%d service(s) found"), n);
     for (int i = 0; i < n; ++i) {
-      Logger.debug(OMG_LOGID, F("Service %d %s found" CR), i, MDNS.hostname(i).c_str());
-      Logger.debug(OMG_LOGID, F("IP %s Port %d" CR), MDNS.IP(i).toString().c_str(), MDNS.port(i));
+      Logger.debug(OMG_LOGID, F("Service %d %s found"), i, MDNS.hostname(i).c_str());
+      Logger.debug(OMG_LOGID, F("IP %s Port %d"), MDNS.IP(i).toString().c_str(), MDNS.port(i));
     }
     if (n == 1) {
-      Logger.debug(OMG_LOGID, F("One MQTT server found setting parameters" CR));
+      Logger.debug(OMG_LOGID, F("One MQTT server found setting parameters"));
       return {MDNS.IP(0).toString(), uint16_t(MDNS.port(0))};
     } else {
-      Logger.warning(OMG_LOGID, F("Several MQTT servers found, please deactivate mDNS and set your default server" CR));
+      Logger.warning(OMG_LOGID, F("Several MQTT servers found, please deactivate mDNS and set your default server"));
     }
   }
   return {"", 0};
@@ -924,7 +924,7 @@ std::pair<String, uint16_t> discoverMQTTbroker() {
 
 #if OMG_MQTT_BROKER_MODE
 void setupMQTT() {
-  Logger.notice(OMG_LOGID, F("Reconfiguring MQTT broker..." CR));
+  Logger.notice(OMG_LOGID, F("Reconfiguring MQTT broker..."));
 
   mqtt.reset(new MQTTServer());
   mqtt->begin();
@@ -940,7 +940,7 @@ struct ss_cnt_parameters_backup {
 static std::unique_ptr<ss_cnt_parameters_backup> cnt_parameters_backup;
 
 void setupMQTT() {
-  Logger.notice(OMG_LOGID, F("Reconfiguring MQTT client..." CR));
+  Logger.notice(OMG_LOGID, F("Reconfiguring MQTT client..."));
 
   const auto& parameters = cnt_parameters_array[cnt_index];
 
@@ -962,7 +962,7 @@ void setupMQTT() {
   }
 
 #  if defined(OMG_MDNS_SD)
-  Logger.debug(OMG_LOGID, F("Connecting to MQTT by mDNS without MQTT hostname" CR));
+  Logger.debug(OMG_LOGID, F("Connecting to MQTT by mDNS without MQTT hostname"));
   const auto discovered_broker = discoverMQTTbroker();
   const auto broker_host = discovered_broker.first.c_str();
   const auto broker_port = discovered_broker.second;
@@ -971,8 +971,8 @@ void setupMQTT() {
   const auto broker_port = String(parameters.mqtt_port).toInt();
 #  endif
 
-  Logger.debug(OMG_LOGID, F("Mqtt server: %s" CR), broker_host);
-  Logger.debug(OMG_LOGID, F("Port: %u" CR), broker_port);
+  Logger.debug(OMG_LOGID, F("Mqtt server: %s"), broker_host);
+  Logger.debug(OMG_LOGID, F("Port: %u"), broker_port);
 
   mqtt.reset(new PicoMQTT::Client(*eClient, broker_host, broker_port, g_gateway_name,
                                   parameters.mqtt_user, parameters.mqtt_pass,
@@ -1011,10 +1011,10 @@ void setupMQTT() {
         start_reconnection_window_millis = current_millis;
       }
       reconnection_count++; // Increment reconnection count
-      Logger.debug(OMG_LOGID, F("MQTT connection count: %d" CR), reconnection_count);
+      Logger.debug(OMG_LOGID, F("MQTT connection count: %d"), reconnection_count);
       if (reconnection_count > reconnection_threshold && SYSConfig.mqtt) {
         // Detected instability in MQTT connection
-        Logger.warning(OMG_LOGID, F("MQTT connection instability detected: %d reconnections in the last %d seconds" CR), reconnection_count, reconnection_window_millis / 1000);
+        Logger.warning(OMG_LOGID, F("MQTT connection instability detected: %d reconnections in the last %d seconds"), reconnection_count, reconnection_window_millis / 1000);
         // Stop xtoMQTT to see if it helps and still enables to receive data
         SYSConfig.mqtt = false;
       }
@@ -1025,7 +1025,7 @@ void setupMQTT() {
 #  endif
     ProcessLock = false; // Release the loop process
     displayPrint("MQTT connected");
-    Logger.notice(OMG_LOGID, F("Connected to broker" CR));
+    Logger.notice(OMG_LOGID, F("Connected to broker"));
     gatewayState = GatewayState::BROKER_CONNECTED;
     failure_number_mqtt = 0;
     // Once connected, publish an announcement...
@@ -1033,7 +1033,7 @@ void setupMQTT() {
 
     if (cnt_parameters_backup) {
       // this was the first attempt to connect to a new server and it succeeded
-      Logger.notice(OMG_LOGID, F("MQTT connection parameters %d successful" CR), cnt_index);
+      Logger.notice(OMG_LOGID, F("MQTT connection parameters %d successful"), cnt_index);
       cnt_parameters_array[cnt_index].validConnection = true;
       readCntParameters(cnt_index);
 
@@ -1055,22 +1055,22 @@ void setupMQTT() {
     }
     failure_number_mqtt++; // we count the failure
     gatewayState = GatewayState::BROKER_DISCONNECTED;
-    Logger.warning(OMG_LOGID, F("failure_number_mqtt: %d" CR), failure_number_mqtt);
+    Logger.warning(OMG_LOGID, F("failure_number_mqtt: %d"), failure_number_mqtt);
 
     const auto& parameters = cnt_parameters_array[cnt_index];
 
     if (parameters.isConnectionSecure) {
       WiFiClientSecure* client = static_cast<WiFiClientSecure*>(eClient.get());
 #  if defined(ESP32)
-      Logger.warning(OMG_LOGID, F("failed, ssl error code=%d" CR), client->lastError(nullptr, 0));
+      Logger.warning(OMG_LOGID, F("failed, ssl error code=%d"), client->lastError(nullptr, 0));
 #  elif defined(ESP8266)
-      Logger.warning(OMG_LOGID, F("failed, ssl error code=%d" CR), client->getLastSSLError());
+      Logger.warning(OMG_LOGID, F("failed, ssl error code=%d"), client->getLastSSLError());
 #  endif
     }
 
     if (cnt_parameters_backup) {
       // this was the first attempt to connect to a new server and it failed, revert to old settings
-      Logger.error(OMG_LOGID, F("MQTT connection failed, reverting to previous settings" CR));
+      Logger.error(OMG_LOGID, F("MQTT connection failed, reverting to previous settings"));
       gatewayState = GatewayState::ERROR;
       cnt_parameters_array[cnt_index] = cnt_parameters_backup->parameters;
       cnt_index = cnt_parameters_backup->cnt_index;
@@ -1091,11 +1091,11 @@ void setupMQTT() {
           cnt_index = 0;
         }
         if (cnt_parameters_array[cnt_index].validConnection) {
-          Logger.notice(OMG_LOGID, F("Connection %d valid, switching" CR), cnt_index);
+          Logger.notice(OMG_LOGID, F("Connection %d valid, switching"), cnt_index);
           saveConfig();
           break;
         } else {
-          Logger.notice(OMG_LOGID, F("Connection %d not valid" CR), cnt_index);
+          Logger.notice(OMG_LOGID, F("Connection %d not valid"), cnt_index);
         }
       }
 #  endif
@@ -1109,7 +1109,7 @@ void setupMQTT() {
           && ((millis_since_last_ota = millis() - last_ota_activity_millis) < OMG_OTA_PASSIVE_FW_UPDATE_TIMEOUT_MILLIS)) {
         // ... We consider that OTA might be still active, and we sleep for a while, and giving
         // OTA chance to proceed (ArduinoOTA.handle())
-        Logger.warning(OMG_LOGID, F("OTA might be still active (activity %d ms ago)" CR), millis_since_last_ota);
+        Logger.warning(OMG_LOGID, F("OTA might be still active (activity %d ms ago)"), millis_since_last_ota);
         ArduinoOTA.handle();
         delay(100);
       }
@@ -1141,14 +1141,14 @@ void setESPWifiProtocolTxPower() {
   //https://www.letscontrolit.com/forum/viewtopic.php?t=671&start=20
 #  if WifiGMode == true
   if (esp_wifi_set_protocol(WIFI_IF_STA, WIFI_PROTOCOL_11B | WIFI_PROTOCOL_11G) != ESP_OK) {
-    Logger.error(OMG_LOGID, F("Failed to change WifiMode." CR));
+    Logger.error(OMG_LOGID, F("Failed to change WifiMode."));
     gatewayState = GatewayState::ERROR;
   }
 #  endif
 
 #  if WifiGMode == false
   if (esp_wifi_set_protocol(WIFI_IF_STA, WIFI_PROTOCOL_11B | WIFI_PROTOCOL_11G | WIFI_PROTOCOL_11N) != ESP_OK) {
-    Logger.error(OMG_LOGID, F("Failed to change WifiMode." CR));
+    Logger.error(OMG_LOGID, F("Failed to change WifiMode."));
     gatewayState = GatewayState::ERROR;
   }
 #  endif
@@ -1158,23 +1158,23 @@ void setESPWifiProtocolTxPower() {
   err = esp_wifi_get_protocol(WIFI_IF_STA, &getprotocol);
 
   if (err != ESP_OK) {
-    Logger.notice(OMG_LOGID, F("Could not get protocol!" CR));
+    Logger.notice(OMG_LOGID, F("Could not get protocol!"));
   }
   if (getprotocol & WIFI_PROTOCOL_11N) {
-    Logger.notice(OMG_LOGID, F("WiFi_Protocol_11n" CR));
+    Logger.notice(OMG_LOGID, F("WiFi_Protocol_11n"));
   }
   if (getprotocol & WIFI_PROTOCOL_11G) {
-    Logger.notice(OMG_LOGID, F("WiFi_Protocol_11g" CR));
+    Logger.notice(OMG_LOGID, F("WiFi_Protocol_11g"));
   }
   if (getprotocol & WIFI_PROTOCOL_11B) {
-    Logger.notice(OMG_LOGID, F("WiFi_Protocol_11b" CR));
+    Logger.notice(OMG_LOGID, F("WiFi_Protocol_11b"));
   }
 
 #  ifdef WifiPower
-  Logger.notice(OMG_LOGID, F("Requested WiFi power level: %i" CR), WifiPower);
+  Logger.notice(OMG_LOGID, F("Requested WiFi power level: %i"), WifiPower);
   WiFi.setTxPower(WifiPower);
 #  endif
-  Logger.notice(OMG_LOGID, F("Operating WiFi power level: %i" CR), WiFi.getTxPower());
+  Logger.notice(OMG_LOGID, F("Operating WiFi power level: %i"), WiFi.getTxPower());
 }
 #endif
 
@@ -1182,31 +1182,31 @@ void setESPWifiProtocolTxPower() {
 void setESPWifiProtocolTxPower() {
 #  if WifiGMode == true
   if (!wifi_set_phy_mode(PHY_MODE_11G)) {
-    Logger.error(OMG_LOGID, F("Failed to change WifiMode." CR));
+    Logger.error(OMG_LOGID, F("Failed to change WifiMode."));
     gatewayState = GatewayState::ERROR;
   }
 #  endif
 
 #  if WifiGMode == false
   if (!wifi_set_phy_mode(PHY_MODE_11N)) {
-    Logger.error(OMG_LOGID, F("Failed to change WifiMode." CR));
+    Logger.error(OMG_LOGID, F("Failed to change WifiMode."));
     gatewayState = GatewayState::ERROR;
   }
 #  endif
 
   phy_mode_t getprotocol = wifi_get_phy_mode();
   if (getprotocol == PHY_MODE_11N) {
-    Logger.notice(OMG_LOGID, F("WiFi_Protocol_11n" CR));
+    Logger.notice(OMG_LOGID, F("WiFi_Protocol_11n"));
   }
   if (getprotocol == PHY_MODE_11G) {
-    Logger.notice(OMG_LOGID, F("WiFi_Protocol_11g" CR));
+    Logger.notice(OMG_LOGID, F("WiFi_Protocol_11g"));
   }
   if (getprotocol == PHY_MODE_11B) {
-    Logger.notice(OMG_LOGID, F("WiFi_Protocol_11b" CR));
+    Logger.notice(OMG_LOGID, F("WiFi_Protocol_11b"));
   }
 
 #  ifdef WifiPower
-  Logger.notice(OMG_LOGID, F("Requested WiFi power level: %i dBm" CR), WifiPower);
+  Logger.notice(OMG_LOGID, F("Requested WiFi power level: %i dBm"), WifiPower);
 
   int i_dBm = int(WifiPower * 4.0f);
 
@@ -1314,10 +1314,10 @@ void setup() {
         OMG_SYSLOG_WAIT_IF_NOT_READY, OMG_SYSLOG_MAX_WAIT_MILLISECONDS);
     Logger.registerSyslog(OMG_LOGID, OMG_LOG_LEVEL_SYSLOG, OMG_SYSLOG_FACILITY, "OMG");
   } else {
-    Logger.error(OMG_LOGID, F("Invalid syslog configuration, skipping registration" CR));
+    Logger.error(OMG_LOGID, F("Invalid syslog configuration, skipping registration"));
   }
 #endif
-  Logger.always(OMG_LOGID, F("************* WELCOME TO OpenMQTTGateway **************" CR));
+  Logger.always(OMG_LOGID, F("************* WELCOME TO OpenMQTTGateway **************"));
 #if defined(TRIGGER_GPIO) && !defined(OMG_ESP_WIFI_MANUAL_SETUP)
   pinMode(TRIGGER_GPIO, INPUT_PULLUP);
   checkButton();
@@ -1365,22 +1365,22 @@ void setup() {
 #  endif
 #endif
 
-  Logger.always(OMG_LOGID, F("OpenMQTTGateway Version: " OMG_VERSION CR));
+  Logger.always(OMG_LOGID, F("OpenMQTTGateway Version: " OMG_VERSION));
 
 #ifdef ESP32_EXT0_WAKE_PIN
-  Logger.notice(OMG_LOGID, F("Setting EXT0 Wakeup for deep sleep." CR));
+  Logger.notice(OMG_LOGID, F("Setting EXT0 Wakeup for deep sleep."));
   gpio_num_t wake_pin0 = static_cast<gpio_num_t>(ESP32_EXT0_WAKE_PIN);
   if (esp_sleep_enable_ext0_wakeup(wake_pin0, ESP32_EXT0_WAKE_PIN_STATE) != ESP_OK) {
-    Logger.error(OMG_LOGID, F("Failed to set deep sleep EXT0 Wakeup." CR));
+    Logger.error(OMG_LOGID, F("Failed to set deep sleep EXT0 Wakeup."));
     gatewayState = GatewayState::ERROR;
   }
 #endif
 #ifdef ESP32_EXT1_WAKE_PIN
-  Logger.notice(OMG_LOGID, F("Setting EXT1 Wakeup for deep sleep." CR));
+  Logger.notice(OMG_LOGID, F("Setting EXT1 Wakeup for deep sleep."));
   uint64_t wake_pin_bitmask = 1ULL << ESP32_EXT1_WAKE_PIN; // Adjust this line if multiple pins are used.
   esp_sleep_ext1_wakeup_mode_t wake_state1 = static_cast<esp_sleep_ext1_wakeup_mode_t>(ESP32_EXT1_WAKE_PIN_STATE);
   if (esp_sleep_enable_ext1_wakeup(wake_pin_bitmask, wake_state1) != ESP_OK) {
-    Logger.error(OMG_LOGID, F("Failed to set deep sleep EXT1 Wakeup." CR));
+    Logger.error(OMG_LOGID, F("Failed to set deep sleep EXT1 Wakeup."));
     gatewayState = GatewayState::ERROR;
   }
 #endif
@@ -1409,7 +1409,7 @@ void setup() {
   setupWiFiFromBuild();
 #else
   if (loadConfigFromFlash()) { // Config present
-    Logger.notice(OMG_LOGID, F("Config loaded from flash" CR));
+    Logger.notice(OMG_LOGID, F("Config loaded from flash"));
 #  ifdef OMG_ESP32_ETHERNET
     setup_ethernet_esp32();
 #  endif
@@ -1425,26 +1425,26 @@ void setup() {
     checkSerial();
 #  endif
 
-    Logger.notice(OMG_LOGID, F("No config in flash, launching wifi manager" CR));
+    Logger.notice(OMG_LOGID, F("No config in flash, launching wifi manager"));
     // In failSafeMode we don't want to setup wifi manager as it has already been done before
     if (!failSafeMode) setupWiFiManager();
   }
 
 #endif
-  Logger.debug(OMG_LOGID, F("OpenMQTTGateway mac: %s" CR), WiFi.macAddress().c_str());
-  Logger.debug(OMG_LOGID, F("OpenMQTTGateway ip: %s" CR), WiFi.localIP().toString().c_str());
-  Logger.debug(OMG_LOGID, F("OpenMQTTGateway index %d" CR), cnt_index);
-  Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt topic: %s" CR), mqtt_topic);
+  Logger.debug(OMG_LOGID, F("OpenMQTTGateway mac: %s"), WiFi.macAddress().c_str());
+  Logger.debug(OMG_LOGID, F("OpenMQTTGateway ip: %s"), WiFi.localIP().toString().c_str());
+  Logger.debug(OMG_LOGID, F("OpenMQTTGateway index %d"), cnt_index);
+  Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt topic: %s"), mqtt_topic);
 #ifdef OMG_MQTT_DISCOVERY
-  Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt discovery prefix: %s" CR), discovery_prefix);
+  Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt discovery prefix: %s"), discovery_prefix);
 #endif
-  Logger.debug(OMG_LOGID, F("OpenMQTTGateway gateway name: %s" CR), g_gateway_name);
+  Logger.debug(OMG_LOGID, F("OpenMQTTGateway gateway name: %s"), g_gateway_name);
 #if !OMG_MQTT_BROKER_MODE
-  Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt server: %s" CR), cnt_parameters_array[cnt_index].mqtt_server);
-  Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt port: %s" CR), cnt_parameters_array[cnt_index].mqtt_port);
-  Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt user: %s" CR), cnt_parameters_array[cnt_index].mqtt_user);
-  Logger.debug(OMG_LOGID, F("OpenMQTTGateway secure connection: %s" CR), cnt_parameters_array[cnt_index].isConnectionSecure ? "true" : "false");
-  Logger.debug(OMG_LOGID, F("OpenMQTTGateway validate cert: %s" CR), cnt_parameters_array[cnt_index].isCertValidate ? "true" : "false");
+  Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt server: %s"), cnt_parameters_array[cnt_index].mqtt_server);
+  Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt port: %s"), cnt_parameters_array[cnt_index].mqtt_port);
+  Logger.debug(OMG_LOGID, F("OpenMQTTGateway mqtt user: %s"), cnt_parameters_array[cnt_index].mqtt_user);
+  Logger.debug(OMG_LOGID, F("OpenMQTTGateway secure connection: %s"), cnt_parameters_array[cnt_index].isConnectionSecure ? "true" : "false");
+  Logger.debug(OMG_LOGID, F("OpenMQTTGateway validate cert: %s"), cnt_parameters_array[cnt_index].isCertValidate ? "true" : "false");
 #endif
 
 #if OMG_OTA_PASSIVE_FW_UPDATE
@@ -1609,12 +1609,12 @@ void setup() {
   setupRTL_433();
   modules.add(OMG_GATEWAY_RTL_433);
 #endif
-  Logger.debug(OMG_LOGID, F("mqtt_max_payload_size: %d" CR), mqtt_max_payload_size);
-  SYSConfig.offline ? Logger.notice(OMG_LOGID, F("Offline enabled" CR)) : Logger.notice(0, F("Offline disabled" CR));
+  Logger.debug(OMG_LOGID, F("mqtt_max_payload_size: %d"), mqtt_max_payload_size);
+  SYSConfig.offline ? Logger.notice(OMG_LOGID, F("Offline enabled")) : Logger.notice(0, F("Offline disabled"));
   char jsonChar[100];
   serializeJson(modules, jsonChar, measureJson(modules) + 1);
-  Logger.always(OMG_LOGID, F("OpenMQTTGateway modules: %s" CR), jsonChar);
-  Logger.always(OMG_LOGID, F("************** Setup OpenMQTTGateway end **************" CR));
+  Logger.always(OMG_LOGID, F("OpenMQTTGateway modules: %s"), jsonChar);
+  Logger.always(OMG_LOGID, F("************** Setup OpenMQTTGateway end **************"));
 
   g_last_loop_time = millis();
 }
@@ -1624,7 +1624,7 @@ bool wifi_reconnect_bypass() {
 #if defined(ESP32) && defined(USE_BLUFI)
   extern bool omg_blufi_ble_connected;
   if (omg_blufi_ble_connected) {
-    Logger.notice(OMG_LOGID, F("BLUFI is connected, bypassing wifi reconnect" CR));
+    Logger.notice(OMG_LOGID, F("BLUFI is connected, bypassing wifi reconnect"));
     gatewayState = GatewayState::ONBOARDING;
     return true;
   }
@@ -1635,7 +1635,7 @@ bool wifi_reconnect_bypass() {
 #else
   while (WiFi.waitForConnectResult() != WL_CONNECTED && wifi_autoreconnect_cnt < maxConnectionRetryNetwork) {
 #endif
-    Logger.notice(OMG_LOGID, F("Attempting Wifi connection with saved AP: %d" CR), wifi_autoreconnect_cnt);
+    Logger.notice(OMG_LOGID, F("Attempting Wifi connection with saved AP: %d"), wifi_autoreconnect_cnt);
 
     WiFi.begin();
 #if defined(WifiGMode) || defined(WifiPower)
@@ -1666,7 +1666,7 @@ void setOTA() {
   ArduinoOTA.setMdnsEnabled(OMG_OTA_PASSIVE_FW_UPDATE_MDNS_ENABLED);
 
   ArduinoOTA.onStart([]() {
-    Logger.debug(OMG_LOGID, F("Start OTA, lock other functions" CR));
+    Logger.debug(OMG_LOGID, F("Start OTA, lock other functions"));
     last_ota_activity_millis = millis();
 #ifdef ESP32
     ProcessLock = true;
@@ -1677,13 +1677,13 @@ void setOTA() {
     lpDisplayPrint("OTA in progress");
   });
   ArduinoOTA.onEnd([]() {
-    Logger.debug(OMG_LOGID, F("\nOTA done" CR));
+    Logger.debug(OMG_LOGID, F("\nOTA done"));
     last_ota_activity_millis = 0;
     lpDisplayPrint("OTA done");
     ESPRestart(6);
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Logger.debug(OMG_LOGID, F("Progress: %u%%\r" CR), (progress / (total / 100)));
+    Logger.debug(OMG_LOGID, F("Progress: %u%%\r"), (progress / (total / 100)));
     gatewayState = GatewayState::LOCAL_OTA_IN_PROGRESS;
     last_ota_activity_millis = millis();
   });
@@ -1692,15 +1692,15 @@ void setOTA() {
     Serial.printf("Error[%u]: ", error);
     gatewayState = GatewayState::ERROR;
     if (error == OTA_AUTH_ERROR)
-      Logger.error(OMG_LOGID, F("Auth Failed" CR));
+      Logger.error(OMG_LOGID, F("Auth Failed"));
     else if (error == OTA_BEGIN_ERROR)
-      Logger.error(OMG_LOGID, F("Begin Failed" CR));
+      Logger.error(OMG_LOGID, F("Begin Failed"));
     else if (error == OTA_CONNECT_ERROR)
-      Logger.error(OMG_LOGID, F("Connect Failed" CR));
+      Logger.error(OMG_LOGID, F("Connect Failed"));
     else if (error == OTA_RECEIVE_ERROR)
-      Logger.error(OMG_LOGID, F("Receive Failed" CR));
+      Logger.error(OMG_LOGID, F("Receive Failed"));
     else if (error == OTA_END_ERROR)
-      Logger.error(OMG_LOGID, F("End Failed" CR));
+      Logger.error(OMG_LOGID, F("End Failed"));
     ESPRestart(6);
   });
   ArduinoOTA.begin();
@@ -1711,49 +1711,49 @@ void setOTA() {
 void setupTLS(int index) {
   configTime(0, 0, OMG_NTP_SERVER);
   WiFiClientSecure* sClient = static_cast<WiFiClientSecure*>(eClient.get());
-  Logger.notice(OMG_LOGID, F("cnt index used: %d" CR), index);
+  Logger.notice(OMG_LOGID, F("cnt index used: %d"), index);
   if (!cnt_parameters_array[index].isCertValidate) {
-    Logger.notice(OMG_LOGID, F("Disabling cert validation" CR));
+    Logger.notice(OMG_LOGID, F("Disabling cert validation"));
     sClient->setInsecure();
   } else {
-    Logger.notice(OMG_LOGID, F("Enabling cert validation" CR));
+    Logger.notice(OMG_LOGID, F("Enabling cert validation"));
 #  if defined(ESP32)
     if (cnt_parameters_array[index].server_cert.length() > MIN_CERT_LENGTH) {
       sClient->setCACert(cnt_parameters_array[index].server_cert.c_str());
-      Logger.notice(OMG_LOGID, F("Server cert found from cert array" CR));
+      Logger.notice(OMG_LOGID, F("Server cert found from cert array"));
     } else if (strlen(ss_server_cert) > MIN_CERT_LENGTH) {
       sClient->setCACert(ss_server_cert);
-      Logger.notice(OMG_LOGID, F("Server cert found from ss_server_cert" CR));
+      Logger.notice(OMG_LOGID, F("Server cert found from ss_server_cert"));
     } else {
-      Logger.error(OMG_LOGID, F("No server cert found" CR));
+      Logger.error(OMG_LOGID, F("No server cert found"));
       gatewayState = GatewayState::ERROR;
     }
 
 #    if AWS_IOT
     if (strcmp(cnt_parameters_array[index].mqtt_port, "443") == 0) {
-      Logger.notice(OMG_LOGID, F("Using ALPN" CR));
+      Logger.notice(OMG_LOGID, F("Using ALPN"));
       sClient->setAlpnProtocols(alpnProtocols);
     }
 #    endif
 #    if OMG_MQTT_SECURE_SIGNED_CLIENT
     if (cnt_parameters_array[index].client_cert.length() > MIN_CERT_LENGTH) {
       sClient->setCertificate(cnt_parameters_array[index].client_cert.c_str());
-      Logger.notice(OMG_LOGID, F("Client cert found from cert array" CR));
+      Logger.notice(OMG_LOGID, F("Client cert found from cert array"));
     } else if (strlen(ss_client_cert) > MIN_CERT_LENGTH) {
       sClient->setCertificate(ss_client_cert);
-      Logger.notice(OMG_LOGID, F("Client cert found from ss_client_cert" CR));
+      Logger.notice(OMG_LOGID, F("Client cert found from ss_client_cert"));
     } else {
-      Logger.error(OMG_LOGID, F("No client cert found" CR));
+      Logger.error(OMG_LOGID, F("No client cert found"));
       gatewayState = GatewayState::ERROR;
     }
     if (cnt_parameters_array[index].client_key.length() > MIN_CERT_LENGTH) {
       sClient->setPrivateKey(cnt_parameters_array[index].client_key.c_str());
-      Logger.notice(OMG_LOGID, F("Client key found from cert array" CR));
+      Logger.notice(OMG_LOGID, F("Client key found from cert array"));
     } else if (strlen(ss_client_key) > MIN_CERT_LENGTH) {
       sClient->setPrivateKey(ss_client_key);
-      Logger.notice(OMG_LOGID, F("Client key found from ss_client_key" CR));
+      Logger.notice(OMG_LOGID, F("Client key found from ss_client_key"));
     } else {
-      Logger.error(OMG_LOGID, F("No client key found" CR));
+      Logger.error(OMG_LOGID, F("No client key found"));
       gatewayState = GatewayState::ERROR;
     }
 #    endif
@@ -1794,7 +1794,7 @@ void ESPRestart(byte reason) {
 #ifdef OMG_SECONDARY_MODULE
   // Erase the secondary module config
   String restartCmdStr = "{\"cmd\":\"" + String(restartCmd) + "\"}";
-  Logger.notice(OMG_LOGID, F("Restarting secondary module : %s" CR), restartCmdStr.c_str());
+  Logger.notice(OMG_LOGID, F("Restarting secondary module : %s"), restartCmdStr.c_str());
   receivingDATA(subjectMQTTtoSYSsetOMG_SECONDARY_MODULE, restartCmdStr.c_str());
   delay(2000);
 #endif
@@ -1809,7 +1809,7 @@ void ESPRestart(byte reason) {
   while (!jsonQueue.empty()) {
     jsonQueue.pop();
   }
-  Logger.warning(OMG_LOGID, F("Rebooting for reason code %d" CR), reason);
+  Logger.warning(OMG_LOGID, F("Rebooting for reason code %d"), reason);
 #if defined(ESP32)
   ESP.restart();
 #elif defined(ESP8266)
@@ -1823,10 +1823,10 @@ void setupWiFiFromBuild() {
   WiFi.setHostname(g_gateway_name);
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP(OMG_WIFI_SSID, OMG_WIFI_PASSWORD);
-  Logger.debug(OMG_LOGID, F("Connecting to %s" CR), OMG_WIFI_SSID);
+  Logger.debug(OMG_LOGID, F("Connecting to %s"), OMG_WIFI_SSID);
 #  ifdef OMG_WIFI_SSID1
   wifiMulti.addAP(OMG_WIFI_SSID1, OMG_WIFI_PASSWORD1);
-  Logger.debug(OMG_LOGID, F("Connecting to %s" CR), OMG_WIFI_SSID1);
+  Logger.debug(OMG_LOGID, F("Connecting to %s"), OMG_WIFI_SSID1);
 #  endif
   delay(10);
 
@@ -1843,7 +1843,7 @@ void setupWiFiFromBuild() {
   dns_adress.fromString(OMG_NET_DNS);
 
   if (!WiFi.config(ip_adress, gateway_adress, subnet_adress, dns_adress)) {
-    Logger.error(OMG_LOGID, F("Wifi STA Failed to configure" CR));
+    Logger.error(OMG_LOGID, F("Wifi STA Failed to configure"));
     gatewayState = GatewayState::ERROR;
   }
 
@@ -1851,7 +1851,7 @@ void setupWiFiFromBuild() {
 
   while (wifiMulti.run() != WL_CONNECTED) {
     delay(500);
-    Logger.debug(OMG_LOGID, F("." CR));
+    Logger.debug(OMG_LOGID, F("."));
     failure_number_ntwk++;
 #  if defined(ESP32) && defined(OMG_GATEWAY_BT)
     if (SYSConfig.powerMode) {
@@ -1869,7 +1869,7 @@ void setupWiFiFromBuild() {
     }
 #  endif
   }
-  Logger.notice(OMG_LOGID, F("WiFi ok with manual config credentials" CR));
+  Logger.notice(OMG_LOGID, F("WiFi ok with manual config credentials"));
   displayPrint("Wifi connected");
 }
 
@@ -1883,7 +1883,7 @@ bool shouldSaveConfig = false;
 
 //callback notifying us of the need to save config
 void saveConfigCallback() {
-  Logger.debug(OMG_LOGID, F("Should save config" CR));
+  Logger.debug(OMG_LOGID, F("Should save config"));
   shouldSaveConfig = true;
 }
 
@@ -1895,10 +1895,10 @@ void blockingWaitForReset() {
   if (digitalRead(TRIGGER_GPIO) == LOW) {
     delay(50);
     if (digitalRead(TRIGGER_GPIO) == LOW) {
-      Logger.debug(OMG_LOGID, F("Trigger button Pressed" CR));
+      Logger.debug(OMG_LOGID, F("Trigger button Pressed"));
       delay(3000); // reset delay hold
       if (digitalRead(TRIGGER_GPIO) == LOW) {
-        Logger.notice(OMG_LOGID, F("Button Held" CR));
+        Logger.notice(OMG_LOGID, F("Button Held"));
 // Switching off the relay during reset or failsafe operations
 #    ifdef OMG_ACTUATOR_ONOFF
         uint8_t level = digitalRead(ACTUATOR_ONOFF_GPIO);
@@ -1910,15 +1910,15 @@ void blockingWaitForReset() {
         // Checking if the flash has already been erased to identify if we erase it or go into failsafe mode
         // going to failsafe mode is done by doing a long button press from a state where the flash has already been erased
         if (SPIFFS.begin()) {
-          Logger.debug(OMG_LOGID, F("mounted file system" CR));
+          Logger.debug(OMG_LOGID, F("mounted file system"));
           if (SPIFFS.exists("/config.json")) {
-            Logger.notice(OMG_LOGID, F("Erasing ESP Config, restarting" CR));
+            Logger.notice(OMG_LOGID, F("Erasing ESP Config, restarting"));
             erase(true);
           }
         }
         delay(30000);
         if (digitalRead(TRIGGER_GPIO) == LOW) {
-          Logger.notice(OMG_LOGID, F("Going into failsafe mode without peripherals" CR));
+          Logger.notice(OMG_LOGID, F("Going into failsafe mode without peripherals"));
           // Failsafe mode enable to connect to Wifi or change the firmware without the peripherals setup
           failSafeMode = true;
           setupWiFiManager();
@@ -1949,7 +1949,7 @@ void checkButton() {}
 #  endif
 
 void saveConfig() {
-  Logger.debug(OMG_LOGID, F("saving configs" CR));
+  Logger.debug(OMG_LOGID, F("saving configs"));
 
   int totalSize = 512;
 #  if !OMG_MQTT_BROKER_MODE
@@ -1963,7 +1963,7 @@ void saveConfig() {
   }
 #  endif
 
-  Logger.notice(OMG_LOGID, F("Total size: %d" CR), totalSize);
+  Logger.notice(OMG_LOGID, F("Total size: %d"), totalSize);
 
   DynamicJsonDocument json(512 + totalSize);
 
@@ -2040,7 +2040,7 @@ void saveConfig() {
 
   File configFile = SPIFFS.open("/config.json", "w");
   if (!configFile) {
-    Logger.error(OMG_LOGID, F("failed to open config file for writing" CR));
+    Logger.error(OMG_LOGID, F("failed to open config file for writing"));
     gatewayState = GatewayState::ERROR;
   }
 
@@ -2049,31 +2049,31 @@ void saveConfig() {
 }
 
 bool loadConfigFromFlash() {
-  Logger.debug(OMG_LOGID, F("mounting FS..." CR));
+  Logger.debug(OMG_LOGID, F("mounting FS..."));
   bool result = false;
 
   if (SPIFFS.begin()) {
-    Logger.debug(OMG_LOGID, F("mounted file system" CR));
+    Logger.debug(OMG_LOGID, F("mounted file system"));
   } else {
-    Logger.warning(OMG_LOGID, F("failed to mount FS -> formating" CR));
+    Logger.warning(OMG_LOGID, F("failed to mount FS -> formating"));
     SPIFFS.format();
     if (SPIFFS.begin())
-      Logger.debug(OMG_LOGID, F("mounted file system after formating" CR));
+      Logger.debug(OMG_LOGID, F("mounted file system after formating"));
   }
   if (SPIFFS.exists("/config.json")) {
     //file exists, reading and loading
-    Logger.debug(OMG_LOGID, F("reading config file" CR));
+    Logger.debug(OMG_LOGID, F("reading config file"));
     File configFile = SPIFFS.open("/config.json", "r");
     if (configFile) {
-      Logger.debug(OMG_LOGID, F("opened config file" CR));
+      Logger.debug(OMG_LOGID, F("opened config file"));
       DynamicJsonDocument json(configFile.size() * 2);
       auto error = deserializeJson(json, configFile);
       if (error) {
-        Logger.error(OMG_LOGID, F("deserialize config failed: %s, buffer capacity: %u" CR), error.c_str(), json.capacity());
+        Logger.error(OMG_LOGID, F("deserialize config failed: %s, buffer capacity: %u"), error.c_str(), json.capacity());
         gatewayState = GatewayState::ERROR;
       }
       if (!json.isNull()) {
-        Logger.debug(OMG_LOGID, F("\nparsed json, size: %u" CR), json.memoryUsage());
+        Logger.debug(OMG_LOGID, F("\nparsed json, size: %u"), json.memoryUsage());
         // Print json to serial port
         //serializeJsonPretty(json, Serial);
 
@@ -2111,9 +2111,9 @@ bool loadConfigFromFlash() {
             // Compare the hash with the expected hash
             if (hash == GITHUB_OTA_SERVER_CERT_HASH) {
               // Do nothing
-              Logger.warning(OMG_LOGID, F("Old Github OTA server detected, skipping" CR));
+              Logger.warning(OMG_LOGID, F("Old Github OTA server detected, skipping"));
             } else {
-              Logger.notice(OMG_LOGID, F("OTA server cert hash: %s" CR), hash.c_str());
+              Logger.notice(OMG_LOGID, F("OTA server cert hash: %s"), hash.c_str());
               cnt_parameters_array[i].ota_server_cert = json["ota_server_cert"].as<const char*>();
             }
 #    else
@@ -2156,7 +2156,7 @@ bool loadConfigFromFlash() {
             cnt_parameters_array[i].validConnection = json[key].as<bool>();
           } else if (i == OMG_MQTT_CNT_DEFAULT_INDEX) {
             // For backward compatibility, if valid_cnt is not found, we assume the connection is valid for OMG_MQTT_CNT_DEFAULT_INDEX
-            Logger.warning(OMG_LOGID, F("valid_cnt not found, assuming connection is valid" CR));
+            Logger.warning(OMG_LOGID, F("valid_cnt not found, assuming connection is valid"));
             cnt_parameters_array[i].validConnection = true;
           }
         }
@@ -2192,17 +2192,17 @@ bool loadConfigFromFlash() {
 #  endif
         result = true;
       } else {
-        Logger.warning(OMG_LOGID, F("failed to load json config" CR));
+        Logger.warning(OMG_LOGID, F("failed to load json config"));
       }
       configFile.close();
     }
   } else {
-    Logger.notice(OMG_LOGID, F("No config file found defining default values" CR));
+    Logger.notice(OMG_LOGID, F("No config file found defining default values"));
 #  ifdef OMG_USE_MAC_AS_GATEWAY_NAME
     String s = WiFi.macAddress();
     sprintf(g_gateway_name, "%.2s%.2s%.2s%.2s%.2s%.2s",
             s.c_str(), s.c_str() + 3, s.c_str() + 6, s.c_str() + 9, s.c_str() + 12, s.c_str() + 15);
-    Log.notice(F("Gateway Name: %s.local" CR), g_gateway_name);
+    Log.notice(F("Gateway Name: %s.local"), g_gateway_name);
 #  endif
 #  ifdef OMG_GW_PWD_FROM_MAC // From ESP Mac Address, last 8 digits as the password
     sprintf(g_gw_pass, "%.2s%.2s%.2s%.2s",
@@ -2260,7 +2260,7 @@ void setupWiFiManager() {
 
 //set static IP
 #  ifdef OMG_NETWORK_ADVANCED_SETUP
-  Logger.debug(OMG_LOGID, F("Adv wifi cfg" CR));
+  Logger.debug(OMG_LOGID, F("Adv wifi cfg"));
   IPAddress ip_adress;
   IPAddress gateway_adress;
   IPAddress subnet_adress;
@@ -2296,7 +2296,7 @@ void setupWiFiManager() {
   wifiManager.setMinimumSignalQuality(MinimumWifiSignalQuality);
 
   if (SPIFFS.begin()) {
-    Logger.debug(OMG_LOGID, F("mounted file system" CR));
+    Logger.debug(OMG_LOGID, F("mounted file system"));
     // Check if the config file exists and prevent the portal from showing if yes
     // Showing the portal if the config file exist would enable access to the configuration data and to the ESP update page
     // This is a security risk if an attacker has access to the gateway password
@@ -2311,13 +2311,13 @@ void setupWiFiManager() {
 
   if (!SYSConfig.offline && !wifi_reconnect_bypass()) // if we didn't connect with saved credential we start Wifimanager web portal
   {
-    Logger.notice(OMG_LOGID, F("Connect your phone to WIFI AP: %s with PWD: %s" CR), g_WifiManager_ssid, g_gw_pass);
+    Logger.notice(OMG_LOGID, F("Connect your phone to WIFI AP: %s with PWD: %s"), g_WifiManager_ssid, g_gw_pass);
     gatewayState = GatewayState::ONBOARDING;
     //fetches ssid and pass and tries to connect
     //if it does not connect it starts an access point with the specified name
     //and goes into a blocking loop awaiting configuration
     if (!wifiManager.autoConnect(g_WifiManager_ssid, g_gw_pass)) {
-      Logger.warning(OMG_LOGID, F("failed to connect and hit timeout" CR));
+      Logger.warning(OMG_LOGID, F("failed to connect and hit timeout"));
       delay(3000);
 
 #  ifdef ESP32
@@ -2410,22 +2410,22 @@ void setup_ethernet_esp32() {
   subnet.fromString(OMG_NET_MASK);
   Dns.fromString(OMG_NET_DNS);
 
-  Logger.debug(OMG_LOGID, F("Adv eth cfg" CR));
+  Logger.debug(OMG_LOGID, F("Adv eth cfg"));
   ETH.config(ip, gateway, subnet, Dns);
   ethBeginSuccess = ETH.begin();
 #    else
-  Logger.notice(OMG_LOGID, F("Spl eth cfg" CR));
+  Logger.notice(OMG_LOGID, F("Spl eth cfg"));
   ethBeginSuccess = ETH.begin();
 #    endif
   if (ethBeginSuccess) {
-    Logger.notice(OMG_LOGID, F("Ethernet started" CR));
+    Logger.notice(OMG_LOGID, F("Ethernet started"));
     while (!ethConnected && failure_number_ntwk <= maxConnectionRetryNetwork) {
       delay(500);
-      Logger.notice(OMG_LOGID, F("." CR));
+      Logger.notice(OMG_LOGID, F("."));
       failure_number_ntwk++;
     }
   } else {
-    Logger.error(OMG_LOGID, F("Ethernet not started" CR));
+    Logger.error(OMG_LOGID, F("Ethernet not started"));
     gatewayState = GatewayState::ERROR;
   }
 }
@@ -2433,25 +2433,25 @@ void setup_ethernet_esp32() {
 void WiFiEvent(WiFiEvent_t event) {
   switch (event) {
     case ARDUINO_EVENT_ETH_START:
-      Logger.debug(OMG_LOGID, F("Ethernet Started" CR));
+      Logger.debug(OMG_LOGID, F("Ethernet Started"));
       ETH.setHostname(g_gateway_name);
       break;
     case ARDUINO_EVENT_ETH_CONNECTED:
-      Logger.notice(OMG_LOGID, F("Ethernet Connected" CR));
+      Logger.notice(OMG_LOGID, F("Ethernet Connected"));
       break;
     case ARDUINO_EVENT_ETH_GOT_IP:
-      Logger.notice(OMG_LOGID, F("OpenMQTTGateway Ethernet MAC: %s" CR), ETH.macAddress().c_str());
-      Logger.notice(OMG_LOGID, F("OpenMQTTGateway Ethernet IP: %s" CR), ETH.localIP().toString().c_str());
-      Logger.notice(OMG_LOGID, F("OpenMQTTGateway Ethernet link speed: %d Mbps" CR), ETH.linkSpeed());
+      Logger.notice(OMG_LOGID, F("OpenMQTTGateway Ethernet MAC: %s"), ETH.macAddress().c_str());
+      Logger.notice(OMG_LOGID, F("OpenMQTTGateway Ethernet IP: %s"), ETH.localIP().toString().c_str());
+      Logger.notice(OMG_LOGID, F("OpenMQTTGateway Ethernet link speed: %d Mbps"), ETH.linkSpeed());
       gatewayState = GatewayState::NTWK_CONNECTED;
       ethConnected = true;
       break;
     case ARDUINO_EVENT_ETH_DISCONNECTED:
-      Logger.warning(OMG_LOGID, F("Ethernet Disconnected" CR));
+      Logger.warning(OMG_LOGID, F("Ethernet Disconnected"));
       ethConnected = false;
       break;
     case ARDUINO_EVENT_ETH_STOP:
-      Logger.warning(OMG_LOGID, F("Ethernet Stopped" CR));
+      Logger.warning(OMG_LOGID, F("Ethernet Stopped"));
       ethConnected = false;
       break;
     default:
@@ -2469,14 +2469,14 @@ void WiFiEvent(WiFiEvent_t event) {
 void sleep() {
   if (SYSConfig.powerMode < PowerMode::INTERVAL)
     return;
-  Logger.notice(OMG_LOGID, F("Entering deep sleep" CR));
+  Logger.notice(OMG_LOGID, F("Entering deep sleep"));
   gatewayState = GatewayState::SLEEPING;
   delay(250); // To allow the LEDs to switch off and MQTT message to be sent
 #  if defined(OMG_BOARD_M5STACK) || defined(OMG_BOARD_M5STICKC) || defined(OMG_BOARD_M5STICKCP) || defined(OMG_BOARD_M5TOUGH)
   sleepScreen();
   esp_sleep_enable_ext0_wakeup((gpio_num_t)SLEEP_BUTTON, LOW);
 #  endif
-  Logger.debug(OMG_LOGID, F("Deactivating ESP32 components" CR));
+  Logger.debug(OMG_LOGID, F("Deactivating ESP32 components"));
 #  ifdef OMG_GATEWAY_BT
   stopProcessing();
   ProcessLock = true;
@@ -2487,15 +2487,15 @@ void sleep() {
 #  pragma GCC diagnostic pop
   esp_wifi_stop();
 #  ifdef ESP32_EXT0_WAKE_PIN
-  Logger.notice(OMG_LOGID, F("Entering deep sleep, EXT0 Wakeup by pin : %l." CR), ESP32_EXT0_WAKE_PIN);
+  Logger.notice(OMG_LOGID, F("Entering deep sleep, EXT0 Wakeup by pin : %l."), ESP32_EXT0_WAKE_PIN);
 #  endif
 #  ifdef ESP32_EXT1_WAKE_PIN
-  Logger.notice(OMG_LOGID, F("Entering deep sleep, EXT1 Wakeup by pin : %l." CR), ESP32_EXT1_WAKE_PIN);
+  Logger.notice(OMG_LOGID, F("Entering deep sleep, EXT1 Wakeup by pin : %l."), ESP32_EXT1_WAKE_PIN);
 #  endif
   if (SYSConfig.powerMode == PowerMode::ACTION) {
     esp_deep_sleep_start();
   } else if (SYSConfig.powerMode == PowerMode::INTERVAL) {
-    Logger.notice(OMG_LOGID, F("Entering deep sleep for %l us." CR), DEEP_SLEEP_IN_US);
+    Logger.notice(OMG_LOGID, F("Entering deep sleep for %l us."), DEEP_SLEEP_IN_US);
     esp_deep_sleep(DEEP_SLEEP_IN_US);
   }
 }
@@ -2579,7 +2579,7 @@ void loop() {
 #endif
     }
   } else if (!SYSConfig.offline && !SYSConfig.serial) { // disconnected from network
-    Logger.warning(OMG_LOGID, F("Network disconnected" CR));
+    Logger.warning(OMG_LOGID, F("Network disconnected"));
     gatewayState = GatewayState::NTWK_DISCONNECTED;
     if (!wifi_reconnect_bypass()) {
       sleep();
@@ -2710,11 +2710,11 @@ void loop() {
 #endif
 #ifdef OMG_GATEWAY_2G
     if (_2GtoX())
-      Logger.debug(OMG_LOGID, F("2GtoMQTT OK" CR));
+      Logger.debug(OMG_LOGID, F("2GtoMQTT OK"));
 #endif
 #ifdef OMG_GATEWAY_RFM69
     if (RFM69toX())
-      Logger.debug(OMG_LOGID, F("RFM69toMQTT OK" CR));
+      Logger.debug(OMG_LOGID, F("RFM69toMQTT OK"));
 #endif
 #ifdef OMG_ACTUATOR_FASTLED
     FASTLEDLoop();
@@ -2780,11 +2780,11 @@ void erase(bool restart) {
 #ifdef OMG_SECONDARY_MODULE
   // Erase the secondary module config
   String eraseCmdStr = "{\"cmd\":\"" + String(eraseCmd) + "\"}";
-  Logger.notice(OMG_LOGID, F("Erasing secondary module config: %s" CR), eraseCmdStr.c_str());
+  Logger.notice(OMG_LOGID, F("Erasing secondary module config: %s"), eraseCmdStr.c_str());
   receivingDATA(subjectMQTTtoSYSsetSecondaryModule, eraseCmdStr.c_str());
   delay(2000);
 #endif
-  Logger.debug(OMG_LOGID, F("Formatting requested, result: %d" CR), SPIFFS.format());
+  Logger.debug(OMG_LOGID, F("Formatting requested, result: %d"), SPIFFS.format());
 
 #if defined(ESP8266)
   WiFi.disconnect(true);
@@ -2827,7 +2827,7 @@ String stateMeasures() {
 #ifdef OMG_GATEWAY_RTL_433
   // Some RTL_433 decoders have memory leak, this is a temporary workaround
   if (freeMem < MinimumMemory) {
-    Logger.error(OMG_LOGID, F("Not enough memory %d, restarting" CR), freeMem);
+    Logger.error(OMG_LOGID, F("Not enough memory %d, restarting"), freeMem);
     gatewayState = GatewayState::ERROR;
     ESPRestart(8);
   }
@@ -2906,7 +2906,7 @@ String stateMeasures() {
 
   String output;
   serializeJson(SYSdata, output);
-  Logger.notice(OMG_LOGID, F("SYS json: %s" CR), output.c_str());
+  Logger.notice(OMG_LOGID, F("SYS json: %s"), output.c_str());
   return output;
 }
 
@@ -2918,16 +2918,16 @@ void storeSignalValue(uint64_t MQTTvalue) {
   unsigned long now = millis();
   // find oldest value of the buffer
   int o = getMin();
-  Logger.debug(OMG_LOGID, F("Min ind: %d" CR), o);
+  Logger.debug(OMG_LOGID, F("Min ind: %d"), o);
   // replace it by the new one
   receivedSignal[o].value = MQTTvalue;
   receivedSignal[o].time = now;
 
   // Casting "receivedSignal[o].value" to (unsigned long) because ArduinoLog doesn't support uint64_t for ESP's
-  Logger.debug(OMG_LOGID, F("store code : %u / %u" CR), (unsigned long)receivedSignal[o].value, receivedSignal[o].time);
-  Logger.debug(OMG_LOGID, F("Col: val/timestamp" CR));
+  Logger.debug(OMG_LOGID, F("store code : %u / %u"), (unsigned long)receivedSignal[o].value, receivedSignal[o].time);
+  Logger.debug(OMG_LOGID, F("Col: val/timestamp"));
   for (int i = 0; i < struct_size; i++) {
-    Logger.debug(OMG_LOGID, F("mem code : %u / %u" CR), (unsigned long)receivedSignal[i].value, receivedSignal[i].time);
+    Logger.debug(OMG_LOGID, F("mem code : %u / %u"), (unsigned long)receivedSignal[i].value, receivedSignal[i].time);
   }
 }
 
@@ -2950,12 +2950,12 @@ int getMin() {
  * Check if signal values from RF, IR, SRFB or Weather stations are duplicates
  */
 bool isAduplicateSignal(uint64_t value) {
-  Logger.debug(OMG_LOGID, F("isAdupl?" CR));
+  Logger.debug(OMG_LOGID, F("isAdupl?"));
   for (int i = 0; i < struct_size; i++) {
     if (receivedSignal[i].value == value) {
       unsigned long now = millis();
       if (now - receivedSignal[i].time < time_avoid_duplicate) { // change
-        Logger.debug(OMG_LOGID, F("no pub. dupl" CR));
+        Logger.debug(OMG_LOGID, F("no pub. dupl"));
         return true;
       }
     }
@@ -2970,17 +2970,17 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
   JsonObject jsondata = jsonBuffer.to<JsonObject>();
   DeserializationError error = deserializeJson(jsonBuffer, datacallback);
   if (error || jsondata.isNull()) {
-    Logger.error(OMG_LOGID, F("deserialize MQTT data failed: %s" CR), error.c_str());
+    Logger.error(OMG_LOGID, F("deserialize MQTT data failed: %s"), error.c_str());
     gatewayState = GatewayState::ERROR;
     return;
   }
   if (topicOri == nullptr || strcmp(topicOri, "") == 0) {
     if (jsondata.containsKey("target") && jsondata["target"].is<const char*>()) {
       strTopicOri = jsondata["target"].as<const char*>();
-      Logger.debug(OMG_LOGID, F("BUS Msg target: %s" CR), strTopicOri.c_str());
+      Logger.debug(OMG_LOGID, F("BUS Msg target: %s"), strTopicOri.c_str());
     } else if (jsondata.containsKey("origin") && jsondata["origin"].is<const char*>()) {
       strTopicOri = jsondata["origin"].as<const char*>();
-      Logger.debug(OMG_LOGID, F("BUS Msg origin: %s" CR), strTopicOri.c_str());
+      Logger.debug(OMG_LOGID, F("BUS Msg origin: %s"), strTopicOri.c_str());
     }
   } else {
 #if defined(OMG_SECONDARY_MODULE) // Redirect certain commands to Serial
@@ -3000,7 +3000,7 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
       jsondata["target"] = subjectMQTTtoSYSsetSecondaryModule;
     }
 #endif
-    Logger.debug(OMG_LOGID, F("MQTT Msg topic: %s" CR), strTopicOri.c_str());
+    Logger.debug(OMG_LOGID, F("MQTT Msg topic: %s"), strTopicOri.c_str());
   }
 
 #if defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_IR) || defined(OMG_GATEWAY_SRFB) || defined(OMG_GATEWAY_WEATHERSTATION)
@@ -3016,7 +3016,7 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
     // log the received json
     String buffer = "";
     serializeJson(jsondata, buffer);
-    //Logger.notice(OMG_LOGID, F("[ MQTT->OMG ]: %s" CR), buffer.c_str());
+    //Logger.notice(OMG_LOGID, F("[ MQTT->OMG ]: %s"), buffer.c_str());
 
 #ifdef OMG_GATEWAY_PILIGHT // OMG_GATEWAY_PILIGHT is only defined with json publishing due to its numerous parameters
     XtoPilight(strTopicOri.c_str(), jsondata);
@@ -3135,12 +3135,12 @@ bool checkForUpdates() {
   std::string ota_cert;
 #      if !OMG_MQTT_BROKER_MODE
   if (cnt_parameters_array[cnt_index].ota_server_cert.length() > MIN_CERT_LENGTH) {
-    Logger.notice(OMG_LOGID, F("Using memory cert" CR));
+    Logger.notice(OMG_LOGID, F("Using memory cert"));
     ota_cert = cnt_parameters_array[cnt_index].ota_server_cert;
   } else
 #      endif
   {
-    Logger.notice(OMG_LOGID, F("Using config cert" CR));
+    Logger.notice(OMG_LOGID, F("Using config cert"));
     ota_cert = OTAserver_cert;
   }
 
@@ -3153,11 +3153,11 @@ bool checkForUpdates() {
     String payload = http.getString();
     auto error = deserializeJson(jsonBuffer, payload);
     if (error) {
-      Logger.error(OMG_LOGID, F("Deserialize MQTT data failed: %s" CR), error.c_str());
+      Logger.error(OMG_LOGID, F("Deserialize MQTT data failed: %s"), error.c_str());
       gatewayState = GatewayState::ERROR;
     }
-    Logger.debug(OMG_LOGID, F("HttpCode %d" CR), httpCode);
-    Logger.debug(OMG_LOGID, F("Payload %s" CR), payload.c_str());
+    Logger.debug(OMG_LOGID, F("HttpCode %d"), httpCode);
+    Logger.debug(OMG_LOGID, F("Payload %s"), payload.c_str());
   } else {
     Logger.error(OMG_LOGID, F("Error on HTTP request"));
     gatewayState = GatewayState::ERROR;
@@ -3174,10 +3174,10 @@ bool checkForUpdates() {
     jsondata["retain"] = true;
     enqueueJsonObject(jsondata);
 
-    Logger.debug(OMG_LOGID, F("Update file found on server" CR));
+    Logger.debug(OMG_LOGID, F("Update file found on server"));
     return true;
   } else {
-    Logger.debug(OMG_LOGID, F("No update file found on server" CR));
+    Logger.debug(OMG_LOGID, F("No update file found on server"));
     return false;
   }
 #elif OMG_OTA_FW_UPDATE_LATEST_STYLE == filename && OMG_OTA_FW_UPDATE_URL_STYLE == version_in_name
@@ -3192,11 +3192,11 @@ bool checkForUpdates() {
 
   http.begin(uri_latest);
   httpResponseCode = http.GET();
-  Logger.debug(OMG_LOGID, F("HTTP Response Code: %d" CR), httpResponseCode);
+  Logger.debug(OMG_LOGID, F("HTTP Response Code: %d"), httpResponseCode);
 
   if (httpResponseCode > 0) {
     payload = http.getString();
-    Logger.debug(OMG_LOGID, F("Payload: %s" CR), payload.c_str());
+    Logger.debug(OMG_LOGID, F("Payload: %s"), payload.c_str());
   } else {
     Logger.error(OMG_LOGID, F("Error %d on GET request for \"%s\""), httpResponseCode, uri_latest.c_str());
     gatewayState = GatewayState::ERROR;
@@ -3223,13 +3223,13 @@ bool checkForUpdates() {
     version = payload.substring(first_dash_ix + 1, second_dash_ix);
     suffix = payload.substring(second_dash_ix + 1);
   }
-  Logger.debug(OMG_LOGID, F("Pioenv: %s" CR), pioenv.c_str());
-  Logger.debug(OMG_LOGID, F("Version: %s" CR), version.c_str());
-  Logger.debug(OMG_LOGID, F("Suffix: %s" CR), suffix.c_str());
+  Logger.debug(OMG_LOGID, F("Pioenv: %s"), pioenv.c_str());
+  Logger.debug(OMG_LOGID, F("Version: %s"), version.c_str());
+  Logger.debug(OMG_LOGID, F("Suffix: %s"), suffix.c_str());
 
   // Check that the filename is valid
   if ((pioenv != ENV_NAME || suffix != "firmware.bin")) {
-    Logger.warning(OMG_LOGID, F("Invalid update file \"%s\" found on server" CR), payload.c_str());
+    Logger.warning(OMG_LOGID, F("Invalid update file \"%s\" found on server"), payload.c_str());
     return false;
   }
 
@@ -3256,18 +3256,18 @@ bool checkForUpdates() {
 
 #  if OMG_OTA_SELF_FW_UPDATE
 
-    Logger.debug(OMG_LOGID, F("Update file found on server, upgrading" CR));
+    Logger.debug(OMG_LOGID, F("Update file found on server, upgrading"));
     MQTTHttpsFWUpdate(subjectMQTTtoSYSupdate, jsondata);
 
 #  else // OMG_OTA_SELF_FW_UPDATE
 
-    Logger.debug(OMG_LOGID, F("Update file found on server" CR));
+    Logger.debug(OMG_LOGID, F("Update file found on server"));
 
 #  endif // OMG_OTA_SELF_FW_UPDATE
 
     return true;
   } else {
-    Logger.debug(OMG_LOGID, F("No update file found on server" CR));
+    Logger.debug(OMG_LOGID, F("No update file found on server"));
     return false;
   }
 #else
@@ -3301,7 +3301,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
       String systemUrl;
       if (url) {
         if (!strstr((url + (strlen(url) - 5)), ".bin")) {
-          Logger.error(OMG_LOGID, F("Invalid firmware extension" CR));
+          Logger.error(OMG_LOGID, F("Invalid firmware extension"));
           gatewayState = GatewayState::ERROR;
           return;
         }
@@ -3309,12 +3309,12 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
         const char* pwd = HttpsFwUpdateData["password"];
         if (pwd) {
           if (strcmp(pwd, g_gw_pass) != 0) {
-            Logger.error(OMG_LOGID, F("Invalid OTA password" CR));
+            Logger.error(OMG_LOGID, F("Invalid OTA password"));
             gatewayState = GatewayState::ERROR;
             return;
           }
         } else {
-          Logger.error(OMG_LOGID, F("No password sent" CR));
+          Logger.error(OMG_LOGID, F("No password sent"));
           gatewayState = GatewayState::ERROR;
           return;
         }
@@ -3329,11 +3329,11 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
 #      error Invalid value for OMG_OTA_FW_UPDATE_URL_STYLE
 #    endif
         url = systemUrl.c_str();
-        Logger.notice(OMG_LOGID, F("Using system OTA url with latest version %s" CR), url);
+        Logger.notice(OMG_LOGID, F("Using system OTA url with latest version %s"), url);
       } else if (strcmp(version, "dev") == 0) {
         systemUrl = String(OMG_OTA_DEV_BASE_URL) + ENV_NAME + "-firmware.bin";
         url = systemUrl.c_str();
-        Logger.notice(OMG_LOGID, F("Using system OTA url with dev version %s" CR), url);
+        Logger.notice(OMG_LOGID, F("Using system OTA url with dev version %s"), url);
       } else if (version[0] == 'v') {
 #    if OMG_OTA_FW_UPDATE_URL_STYLE == openmqttgateway
         systemUrl = String(OMG_OTA_RELEASE_BASE_URL) + version + "/" + ENV_NAME + "-firmware.bin";
@@ -3343,10 +3343,10 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
 #      error Invalid value for OMG_OTA_FW_UPDATE_URL_STYLE
 #    endif
         url = systemUrl.c_str();
-        Logger.notice(OMG_LOGID, F("Using system OTA url with defined version %s" CR), url);
+        Logger.notice(OMG_LOGID, F("Using system OTA url with defined version %s"), url);
 #  endif
       } else {
-        Logger.error(OMG_LOGID, F("Invalid URL" CR));
+        Logger.error(OMG_LOGID, F("Invalid URL"));
         gatewayState = GatewayState::ERROR;
         return;
       }
@@ -3356,7 +3356,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
       stopProcessing();
 #    endif
 #  endif
-      Logger.warning(OMG_LOGID, F("Starting firmware update" CR));
+      Logger.warning(OMG_LOGID, F("Starting firmware update"));
       gatewayState = GatewayState::REMOTE_OTA_IN_PROGRESS;
 
       StaticJsonDocument<JSON_MSG_BUFFER> jsondata;
@@ -3365,23 +3365,23 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
       enqueueJsonObject(jsondata);
 
       std::string ota_cert = TheengsUtils::processCert(HttpsFwUpdateData["ota_server_cert"] | "");
-      Logger.notice(OMG_LOGID, F("OTA cert: %s" CR), ota_cert.c_str());
+      Logger.notice(OMG_LOGID, F("OTA cert: %s"), ota_cert.c_str());
       if (ota_cert.length() < MIN_CERT_LENGTH && !strstr(url, "http:")) {
 #  if !OMG_MQTT_BROKER_MODE
         if (cnt_parameters_array[cnt_index].ota_server_cert.length() > MIN_CERT_LENGTH) {
-          Logger.notice(OMG_LOGID, F("Using memory cert" CR));
+          Logger.notice(OMG_LOGID, F("Using memory cert"));
           ota_cert = cnt_parameters_array[cnt_index].ota_server_cert.c_str();
         } else
 #  endif
         {
-          Logger.notice(OMG_LOGID, F("Using config cert" CR));
+          Logger.notice(OMG_LOGID, F("Using config cert"));
           ota_cert = OTAserver_cert;
         }
       }
 
       t_httpUpdate_return result = HTTP_UPDATE_FAILED;
       if (strstr(url, "http:")) {
-        Logger.notice(OMG_LOGID, F("Http update" CR));
+        Logger.notice(OMG_LOGID, F("Http update"));
         WiFiClient update_client;
 #  ifdef ESP32
         httpUpdate.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
@@ -3423,19 +3423,19 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
       switch (result) {
         case HTTP_UPDATE_FAILED:
 #  ifdef ESP32
-          Logger.error(OMG_LOGID, F("HTTP_UPDATE_FAILED Error (%d): %s\n" CR), httpUpdate.getLastError(), httpUpdate.getLastErrorString().c_str());
+          Logger.error(OMG_LOGID, F("HTTP_UPDATE_FAILED Error (%d): %s\n"), httpUpdate.getLastError(), httpUpdate.getLastErrorString().c_str());
 #  elif ESP8266
-          Logger.error(OMG_LOGID, F("HTTP_UPDATE_FAILED Error (%d): %s\n" CR), ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+          Logger.error(OMG_LOGID, F("HTTP_UPDATE_FAILED Error (%d): %s\n"), ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
 #  endif
           gatewayState = GatewayState::ERROR;
           break;
 
         case HTTP_UPDATE_NO_UPDATES:
-          Logger.notice(OMG_LOGID, F("HTTP_UPDATE_NO_UPDATES" CR));
+          Logger.notice(OMG_LOGID, F("HTTP_UPDATE_NO_UPDATES"));
           break;
 
         case HTTP_UPDATE_OK:
-          Logger.notice(OMG_LOGID, F("HTTP_UPDATE_OK" CR));
+          Logger.notice(OMG_LOGID, F("HTTP_UPDATE_OK"));
           jsondata["release_summary"] = "Update success !";
           jsondata["installed_version"] = latestVersion;
           jsondata["origin"] = subjectRLStoMQTT;
@@ -3463,7 +3463,7 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
 */
 void readCntParameters(int index) {
   if (index < 0 || index > 2) {
-    Logger.warning(OMG_LOGID, F("Invalid cnt index" CR));
+    Logger.warning(OMG_LOGID, F("Invalid cnt index"));
     return;
   }
   StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
@@ -3497,10 +3497,10 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
   if (cmpToMainTopic(topicOri, subjectMQTTtoSYSset)) {
     bool restartESP = false;
     bool publishState = false;
-    Logger.debug(OMG_LOGID, F("MQTTtoSYS json" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoSYS json"));
     if (SYSdata.containsKey("cmd")) {
       const char* cmd = SYSdata["cmd"];
-      Logger.notice(OMG_LOGID, F("Command: %s" CR), cmd);
+      Logger.notice(OMG_LOGID, F("Command: %s"), cmd);
       if (strstr(cmd, restartCmd) != NULL) { //restart
         ESPRestart(5);
       } else if (strstr(cmd, eraseCmd) != NULL) { //erase and restart
@@ -3517,17 +3517,17 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
 #  ifdef OMG_ACTUATOR_ONOFF
         updatePowerIndicator();
 #  endif
-        Logger.notice(OMG_LOGID, F("RGB brightness: %d" CR), SYSConfig.rgbbrightness);
+        Logger.notice(OMG_LOGID, F("RGB brightness: %d"), SYSConfig.rgbbrightness);
         publishState = true;
       } else {
-        Logger.warning(OMG_LOGID, F("RGB brightness value invalid - ignoring command" CR));
+        Logger.warning(OMG_LOGID, F("RGB brightness value invalid - ignoring command"));
       }
     }
 #endif
 #ifdef OMG_MQTT_DISCOVERY
     if (SYSdata.containsKey("ohdisc") && SYSdata["ohdisc"].is<bool>()) {
       SYSConfig.ohdiscovery = SYSdata["ohdisc"];
-      Logger.notice(OMG_LOGID, F("OpenHAB discovery: %T" CR), SYSConfig.ohdiscovery);
+      Logger.notice(OMG_LOGID, F("OpenHAB discovery: %T"), SYSConfig.ohdiscovery);
       publishState = true;
     }
 #endif
@@ -3543,7 +3543,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       // NOTE: There's no need to disconnect MQTT manually
       WiFi.disconnect(true);
 
-      Logger.warning(OMG_LOGID, F("Attempting connection to new AP %s" CR), (const char*)SYSdata["wifi_ssid"]);
+      Logger.warning(OMG_LOGID, F("Attempting connection to new AP %s"), (const char*)SYSdata["wifi_ssid"]);
       WiFi.begin((const char*)SYSdata["wifi_ssid"], (const char*)SYSdata["wifi_pass"]);
 #if defined(WifiGMode) || defined(WifiPower)
       setESPWifiProtocolTxPower();
@@ -3551,7 +3551,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       WiFi.waitForConnectResult(OMG_WIFI_TIMEOUT * 1000);
 
       if (WiFi.status() != WL_CONNECTED) {
-        Logger.warning(OMG_LOGID, F("Failed to connect to new AP; falling back" CR));
+        Logger.warning(OMG_LOGID, F("Failed to connect to new AP; falling back"));
         WiFi.disconnect(true);
         WiFi.begin(prev_ssid.c_str(), prev_pass.c_str());
 #if defined(WifiGMode) || defined(WifiPower)
@@ -3626,7 +3626,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
 
     if (SYSdata.containsKey("cnt_index") && SYSdata["cnt_index"].is<int>()) {
       if (SYSdata["cnt_index"].as<int>() < 0 || SYSdata["cnt_index"].as<int>() > 2) {
-        Logger.warning(OMG_LOGID, F("Invalid cnt index provided - ignoring command" CR));
+        Logger.warning(OMG_LOGID, F("Invalid cnt index provided - ignoring command"));
         return;
       }
 
@@ -3638,7 +3638,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       cnt_index = SYSdata["cnt_index"].as<int>();
       cnt_parameters_backup->parameters = cnt_parameters_array[cnt_index];
 
-      Logger.notice(OMG_LOGID, F("MQTT cnt index %d" CR), cnt_index);
+      Logger.notice(OMG_LOGID, F("MQTT cnt index %d"), cnt_index);
 
       if (SYSdata.containsKey("mqtt_user") && SYSdata["mqtt_user"].is<const char*>() && SYSdata.containsKey("mqtt_pass") && SYSdata["mqtt_pass"].is<const char*>()) {
         strcpy(cnt_parameters_array[cnt_index].mqtt_user, SYSdata["mqtt_user"]);
@@ -3669,22 +3669,22 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       // Copy the certs to the memory
       if (SYSdata.containsKey("mqtt_server_cert") && SYSdata["mqtt_server_cert"].is<const char*>()) {
         cnt_parameters_array[cnt_index].server_cert = TheengsUtils::processCert(SYSdata["mqtt_server_cert"].as<const char*>());
-        Logger.debug(OMG_LOGID, F("Assigning server cert %s" CR), generateHash(cnt_parameters_array[cnt_index].server_cert).c_str());
+        Logger.debug(OMG_LOGID, F("Assigning server cert %s"), generateHash(cnt_parameters_array[cnt_index].server_cert).c_str());
         cnt_parameters_array[cnt_index].validConnection = false;
       }
       if (SYSdata.containsKey("mqtt_client_cert") && SYSdata["mqtt_client_cert"].is<const char*>()) {
         cnt_parameters_array[cnt_index].client_cert = TheengsUtils::processCert(SYSdata["mqtt_client_cert"].as<const char*>());
-        Logger.debug(OMG_LOGID, F("Assigning client cert %s" CR), generateHash(cnt_parameters_array[cnt_index].client_cert).c_str());
+        Logger.debug(OMG_LOGID, F("Assigning client cert %s"), generateHash(cnt_parameters_array[cnt_index].client_cert).c_str());
         cnt_parameters_array[cnt_index].validConnection = false;
       }
       if (SYSdata.containsKey("mqtt_client_key") && SYSdata["mqtt_client_key"].is<const char*>()) {
         cnt_parameters_array[cnt_index].client_key = TheengsUtils::processCert(SYSdata["mqtt_client_key"].as<const char*>());
-        Logger.debug(OMG_LOGID, F("Assigning client key %s" CR), generateHash(cnt_parameters_array[cnt_index].client_key).c_str());
+        Logger.debug(OMG_LOGID, F("Assigning client key %s"), generateHash(cnt_parameters_array[cnt_index].client_key).c_str());
         cnt_parameters_array[cnt_index].validConnection = false;
       }
       if (SYSdata.containsKey("ota_server_cert") && SYSdata["ota_server_cert"].is<const char*>()) {
         cnt_parameters_array[cnt_index].ota_server_cert = TheengsUtils::processCert(SYSdata["ota_server_cert"].as<const char*>());
-        Logger.debug(OMG_LOGID, F("Assigning OTA server cert %s" CR), generateHash(cnt_parameters_array[cnt_index].ota_server_cert).c_str());
+        Logger.debug(OMG_LOGID, F("Assigning OTA server cert %s"), generateHash(cnt_parameters_array[cnt_index].ota_server_cert).c_str());
       }
 
       // Read the memory certs hash to MQTT
@@ -3714,15 +3714,15 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
 
     if (SYSdata.containsKey("mqtt") && SYSdata["mqtt"].is<bool>()) {
       SYSConfig.mqtt = SYSdata["mqtt"];
-      Logger.notice(OMG_LOGID, F("xtomqtt: %T" CR), SYSConfig.mqtt);
+      Logger.notice(OMG_LOGID, F("xtomqtt: %T"), SYSConfig.mqtt);
     }
     if (SYSdata.containsKey("serial") && SYSdata["serial"].is<bool>()) {
       SYSConfig.serial = SYSdata["serial"];
-      Logger.notice(OMG_LOGID, F("SERIAL: %T" CR), SYSConfig.serial);
+      Logger.notice(OMG_LOGID, F("SERIAL: %T"), SYSConfig.serial);
     }
     if (SYSdata.containsKey("offline") && SYSdata["offline"].is<bool>()) {
       SYSConfig.offline = SYSdata["offline"];
-      Logger.notice(OMG_LOGID, F("offline: %T" CR), SYSConfig.offline);
+      Logger.notice(OMG_LOGID, F("offline: %T"), SYSConfig.offline);
       if (SYSConfig.offline) {
         gatewayState = GatewayState::OFFLINE;
 // Disconnect MQTT
@@ -3738,7 +3738,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
     }
     if (SYSdata.containsKey("powermode") && SYSdata["powermode"].is<int>()) {
       SYSConfig.powerMode = SYSdata["powermode"];
-      Logger.notice(OMG_LOGID, F("Power mode: %d" CR), SYSConfig.powerMode);
+      Logger.notice(OMG_LOGID, F("Power mode: %d"), SYSConfig.powerMode);
     }
 #if USE_BLUFI
     if (SYSdata.containsKey("blufi") && SYSdata["blufi"].is<bool>()) {
@@ -3751,7 +3751,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       if (res)
         SYSConfig.blufi = SYSdata["blufi"];
       publishState = true;
-      Logger.notice(OMG_LOGID, F("Blufi: %T" CR), SYSConfig.blufi);
+      Logger.notice(OMG_LOGID, F("Blufi: %T"), SYSConfig.blufi);
     }
 #endif
     if (SYSdata.containsKey("disc")) {
@@ -3763,9 +3763,9 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
         if (SYSConfig.discovery)
           pubMqttDiscovery();
       } else {
-        Logger.warning(OMG_LOGID, F("Discovery command not a boolean" CR));
+        Logger.warning(OMG_LOGID, F("Discovery command not a boolean"));
       }
-      Logger.notice(OMG_LOGID, F("Discovery state: %T" CR), SYSConfig.discovery);
+      Logger.notice(OMG_LOGID, F("Discovery state: %T"), SYSConfig.discovery);
     }
     if (SYSdata.containsKey("save") && SYSdata["save"].as<bool>()) {
       SYSConfig_save();

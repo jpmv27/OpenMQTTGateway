@@ -188,7 +188,7 @@ void announceDeviceTrigger(bool use_gateway_info, char* topic, char* type, char*
 
   /* Publish on the topic */
   String topic_to_publish = String(discovery_prefix) + "/device_automation/" + String(unique_id) + "/config";
-  Logger.debug(OMG_LOGID, F("Announce Device Trigger  %s" CR), topic_to_publish.c_str());
+  Logger.debug(OMG_LOGID, F("Announce Device Trigger  %s"), topic_to_publish.c_str());
   sensor["topic"] = topic_to_publish;
   sensor["retain"] = true;
   enqueueJsonObject(sensor);
@@ -451,7 +451,7 @@ void createDiscovery(const char* sensor_type,
   sensor["device"] = device;
 
   String topic = String(discovery_prefix) + "/" + String(sensor_type) + "/" + String(unique_id) + "/config";
-  Logger.debug(OMG_LOGID, F("Announce Device %s on  %s" CR), String(sensor_type).c_str(), topic.c_str());
+  Logger.debug(OMG_LOGID, F("Announce Device %s on  %s"), String(sensor_type).c_str(), topic.c_str());
   sensor["topic"] = topic;
   sensor["retain"] = true;
   enqueueJsonObject(sensor);
@@ -462,7 +462,7 @@ void eraseTopic(const char* sensor_type, const char* unique_id) {
     return;
   }
   String topic = String(discovery_prefix) + "/" + String(sensor_type) + "/" + String(unique_id) + "/config";
-  Logger.debug(OMG_LOGID, F("Erase entity discovery %s on  %s" CR), String(sensor_type).c_str(), topic.c_str());
+  Logger.debug(OMG_LOGID, F("Erase entity discovery %s on  %s"), String(sensor_type).c_str(), topic.c_str());
   pubMQTT((char*)topic.c_str(), "", true);
 }
 
@@ -501,7 +501,7 @@ void btScanParametersDiscovery() {
 #  endif
 
 void pubMqttDiscovery() {
-  Logger.debug(OMG_LOGID, F("omgStatusDiscovery" CR));
+  Logger.debug(OMG_LOGID, F("omgStatusDiscovery"));
 #  ifdef OMG_SECONDARY_MODULE
   String uptimeName = "SYS: Uptime " + String(OMG_SECONDARY_MODULE);
   String uptimeId = "uptime-" + String(OMG_SECONDARY_MODULE);
@@ -758,7 +758,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_SENSOR_BME280
 #    define BMEparametersCount 5
-  Logger.debug(OMG_LOGID, F("bme280Discovery" CR));
+  Logger.debug(OMG_LOGID, F("bme280Discovery"));
   char* BMEsensor[BMEparametersCount][8] = {
       {"sensor", "temp", "bme", "temperature", jsonTempc, "", "", "°C"},
       {"sensor", "pa", "bme", "pressure", jsonPa, "", "", "hPa"},
@@ -782,7 +782,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_SENSOR_HTU21
 #    define HTUparametersCount 2
-  Logger.debug(OMG_LOGID, F("htu21Discovery" CR));
+  Logger.debug(OMG_LOGID, F("htu21Discovery"));
   char* HTUsensor[HTUparametersCount][8] = {
       {"sensor", "temp", "htu", "temperature", jsonTempc, "", "", "°C"},
       {"sensor", "hum", "htu", "humidity", jsonHum, "", "", "%"}
@@ -803,7 +803,7 @@ void pubMqttDiscovery() {
 #  endif
 
 #  ifdef OMG_SENSOR_LM75
-  Logger.debug(OMG_LOGID, F("LM75Discovery" CR));
+  Logger.debug(OMG_LOGID, F("LM75Discovery"));
   char* LM75sensor[8] = {"sensor", "temp", "htu", "temperature", jsonTempc, "", "", "°C"};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
 
@@ -819,7 +819,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_SENSOR_AHTX0
 #    define AHTparametersCount 2
-  Logger.debug(OMG_LOGID, F("AHTx0Discovery" CR));
+  Logger.debug(OMG_LOGID, F("AHTx0Discovery"));
   char* AHTsensor[AHTparametersCount][8] = {
       {"sensor", "temp", "aht", "temperature", jsonTempc, "", "", "°C"},
       {"sensor", "hum", "aht", "humidity", jsonHum, "", "", "%"}
@@ -840,7 +840,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_SENSOR_DHT
 #    define DHTparametersCount 2
-  Logger.debug(OMG_LOGID, F("DHTDiscovery" CR));
+  Logger.debug(OMG_LOGID, F("DHTDiscovery"));
   char* DHTsensor[DHTparametersCount][8] = {
       {"sensor", "temp", "dht", "temperature", jsonTempc, "", "", "°C"},
       {"sensor", "hum", "dht", "humidity", jsonHum, "", "", "%"}
@@ -861,7 +861,7 @@ void pubMqttDiscovery() {
 #  endif
 
 #  ifdef OMG_SENSOR_ADC
-  Logger.debug(OMG_LOGID, F("ADCDiscovery" CR));
+  Logger.debug(OMG_LOGID, F("ADCDiscovery"));
   char* ADCsensor[8] = {"sensor", "adc", "", "", jsonAdc, "", "", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
 
@@ -878,7 +878,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_SENSOR_BH1750
 #    define BH1750parametersCount 3
-  Logger.debug(OMG_LOGID, F("BH1750Discovery" CR));
+  Logger.debug(OMG_LOGID, F("BH1750Discovery"));
   char* BH1750sensor[BH1750parametersCount][8] = {
       {"sensor", "lux", "BH1750", "illuminance", jsonLux, "", "", "lx"},
       {"sensor", "ftCd", "BH1750", "irradiance", jsonFtcd, "", "", ""},
@@ -901,7 +901,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_SENSOR_MQ2
 #    define MQ2parametersCount 2
-  Logger.debug(OMG_LOGID, F("MQ2Discovery" CR));
+  Logger.debug(OMG_LOGID, F("MQ2Discovery"));
   char* MQ2sensor[MQ2parametersCount][8] = {
       {"sensor", "gas", "MQ2", "gas", jsonVal, "", "", "ppm"},
       {"binary_sensor", "MQ2", "", "gas", jsonPresence, "true", "false", ""}
@@ -922,7 +922,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_SENSOR_TEMT6000
 #    define TEMT6000parametersCount 3
-  Logger.debug(OMG_LOGID, F("TEMT6000Discovery" CR));
+  Logger.debug(OMG_LOGID, F("TEMT6000Discovery"));
   char* TEMT6000sensor[TEMT6000parametersCount][8] = {
       {"sensor", "lux", "TEMT6000", "illuminance", jsonLux, "", "", "lx"},
       {"sensor", "ftcd", "TEMT6000", "irradiance", jsonFtcd, "", "", ""},
@@ -945,7 +945,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_SENSOR_TSL2561
 #    define TSL2561parametersCount 3
-  Logger.debug(OMG_LOGID, F("TSL2561Discovery" CR));
+  Logger.debug(OMG_LOGID, F("TSL2561Discovery"));
   char* TSL2561sensor[TSL2561parametersCount][8] = {
       {"sensor", "lux", "TSL2561", "illuminance", jsonLux, "", "", "lx"},
       {"sensor", "ftcd", "TSL2561", "irradiance", jsonFtcd, "", "", ""},
@@ -967,7 +967,7 @@ void pubMqttDiscovery() {
 #  endif
 
 #  ifdef OMG_SENSOR_HCSR501
-  Logger.debug(OMG_LOGID, F("HCSR501Discovery" CR));
+  Logger.debug(OMG_LOGID, F("HCSR501Discovery"));
   char* HCSR501sensor[8] = {"binary_sensor", "hcsr501", "", "motion", jsonPresence, "true", "false", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
 
@@ -983,7 +983,7 @@ void pubMqttDiscovery() {
 #  endif
 
 #  ifdef OMG_SENSOR_GPIOINPUT
-  Logger.debug(OMG_LOGID, F("GPIOInputDiscovery" CR));
+  Logger.debug(OMG_LOGID, F("GPIOInputDiscovery"));
   char* GPIOInputsensor[8] = {"binary_sensor", "GPIOInput", "", "", jsonGpio, INPUT_GPIO_ON_VALUE, INPUT_GPIO_OFF_VALUE, ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
 
@@ -1000,7 +1000,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_SENSOR_INA226
 #    define INA226parametersCount 3
-  Logger.debug(OMG_LOGID, F("INA226Discovery" CR));
+  Logger.debug(OMG_LOGID, F("INA226Discovery"));
   char* INA226sensor[INA226parametersCount][8] = {
       {"sensor", "volt", "INA226", "voltage", jsonVolt, "", "", "V"},
       {"sensor", "current", "INA226", "current", jsonCurrent, "", "", "A"},
@@ -1027,7 +1027,7 @@ void pubMqttDiscovery() {
 #  endif
 
 #  ifdef OMG_ACTUATOR_ONOFF
-  Logger.debug(OMG_LOGID, F("actuatorONOFFDiscovery" CR));
+  Logger.debug(OMG_LOGID, F("actuatorONOFFDiscovery"));
   char* actuatorONOFF[8] = {"switch", "actuatorONOFF", "", "", "{{ value_json.cmd }}", "{\"cmd\":1}", "{\"cmd\":0}", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
 
@@ -1045,7 +1045,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_SENSOR_RN8209
 #    define RN8209parametersCount 4
-  Logger.debug(OMG_LOGID, F("RN8209Discovery" CR));
+  Logger.debug(OMG_LOGID, F("RN8209Discovery"));
   char* RN8209sensor[RN8209parametersCount][8] = {
       {"sensor", "volt", "RN8209", "voltage", jsonVolt, "", "", "V"},
       {"sensor", "current", "RN8209", "current", jsonCurrent, "", "", "A"},
@@ -1069,7 +1069,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_GATEWAY_RF
   // Sensor to display RF received value
-  Logger.debug(OMG_LOGID, F("gatewayRFDiscovery" CR));
+  Logger.debug(OMG_LOGID, F("gatewayRFDiscovery"));
   char* gatewayRF[8] = {"sensor", "gatewayRF", "", "", jsonVal, "", "", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
 
@@ -1087,7 +1087,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_GATEWAY_RF2
   // Sensor to display RF received value
-  Logger.debug(OMG_LOGID, F("gatewayRF2Discovery" CR));
+  Logger.debug(OMG_LOGID, F("gatewayRF2Discovery"));
   char* gatewayRF2[8] = {"sensor", "gatewayRF2", "", "", jsonAddress, "", "", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
 
@@ -1104,7 +1104,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_GATEWAY_RFM69
   // Sensor to display RF received value
-  Logger.debug(OMG_LOGID, F("gatewayRFM69Discovery" CR));
+  Logger.debug(OMG_LOGID, F("gatewayRFM69Discovery"));
   char* gatewayRFM69[8] = {"sensor", "gatewayRFM69", "", "", jsonVal, "", "", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
 
@@ -1121,7 +1121,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_GATEWAY_LORA
   // Sensor to display RF received value
-  Logger.debug(OMG_LOGID, F("gatewayLORADiscovery" CR));
+  Logger.debug(OMG_LOGID, F("gatewayLORADiscovery"));
   char* gatewayLORA[8] = {"sensor", "gatewayLORA", "", "", jsonMsg, "", "", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
 
@@ -1171,7 +1171,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_GATEWAY_SRFB
   // Sensor to display RF received value
-  Logger.debug(OMG_LOGID, F("gatewaySRFBDiscovery" CR));
+  Logger.debug(OMG_LOGID, F("gatewaySRFBDiscovery"));
   char* gatewaySRFB[8] = {"sensor", "gatewaySRFB", "", "", jsonVal, "", "", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
 
@@ -1188,7 +1188,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_GATEWAY_PILIGHT
   // Sensor to display RF received value
-  Logger.debug(OMG_LOGID, F("gatewayPilightDiscovery" CR));
+  Logger.debug(OMG_LOGID, F("gatewayPilightDiscovery"));
   char* gatewayPilight[8] = {"sensor", "gatewayPilight", "", "", jsonMsg, "", "", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
 
@@ -1205,7 +1205,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_GATEWAY_IR
   // Sensor to display IR received value
-  Logger.debug(OMG_LOGID, F("gatewayIRDiscovery" CR));
+  Logger.debug(OMG_LOGID, F("gatewayIRDiscovery"));
   char* gatewayIR[8] = {"sensor", "gatewayIR", "", "", jsonVal, "", "", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
 
@@ -1222,7 +1222,7 @@ void pubMqttDiscovery() {
 
 #  ifdef OMG_GATEWAY_2G
   // Sensor to display 2G received value
-  Logger.debug(OMG_LOGID, F("gateway2GDiscovery" CR));
+  Logger.debug(OMG_LOGID, F("gateway2GDiscovery"));
   char* gateway2G[8] = {"sensor", "gateway2G", "", "", jsonMsg, "", "", ""};
   //component type,name,availability topic,device class,value template,payload on, payload off, unit of measurement
 

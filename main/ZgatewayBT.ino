@@ -248,12 +248,12 @@ void BTConfig_fromJson(JsonObject& BTdata, bool startup = false) {
     preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
     if (preferences.isKey("BTConfig")) {
       int result = preferences.remove("BTConfig");
-      Logger.notice(OMG_LOGID, F("BT config erase result: %d" CR), result);
+      Logger.notice(OMG_LOGID, F("BT config erase result: %d"), result);
       preferences.end();
       return; // Erase prevails on save, so skipping save
     } else {
       preferences.end();
-      Logger.notice(OMG_LOGID, F("BT config not found" CR));
+      Logger.notice(OMG_LOGID, F("BT config not found"));
     }
   }
 
@@ -288,7 +288,7 @@ void BTConfig_fromJson(JsonObject& BTdata, bool startup = false) {
     preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
     int result = preferences.putString("BTConfig", conf);
     preferences.end();
-    Logger.notice(OMG_LOGID, F("BT config save: %s, result: %d" CR), conf.c_str(), result);
+    Logger.notice(OMG_LOGID, F("BT config save: %s, result: %d"), conf.c_str(), result);
   }
 }
 
@@ -298,21 +298,21 @@ void BTConfig_load() {
   if (preferences.isKey("BTConfig")) {
     auto error = deserializeJson(jsonBuffer, preferences.getString("BTConfig", "{}"));
     preferences.end();
-    Logger.notice(OMG_LOGID, F("BT config loaded" CR));
+    Logger.notice(OMG_LOGID, F("BT config loaded"));
     if (error) {
-      Logger.error(OMG_LOGID, F("BT config deserialization failed: %s, buffer capacity: %u" CR), error.c_str(), jsonBuffer.capacity());
+      Logger.error(OMG_LOGID, F("BT config deserialization failed: %s, buffer capacity: %u"), error.c_str(), jsonBuffer.capacity());
       return;
     }
     if (jsonBuffer.isNull()) {
-      Logger.warning(OMG_LOGID, F("BT config is null" CR));
+      Logger.warning(OMG_LOGID, F("BT config is null"));
       return;
     }
     JsonObject jo = jsonBuffer.as<JsonObject>();
     BTConfig_fromJson(jo, true); // Never send MQTT message with config
-    Logger.notice(OMG_LOGID, F("BT config loaded" CR));
+    Logger.notice(OMG_LOGID, F("BT config loaded"));
   } else {
     preferences.end();
-    Logger.notice(OMG_LOGID, F("BT config not found" CR));
+    Logger.notice(OMG_LOGID, F("BT config not found"));
   }
 }
 
@@ -324,7 +324,7 @@ void createOrUpdateDevice(const char* mac, uint8_t flags, int model, int mac_typ
 
 BLEdevice* getDeviceByMac(const char* mac); // Declared here to avoid pre-compilation issue (misplaced auto declaration by pio)
 BLEdevice* getDeviceByMac(const char* mac) {
-  Logger.debug(OMG_LOGID, F("getDeviceByMac %s" CR), mac);
+  Logger.debug(OMG_LOGID, F("getDeviceByMac %s"), mac);
 
   for (vector<BLEdevice*>::iterator it = devices.begin(); it != devices.end(); ++it) {
     if ((strcmp((*it)->macAdr, mac) == 0)) {
@@ -335,7 +335,7 @@ BLEdevice* getDeviceByMac(const char* mac) {
 }
 
 bool updateWorB(JsonObject& BTdata, bool isWhite) {
-  Logger.debug(OMG_LOGID, F("update WorB" CR));
+  Logger.debug(OMG_LOGID, F("update WorB"));
   const char* jsonKey = isWhite ? "white-list" : "black-list";
 
   int size = BTdata[jsonKey].size();
@@ -353,12 +353,12 @@ bool updateWorB(JsonObject& BTdata, bool isWhite) {
 
 void createOrUpdateDevice(const char* mac, uint8_t flags, int model, int mac_type, const char* name) {
   if (xSemaphoreTake(semaphoreCreateOrUpdateDevice, pdMS_TO_TICKS(30000)) == pdFALSE) {
-    Logger.error(OMG_LOGID, F("Semaphore NOT taken" CR));
+    Logger.error(OMG_LOGID, F("Semaphore NOT taken"));
     return;
   }
   BLEdevice* device = getDeviceByMac(mac);
   if (device == &NO_BT_DEVICE_FOUND) {
-    Logger.debug(OMG_LOGID, F("add %s" CR), mac);
+    Logger.debug(OMG_LOGID, F("add %s"), mac);
     //new device
     device = new BLEdevice();
     strcpy(device->macAdr, mac);
@@ -369,7 +369,7 @@ void createOrUpdateDevice(const char* mac, uint8_t flags, int model, int mac_typ
     device->macType = mac_type;
     // Check name length
     if (strlen(name) > 20) {
-      Logger.warning(OMG_LOGID, F("Name too long, truncating" CR));
+      Logger.warning(OMG_LOGID, F("Name too long, truncating"));
       strncpy(device->name, name, 20);
       device->name[20] = '\0';
     } else {
@@ -380,7 +380,7 @@ void createOrUpdateDevice(const char* mac, uint8_t flags, int model, int mac_typ
     devices.push_back(device);
     newDevices++;
   } else {
-    Logger.debug(OMG_LOGID, F("update %s" CR), mac);
+    Logger.debug(OMG_LOGID, F("update %s"), mac);
     device->lastUpdate = millis();
     device->macType = mac_type;
 
@@ -455,14 +455,14 @@ void dumpDevices() {
 #  if OMG_LOG_LEVEL > ELOG_LEVEL_NOTICE
   for (vector<BLEdevice*>::iterator it = devices.begin(); it != devices.end(); ++it) {
     BLEdevice* p = *it;
-    Logger.debug(OMG_LOGID, F("macAdr %s" CR), p->macAdr);
-    Logger.debug(OMG_LOGID, F("macType %d" CR), p->macType);
-    Logger.debug(OMG_LOGID, F("isDisc %d" CR), p->isDisc);
-    Logger.debug(OMG_LOGID, F("isWhtL %d" CR), p->isWhtL);
-    Logger.debug(OMG_LOGID, F("isBlkL %d" CR), p->isBlkL);
-    Logger.debug(OMG_LOGID, F("connect %d" CR), p->connect);
-    Logger.debug(OMG_LOGID, F("sensorModel_id %d" CR), p->sensorModel_id);
-    Logger.debug(OMG_LOGID, F("LastUpdate %u" CR), p->lastUpdate);
+    Logger.debug(OMG_LOGID, F("macAdr %s"), p->macAdr);
+    Logger.debug(OMG_LOGID, F("macType %d"), p->macType);
+    Logger.debug(OMG_LOGID, F("isDisc %d"), p->isDisc);
+    Logger.debug(OMG_LOGID, F("isWhtL %d"), p->isWhtL);
+    Logger.debug(OMG_LOGID, F("isBlkL %d"), p->isBlkL);
+    Logger.debug(OMG_LOGID, F("connect %d"), p->connect);
+    Logger.debug(OMG_LOGID, F("sensorModel_id %d"), p->sensorModel_id);
+    Logger.debug(OMG_LOGID, F("LastUpdate %u"), p->lastUpdate);
   }
 #  endif
 }
@@ -476,7 +476,7 @@ void strupp(char* beg) {
 #ifdef OMG_BT_DT24
 void DT24Discovery(const char* mac, const char* sensorModel_id) {
 #    define DT24parametersCount 7
-  Logger.debug(OMG_LOGID, F("DT24Discovery" CR));
+  Logger.debug(OMG_LOGID, F("DT24Discovery"));
   const char* DT24sensor[DT24parametersCount][9] = {
       {"sensor", "volt", mac, "voltage", jsonVolt, "", "", "V", stateClassMeasurement},
       {"sensor", "amp", mac, "current", jsonCurrent, "", "", "A", stateClassMeasurement},
@@ -495,7 +495,7 @@ void DT24Discovery(const char* mac, const char* sensorModel_id) {
 #ifdef OMG_BT_BM2
 void BM2Discovery(const char* mac, const char* sensorModel_id) {
 #    define BM2parametersCount 2
-  Logger.debug(OMG_LOGID, F("BM2Discovery" CR));
+  Logger.debug(OMG_LOGID, F("BM2Discovery"));
   const char* BM2sensor[BM2parametersCount][9] = {
       {"sensor", "volt", mac, "voltage", jsonVoltBM2, "", "", "V", stateClassMeasurement}, // We use a json definition that retrieve only data from the BM2 decoder, as this sensor also advertize volt as an iBeacon
       {"sensor", "batt", mac, "battery", jsonBatt, "", "", "%", stateClassMeasurement}
@@ -509,7 +509,7 @@ void BM2Discovery(const char* mac, const char* sensorModel_id) {
 #if defined(OMG_BT_LYWSD03MMC) || defined(OMG_BT_MHO_C401)
 void LYWSD03MMCDiscovery(const char* mac, const char* sensorModel) {
 #    define LYWSD03MMCparametersCount 4
-  Logger.debug(OMG_LOGID, F("LYWSD03MMCDiscovery" CR));
+  Logger.debug(OMG_LOGID, F("LYWSD03MMCDiscovery"));
   const char* LYWSD03MMCsensor[LYWSD03MMCparametersCount][9] = {
       {"sensor", "batt", mac, "battery", jsonBatt, "", "", "%", stateClassMeasurement},
       {"sensor", "volt", mac, "", jsonVolt, "", "", "V", stateClassMeasurement},
@@ -524,7 +524,7 @@ void LYWSD03MMCDiscovery(const char* mac, const char* sensorModel) {
 
 void MHO_C401Discovery(const char* mac, const char* sensorModel) {
 #    define MHO_C401parametersCount 4
-  Logger.debug(OMG_LOGID, F("MHO_C401Discovery" CR));
+  Logger.debug(OMG_LOGID, F("MHO_C401Discovery"));
   const char* MHO_C401sensor[MHO_C401parametersCount][9] = {
       {"sensor", "batt", mac, "battery", jsonBatt, "", "", "%", stateClassMeasurement},
       {"sensor", "volt", mac, "", jsonVolt, "", "", "V", stateClassMeasurement},
@@ -540,7 +540,7 @@ void MHO_C401Discovery(const char* mac, const char* sensorModel) {
 #ifdef OMG_BT_HHCCJCY01HHCC
 void HHCCJCY01HHCCDiscovery(const char* mac, const char* sensorModel) {
 #    define HHCCJCY01HHCCparametersCount 5
-  Logger.debug(OMG_LOGID, F("HHCCJCY01HHCCDiscovery" CR));
+  Logger.debug(OMG_LOGID, F("HHCCJCY01HHCCDiscovery"));
   const char* HHCCJCY01HHCCsensor[HHCCJCY01HHCCparametersCount][9] = {
       {"sensor", "batt", mac, "battery", jsonBatt, "", "", "%", stateClassMeasurement},
       {"sensor", "temp", mac, "temperature", jsonTempc, "", "", "°C", stateClassMeasurement},
@@ -557,7 +557,7 @@ void HHCCJCY01HHCCDiscovery(const char* mac, const char* sensorModel) {
 #ifdef OMG_BT_XMWSDJ04MMC
 void XMWSDJ04MMCDiscovery(const char* mac, const char* sensorModel) {
 #    define XMWSDJ04MMCparametersCount 4
-  Logger.debug(OMG_LOGID, F("XMWSDJ04MMCDiscovery" CR));
+  Logger.debug(OMG_LOGID, F("XMWSDJ04MMCDiscovery"));
   const char* XMWSDJ04MMCsensor[XMWSDJ04MMCparametersCount][9] = {
       {"sensor", "batt", mac, "battery", jsonBatt, "", "", "%", stateClassMeasurement},
       {"sensor", "volt", mac, "", jsonVolt, "", "", "V", stateClassMeasurement},
@@ -604,7 +604,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
   void onResult(BLEAdvertisedDevice* advertisedDevice) {
     BLEAdvertisedDevice* ad = new BLEAdvertisedDevice(*advertisedDevice);
     if (xQueueSend(BLEQueue, &ad, 0) != pdTRUE) {
-      Logger.error(OMG_LOGID, F("BLEQueue full" CR));
+      Logger.error(OMG_LOGID, F("BLEQueue full"));
       delete (ad);
     }
   }
@@ -615,7 +615,7 @@ std::string convertServiceData(std::string deviceServiceData) {
   char spr[2 * serviceDataLength + 1];
   for (int i = 0; i < serviceDataLength; i++) sprintf(spr + 2 * i, "%.2x", (unsigned char)deviceServiceData[i]);
   spr[2 * serviceDataLength] = 0;
-  Logger.debug(OMG_LOGID, F("Converted service data (%d) to %s" CR), serviceDataLength, spr);
+  Logger.debug(OMG_LOGID, F("Converted service data (%d) to %s"), serviceDataLength, spr);
   return spr;
 }
 
@@ -627,7 +627,7 @@ bool checkIfIsTracker(char ch) {
     data = 10 + (ch - 'a');
 
   if (((data >> 3) & 0x01) == 1) {
-    Logger.debug(OMG_LOGID, F("Is Device Tracker" CR));
+    Logger.debug(OMG_LOGID, F("Is Device Tracker"));
     return true;
   } else {
     return false;
@@ -642,7 +642,7 @@ void procBLETask(void* pvParameters) {
     // Feed the watchdog
     //esp_task_wdt_reset();
     if (!BTProcessLock) {
-      Logger.debug(OMG_LOGID, F("Creating BLE buffer" CR));
+      Logger.debug(OMG_LOGID, F("Creating BLE buffer"));
       StaticJsonDocument<JSON_MSG_BUFFER> BLEdataBuffer;
       JsonObject BLEdata = BLEdataBuffer.to<JsonObject>();
       std::string mac_address = advertisedDevice->getAddress().toString();
@@ -654,11 +654,11 @@ void procBLETask(void* pvParameters) {
       BLEdata["id"] = mac_address;
       BLEdata["mac_type"] = advertisedDevice->getAddress().getType();
       BLEdata["adv_type"] = advertisedDevice->getAdvType();
-      Logger.notice(OMG_LOGID, F("BT Device detected: %s" CR), BLEdata["id"].as<const char*>());
+      Logger.notice(OMG_LOGID, F("BT Device detected: %s"), BLEdata["id"].as<const char*>());
       BLEdevice* device = getDeviceByMac(BLEdata["id"].as<const char*>());
 
       if (BTConfig.filterConnectable && device->connect) {
-        Logger.notice(OMG_LOGID, F("Filtered connectable device" CR));
+        Logger.notice(OMG_LOGID, F("Filtered connectable device"));
         delete (advertisedDevice);
         continue;
       }
@@ -680,15 +680,15 @@ void procBLETask(void* pvParameters) {
         }
         if (advertisedDevice->haveServiceData()) {
           int serviceDataCount = advertisedDevice->getServiceDataCount();
-          Logger.debug(OMG_LOGID, F("Get services data number: %d" CR), serviceDataCount);
+          Logger.debug(OMG_LOGID, F("Get services data number: %d"), serviceDataCount);
           for (int j = 0; j < serviceDataCount; j++) {
             StaticJsonDocument<JSON_MSG_BUFFER> BLEdataBufferTemp;
             JsonObject BLEdataTemp = BLEdataBufferTemp.to<JsonObject>();
             BLEdataBufferTemp = BLEdataBuffer;
             std::string service_data = convertServiceData(advertisedDevice->getServiceData(j));
-            Logger.debug(OMG_LOGID, F("Service data: %s" CR), service_data.c_str());
+            Logger.debug(OMG_LOGID, F("Service data: %s"), service_data.c_str());
             std::string serviceDatauuid = advertisedDevice->getServiceDataUUID(j).toString();
-            Logger.debug(OMG_LOGID, F("Service data UUID: %s" CR), (char*)serviceDatauuid.c_str());
+            Logger.debug(OMG_LOGID, F("Service data UUID: %s"), (char*)serviceDatauuid.c_str());
             BLEdataTemp["servicedata"] = (char*)service_data.c_str();
             BLEdataTemp["servicedatauuid"] = (char*)serviceDatauuid.c_str();
             PublishDeviceData(BLEdataTemp);
@@ -697,7 +697,7 @@ void procBLETask(void* pvParameters) {
           PublishDeviceData(BLEdata);
         }
       } else {
-        Logger.debug(OMG_LOGID, F("Filtered MAC device" CR));
+        Logger.debug(OMG_LOGID, F("Filtered MAC device"));
       }
       updateDevicesStatus();
     }
@@ -714,7 +714,7 @@ void BLEscan() {
   while (uxQueueMessagesWaiting(BLEQueue) || queueLength != 0) { // the criteria on queueLength could be adjusted to parallelize the scan and the queue processing
     delay(1); // Wait for queue to empty, a yield here instead of the delay cause the WDT to trigger
   }
-  Logger.notice(OMG_LOGID, F("Scan begin" CR));
+  Logger.notice(OMG_LOGID, F("Scan begin"));
   BLEScan* pBLEScan = BLEDevice::getScan();
   MyAdvertisedDeviceCallbacks myCallbacks;
   pBLEScan->setAdvertisedDeviceCallbacks(&myCallbacks);
@@ -729,8 +729,8 @@ void BLEscan() {
   BLEScanResults foundDevices = pBLEScan->start(BTConfig.scanDuration / 1000, false);
   if (foundDevices.getCount())
     scanCount++;
-  Logger.notice(OMG_LOGID, F("Found %d devices, scan number %d end" CR), foundDevices.getCount(), scanCount);
-  Logger.debug(OMG_LOGID, F("Process BLE stack free: %u" CR), uxTaskGetStackHighWaterMark(xProcBLETaskHandle));
+  Logger.notice(OMG_LOGID, F("Found %d devices, scan number %d end"), foundDevices.getCount(), scanCount);
+  Logger.debug(OMG_LOGID, F("Process BLE stack free: %u"), uxTaskGetStackHighWaterMark(xProcBLETaskHandle));
 }
 
 /**
@@ -739,12 +739,12 @@ void BLEscan() {
 #  if OMG_BLE_DECODER
 void BLEconnect() {
   if (!BTProcessLock) {
-    Logger.notice(OMG_LOGID, F("BLE Connect begin" CR));
+    Logger.notice(OMG_LOGID, F("BLE Connect begin"));
     do {
       for (vector<BLEdevice*>::iterator it = devices.begin(); it != devices.end(); ++it) {
         BLEdevice* p = *it;
         if (p->connect) {
-          Logger.debug(OMG_LOGID, F("Model to connect found: %s" CR), p->macAdr);
+          Logger.debug(OMG_LOGID, F("Model to connect found: %s"), p->macAdr);
           NimBLEAddress addr((const char*)p->macAdr, p->macType);
 #if defined(OMG_BT_LYWSD03MMC) || defined(OMG_BT_MHO_C401)
           if (false
@@ -852,7 +852,7 @@ void BLEconnect() {
         }
       }
     } while (BLEactions.size() > 0);
-    Logger.notice(OMG_LOGID, F("BLE Connect end" CR));
+    Logger.notice(OMG_LOGID, F("BLE Connect end"));
   }
 }
 #  else
@@ -863,14 +863,14 @@ void stopProcessing() {
   if (BTConfig.enabled) {
     BTProcessLock = true;
     // We stop the scan
-    Logger.notice(OMG_LOGID, F("Stopping BLE scan" CR));
+    Logger.notice(OMG_LOGID, F("Stopping BLE scan"));
     BLEScan* pBLEScan = BLEDevice::getScan();
     if (pBLEScan->isScanning()) {
       pBLEScan->stop();
     }
 
     if (xSemaphoreTake(semaphoreBLEOperation, pdMS_TO_TICKS(5000)) == pdTRUE) {
-      Logger.notice(OMG_LOGID, F("Stopping BLE tasks" CR));
+      Logger.notice(OMG_LOGID, F("Stopping BLE tasks"));
       //Suspending, deleting tasks and stopping BT to free memory
       vTaskSuspend(xCoreTaskHandle);
       vTaskDelete(xCoreTaskHandle);
@@ -879,7 +879,7 @@ void stopProcessing() {
       xSemaphoreGive(semaphoreBLEOperation);
     }
   }
-  Logger.notice(OMG_LOGID, F("BLE gateway stopped, free heap: %d" CR), ESP.getFreeHeap());
+  Logger.notice(OMG_LOGID, F("BLE gateway stopped, free heap: %d"), ESP.getFreeHeap());
 }
 
 void coreTask(void* pvParameters) {
@@ -893,10 +893,10 @@ void coreTask(void* pvParameters) {
           BLEconnect();
         }
         //dumpDevices();
-        Logger.debug(OMG_LOGID, F("CoreTask stack free: %u" CR), uxTaskGetStackHighWaterMark(xCoreTaskHandle));
+        Logger.debug(OMG_LOGID, F("CoreTask stack free: %u"), uxTaskGetStackHighWaterMark(xCoreTaskHandle));
         xSemaphoreGive(semaphoreBLEOperation);
       } else {
-        Logger.error(OMG_LOGID, F("Failed to start scan - BLE busy" CR));
+        Logger.error(OMG_LOGID, F("Failed to start scan - BLE busy"));
       }
       if (SYSConfig.powerMode > 0) {
         int scan = atomic_exchange_explicit(&forceBTScan, 0, ::memory_order_seq_cst); // is this enough, it will wait the full deepsleep...
@@ -944,18 +944,18 @@ void setupBTTasksAndBLE() {
 void setupBT() {
   BTConfig_init();
   BTConfig_load();
-  Logger.notice(OMG_LOGID, F("BLE scans interval: %d" CR), BTConfig.BLEinterval);
-  Logger.notice(OMG_LOGID, F("BLE connects interval: %d" CR), BTConfig.intervalConnect);
-  Logger.notice(OMG_LOGID, F("BLE scan duration: %d" CR), BTConfig.scanDuration);
-  Logger.notice(OMG_LOGID, F("Publishing only BLE sensors: %T" CR), BTConfig.pubOnlySensors);
-  Logger.notice(OMG_LOGID, F("Publishing random MAC devices: %T" CR), BTConfig.pubRandomMACs);
-  Logger.notice(OMG_LOGID, F("Adaptive BLE scan: %T" CR), BTConfig.adaptiveScan);
-  Logger.notice(OMG_LOGID, F("Active BLE scan interval: %d" CR), BTConfig.intervalActiveScan);
-  Logger.notice(OMG_LOGID, F("minrssi: %d" CR), -abs(BTConfig.minRssi));
-  Logger.notice(OMG_LOGID, F("Presence Away Timer: %d" CR), BTConfig.presenceAwayTimer);
-  Logger.notice(OMG_LOGID, F("Moving Timer: %d" CR), BTConfig.movingTimer);
-  Logger.notice(OMG_LOGID, F("Force passive scan: %T" CR), BTConfig.forcePassiveScan);
-  Logger.notice(OMG_LOGID, F("Enabled BLE: %T" CR), BTConfig.enabled);
+  Logger.notice(OMG_LOGID, F("BLE scans interval: %d"), BTConfig.BLEinterval);
+  Logger.notice(OMG_LOGID, F("BLE connects interval: %d"), BTConfig.intervalConnect);
+  Logger.notice(OMG_LOGID, F("BLE scan duration: %d"), BTConfig.scanDuration);
+  Logger.notice(OMG_LOGID, F("Publishing only BLE sensors: %T"), BTConfig.pubOnlySensors);
+  Logger.notice(OMG_LOGID, F("Publishing random MAC devices: %T"), BTConfig.pubRandomMACs);
+  Logger.notice(OMG_LOGID, F("Adaptive BLE scan: %T"), BTConfig.adaptiveScan);
+  Logger.notice(OMG_LOGID, F("Active BLE scan interval: %d"), BTConfig.intervalActiveScan);
+  Logger.notice(OMG_LOGID, F("minrssi: %d"), -abs(BTConfig.minRssi));
+  Logger.notice(OMG_LOGID, F("Presence Away Timer: %d"), BTConfig.presenceAwayTimer);
+  Logger.notice(OMG_LOGID, F("Moving Timer: %d"), BTConfig.movingTimer);
+  Logger.notice(OMG_LOGID, F("Force passive scan: %T"), BTConfig.forcePassiveScan);
+  Logger.notice(OMG_LOGID, F("Enabled BLE: %T"), BTConfig.enabled);
 
   atomic_init(&forceBTScan, 0); // in theory, we don't need this
 
@@ -968,9 +968,9 @@ void setupBT() {
   BLEQueue = xQueueCreate(QueueSize, sizeof(NimBLEAdvertisedDevice*));
   if (BTConfig.enabled) {
     setupBTTasksAndBLE();
-    Logger.notice(OMG_LOGID, F("ZgatewayBT multicore ESP32 setup done" CR));
+    Logger.notice(OMG_LOGID, F("ZgatewayBT multicore ESP32 setup done"));
   } else {
-    Logger.notice(OMG_LOGID, F("ZgatewayBT multicore ESP32 setup disabled" CR));
+    Logger.notice(OMG_LOGID, F("ZgatewayBT multicore ESP32 setup disabled"));
   }
 }
 
@@ -989,7 +989,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
   if (!overrideDiscovery && newDevices == 0)
     return;
   if (xSemaphoreTake(semaphoreCreateOrUpdateDevice, pdMS_TO_TICKS(QueueSemaphoreTimeOutTask)) == pdFALSE) {
-    Logger.error(OMG_LOGID, F("Semaphore NOT taken" CR));
+    Logger.error(OMG_LOGID, F("Semaphore NOT taken"));
     return;
   }
   newDevices = 0;
@@ -997,15 +997,15 @@ void launchBTDiscovery(bool overrideDiscovery) {
   xSemaphoreGive(semaphoreCreateOrUpdateDevice);
   for (vector<BLEdevice*>::iterator it = localDevices.begin(); it != localDevices.end(); ++it) {
     BLEdevice* p = *it;
-    Logger.debug(OMG_LOGID, F("Device mac %s" CR), p->macAdr);
+    Logger.debug(OMG_LOGID, F("Device mac %s"), p->macAdr);
     // Do not launch discovery for the devices already discovered (unless we have overrideDiscovery) or that are not unique by their MAC Address (iBeacon, GAEN and Microsoft CDP)
     if (overrideDiscovery || !isDiscovered(p)) {
       String macWOdots = String(p->macAdr);
       macWOdots.replace(":", "");
       if (p->sensorModel_id >= 0) {
-        Logger.debug(OMG_LOGID, F("Looking for Model_id: %d" CR), p->sensorModel_id);
+        Logger.debug(OMG_LOGID, F("Looking for Model_id: %d"), p->sensorModel_id);
         std::string properties = decoder.getTheengProperties(p->sensorModel_id);
-        Logger.debug(OMG_LOGID, F("properties: %s" CR), properties.c_str());
+        Logger.debug(OMG_LOGID, F("properties: %s"), properties.c_str());
         std::string brand = decoder.getTheengAttribute(p->sensorModel_id, "brand");
         std::string model = decoder.getTheengAttribute(p->sensorModel_id, "model");
 #    ifdef OMG_MQTT_DISCOVERY_FORCE_DEVICE_NAME
@@ -1063,10 +1063,10 @@ void launchBTDiscovery(bool overrideDiscovery) {
               if (jsonBuffer.overflowed()) {
                 // This should not happen if JSON_MSG_BUFFER is large enough for
                 // the Theengs json properties
-                Logger.error(OMG_LOGID, F("JSON deserialization of Theengs properties overflowed (error %s), buffer capacity: %u. Program might crash. Properties json: %s" CR),
+                Logger.error(OMG_LOGID, F("JSON deserialization of Theengs properties overflowed (error %s), buffer capacity: %u. Program might crash. Properties json: %s"),
                           error.c_str(), jsonBuffer.capacity(), properties.c_str());
               } else {
-                Logger.error(OMG_LOGID, F("JSON deserialization of Theengs properties errored: %" CR),
+                Logger.error(OMG_LOGID, F("JSON deserialization of Theengs properties errored: %"),
                           error.c_str());
               }
             }
@@ -1230,13 +1230,13 @@ void launchBTDiscovery(bool overrideDiscovery) {
             }
 #endif // OMG_BT_HHCCJCY01HHCC
           } else {
-            Logger.debug(OMG_LOGID, F("Device UNKNOWN_MODEL %s" CR), p->macAdr);
+            Logger.debug(OMG_LOGID, F("Device UNKNOWN_MODEL %s"), p->macAdr);
           }
         }
       }
       p->isDisc = true; // we don't need the semaphore and all the search magic via createOrUpdateDevice
     } else {
-      Logger.debug(OMG_LOGID, F("Device already discovered or that doesn't require discovery %s" CR), p->macAdr);
+      Logger.debug(OMG_LOGID, F("Device already discovered or that doesn't require discovery %s"), p->macAdr);
     }
   }
 }
@@ -1248,11 +1248,11 @@ void launchBTDiscovery(bool overrideDiscovery) {}
 void process_bledata(JsonObject& BLEdata) {
   yield(); // Necessary to let the loop run in case of connectivity issues
   if (!BLEdata.containsKey("id")) {
-    Logger.error(OMG_LOGID, F("No mac address in the payload" CR));
+    Logger.error(OMG_LOGID, F("No mac address in the payload"));
     return;
   }
   const char* mac = BLEdata["id"].as<const char*>();
-  Logger.debug(OMG_LOGID, F("Processing BLE data %s" CR), BLEdata["id"].as<const char*>());
+  Logger.debug(OMG_LOGID, F("Processing BLE data %s"), BLEdata["id"].as<const char*>());
   int model_id = BTConfig.extDecoderEnable ? -1 : decoder.decodeBLEJson(BLEdata);
   int mac_type = BLEdata["mac_type"].as<int>();
 
@@ -1263,13 +1263,13 @@ void process_bledata(JsonObject& BLEdata) {
       BLEdata.remove("track");
     }
     BLEdata["type"] = "RMAC";
-    Logger.debug(OMG_LOGID, F("Potential RMAC (prmac) converted to RMAC" CR));
+    Logger.debug(OMG_LOGID, F("Potential RMAC (prmac) converted to RMAC"));
   }
   const char* deviceName = BLEdata["name"] | "";
 
   if ((BLEdata["type"].as<string>()).compare("RMAC") != 0 && model_id != TheengsDecoder::BLE_ID_NUM::IBEACON) { // Do not store in memory the random mac devices and iBeacons
     if (model_id >= 0) { // Broadcaster devices
-      Logger.debug(OMG_LOGID, F("Decoder found device: %s" CR), BLEdata["model_id"].as<const char*>());
+      Logger.debug(OMG_LOGID, F("Decoder found device: %s"), BLEdata["model_id"].as<const char*>());
       if (false
 #ifdef OMG_BT_HHCCJCY01HHCC
           || model_id == TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC
@@ -1287,7 +1287,7 @@ void process_bledata(JsonObject& BLEdata) {
               BTConfig.BLEinterval = OMG_BT_MIN_TIME_BTW_SCAN;
               BTConfig.intervalActiveScan = OMG_BT_MIN_TIME_BTW_SCAN;
               BTConfig.scanDuration = OMG_BT_MIN_SCAN_DURATION;
-              Logger.notice(OMG_LOGID, F("Active and continuous scanning required, paramaters adapted" CR));
+              Logger.notice(OMG_LOGID, F("Active and continuous scanning required, paramaters adapted"));
               stateBTMeasures(false);
             }
           } else if (BLEdata.containsKey("cont") && BTConfig.BLEinterval != OMG_BT_MIN_TIME_BTW_SCAN) {
@@ -1296,7 +1296,7 @@ void process_bledata(JsonObject& BLEdata) {
               if ((BLEdata["type"].as<string>()).compare("CTMO") == 0) {
                 BTConfig.scanDuration = OMG_BT_MIN_SCAN_DURATION;
               }
-              Logger.notice(OMG_LOGID, F("Passive continuous scanning required, paramaters adapted" CR));
+              Logger.notice(OMG_LOGID, F("Passive continuous scanning required, paramaters adapted"));
               stateBTMeasures(false);
             }
           }
@@ -1323,7 +1323,7 @@ void process_bledata(JsonObject& BLEdata) {
 #endif // XMWSDJ04MMC
 
         if (model_id > 0) {
-          Logger.debug(OMG_LOGID, F("Connectable device found: %s" CR), name.c_str());
+          Logger.debug(OMG_LOGID, F("Connectable device found: %s"), name.c_str());
           createOrUpdateDevice(mac, device_flags_connect, model_id, mac_type, deviceName);
         }
       } else if (BTConfig.extDecoderEnable && model_id < 0 && BLEdata.containsKey("servicedata")) {
@@ -1331,17 +1331,17 @@ void process_bledata(JsonObject& BLEdata) {
 #ifdef OMG_BT_HHCCJCY01HHCC
         if (strstr(service_data, "209800") != NULL) {
           model_id == TheengsDecoder::BLE_ID_NUM::HHCCJCY01HHCC;
-          Logger.debug(OMG_LOGID, F("Connectable device found: HHCCJCY01HHCC" CR));
+          Logger.debug(OMG_LOGID, F("Connectable device found: HHCCJCY01HHCC"));
           createOrUpdateDevice(mac, device_flags_connect, model_id, mac_type, deviceName);
         }
 #endif // OMG_BT_HHCCJCY01HHCC
       }
     }
   } else {
-    Logger.debug(OMG_LOGID, F("Random MAC or iBeacon device filtered" CR));
+    Logger.debug(OMG_LOGID, F("Random MAC or iBeacon device filtered"));
   }
   if (!BTConfig.extDecoderEnable && model_id < 0) {
-    Logger.debug(OMG_LOGID, F("No eligible device found " CR));
+    Logger.debug(OMG_LOGID, F("No eligible device found "));
   }
 }
 void PublishDeviceData(JsonObject& BLEdata) {
@@ -1350,7 +1350,7 @@ void PublishDeviceData(JsonObject& BLEdata) {
     process_bledata(BLEdata);
     // If the device is a random MAC and pubRandomMACs is false we don't publish this payload
     if (!BTConfig.pubRandomMACs && (BLEdata["type"].as<string>()).compare("RMAC") == 0) {
-      Logger.debug(OMG_LOGID, F("Random MAC, device filtered" CR));
+      Logger.debug(OMG_LOGID, F("Random MAC, device filtered"));
       return;
     }
     // If pubAdvData is false we don't publish the adv data
@@ -1375,7 +1375,7 @@ void PublishDeviceData(JsonObject& BLEdata) {
         BLEdata["id"] = BLEdata["uuid"].as<std::string>();
       }
       String topic = String(mqtt_topic) + BTConfig.presenceTopic + String(g_gateway_name);
-      Logger.debug(OMG_LOGID, F("Pub HA Presence %s" CR), topic.c_str());
+      Logger.debug(OMG_LOGID, F("Pub HA Presence %s"), topic.c_str());
       BLEdata["topic"] = topic;
       enqueueJsonObject(BLEdata, QueueSemaphoreTimeOutTask);
     }
@@ -1385,11 +1385,11 @@ void PublishDeviceData(JsonObject& BLEdata) {
       buildTopicFromId(BLEdata, subjectBTtoMQTT);
       enqueueJsonObject(BLEdata, QueueSemaphoreTimeOutTask);
     } else {
-      Logger.notice(OMG_LOGID, F("Not a sensor device filtered" CR));
+      Logger.notice(OMG_LOGID, F("Not a sensor device filtered"));
       return;
     }
   } else {
-    Logger.notice(OMG_LOGID, F("Low rssi, device filtered" CR));
+    Logger.notice(OMG_LOGID, F("Low rssi, device filtered"));
     return;
   }
 }
@@ -1408,7 +1408,7 @@ void PublishDeviceData(JsonObject& BLEdata) {
     buildTopicFromId(BLEdata, subjectBTtoMQTT);
     enqueueJsonObject(BLEdata, QueueSemaphoreTimeOutTask);
   } else {
-    Logger.notice(OMG_LOGID, F("Low rssi, device filtered" CR));
+    Logger.notice(OMG_LOGID, F("Low rssi, device filtered"));
     return;
   }
 }
@@ -1416,11 +1416,11 @@ void PublishDeviceData(JsonObject& BLEdata) {
 
 void hass_presence(JsonObject& HomePresence) {
   int BLErssi = HomePresence["rssi"];
-  Logger.debug(OMG_LOGID, F("BLErssi %d" CR), BLErssi);
+  Logger.debug(OMG_LOGID, F("BLErssi %d"), BLErssi);
   int txPower = HomePresence["txpower"] | 0;
   if (txPower >= 0)
     txPower = -59; //if tx power is not found we set a default calibration value
-  Logger.debug(OMG_LOGID, F("TxPower: %d" CR), txPower);
+  Logger.debug(OMG_LOGID, F("TxPower: %d"), txPower);
   double ratio = BLErssi * 1.0 / txPower;
   double distance;
   if (ratio < 1.0) {
@@ -1429,17 +1429,17 @@ void hass_presence(JsonObject& HomePresence) {
     distance = (0.89976) * pow(ratio, 7.7095) + 0.111;
   }
   HomePresence["distance"] = distance;
-  Logger.debug(OMG_LOGID, F("Ble distance %D" CR), distance);
+  Logger.debug(OMG_LOGID, F("Ble distance %D"), distance);
 }
 
 void BTforceScan() {
   if (!BTProcessLock) {
     BLEscan();
-    Logger.debug(OMG_LOGID, F("Scan done" CR));
+    Logger.debug(OMG_LOGID, F("Scan done"));
     if (BTConfig.bleConnect)
       BLEconnect();
   } else {
-    Logger.debug(OMG_LOGID, F("Cannot launch scan due to other process running" CR));
+    Logger.debug(OMG_LOGID, F("Cannot launch scan due to other process running"));
   }
 }
 
@@ -1477,7 +1477,7 @@ void immediateBTAction(void* pvParameters) {
       }
       xSemaphoreGive(semaphoreBLEOperation);
     } else {
-      Logger.error(OMG_LOGID, F("BLE busy - command not sent" CR));
+      Logger.error(OMG_LOGID, F("BLE busy - command not sent"));
       StaticJsonDocument<JSON_MSG_BUFFER> BLEdataBuffer;
       JsonObject BLEdata = BLEdataBuffer.to<JsonObject>();
       BLEdata["id"] = BLEactions.back().addr;
@@ -1506,7 +1506,7 @@ void startBTActionTask() {
 #  if OMG_BLE_DECODER
 void KnownBTActions(JsonObject& BTdata) {
   if (!BTdata.containsKey("id")) {
-    Logger.error(OMG_LOGID, F("BLE mac address missing" CR));
+    Logger.error(OMG_LOGID, F("BLE mac address missing"));
     gatewayState = GatewayState::ERROR;
     return;
   }
@@ -1567,7 +1567,7 @@ void KnownBTActions(JsonObject& BTdata) {
       BLEactions.push_back(action);
       startBTActionTask();
     } else {
-      Logger.error(OMG_LOGID, F("BLE action not recognized" CR));
+      Logger.error(OMG_LOGID, F("BLE action not recognized"));
       gatewayState = GatewayState::ERROR;
     }
   }
@@ -1592,12 +1592,12 @@ void XtoBTAction(JsonObject& BTdata) {
     else if (vt == "FLOAT")
       action.value_type = BLE_VAL_FLOAT;
     else if (vt != "STRING") {
-      Logger.error(OMG_LOGID, F("BLE value type invalid %s" CR), vt.c_str());
+      Logger.error(OMG_LOGID, F("BLE value type invalid %s"), vt.c_str());
       return;
     }
   }
 
-  Logger.debug(OMG_LOGID, F("BLE ACTION TTL = %u" CR), action.ttl);
+  Logger.debug(OMG_LOGID, F("BLE ACTION TTL = %u"), action.ttl);
   action.complete = false;
   if (BTdata.containsKey("ble_write_address") &&
       BTdata.containsKey("ble_write_service") &&
@@ -1609,7 +1609,7 @@ void XtoBTAction(JsonObject& BTdata) {
     std::string val = BTdata["ble_write_value"].as<std::string>(); // Fix #1694
     action.value = val;
     action.write = true;
-    Logger.debug(OMG_LOGID, F("BLE ACTION Write" CR));
+    Logger.debug(OMG_LOGID, F("BLE ACTION Write"));
   } else if (BTdata.containsKey("ble_read_address") &&
              BTdata.containsKey("ble_read_service") &&
              BTdata.containsKey("ble_read_char")) {
@@ -1617,7 +1617,7 @@ void XtoBTAction(JsonObject& BTdata) {
     action.service = NimBLEUUID((const char*)BTdata["ble_read_service"]);
     action.characteristic = NimBLEUUID((const char*)BTdata["ble_read_char"]);
     action.write = false;
-    Logger.debug(OMG_LOGID, F("BLE ACTION Read" CR));
+    Logger.debug(OMG_LOGID, F("BLE ACTION Read"));
   } else {
     return;
   }
@@ -1634,7 +1634,7 @@ void XtoBTAction(JsonObject& BTdata) {
 
 void XtoBT(const char* topicOri, JsonObject& BTdata) { // json object decoding
   if (cmpToMainTopic(topicOri, subjectMQTTtoBTset)) {
-    Logger.debug(OMG_LOGID, F("MQTTtoBT json set" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoBT json set"));
 
     // Black list & white list set
     bool WorBupdated;
@@ -1650,7 +1650,7 @@ void XtoBT(const char* topicOri, JsonObject& BTdata) { // json object decoding
 
     // Force scan now
     if (BTdata.containsKey("interval") && BTdata["interval"] == 0) {
-      Logger.notice(OMG_LOGID, F("BLE forced scan" CR));
+      Logger.notice(OMG_LOGID, F("BLE forced scan"));
       atomic_store_explicit(&forceBTScan, 1, ::memory_order_seq_cst); // ask the other core to do the scan for us
     }
 
@@ -1677,7 +1677,7 @@ void XtoBT(const char* topicOri, JsonObject& BTdata) { // json object decoding
       XtoBTAction(BTdata);
       xSemaphoreGive(semaphoreBLEOperation);
     } else {
-      Logger.error(OMG_LOGID, F("BLE busy - command not sent" CR));
+      Logger.error(OMG_LOGID, F("BLE busy - command not sent"));
       gatewayState = GatewayState::ERROR;
     }
   }

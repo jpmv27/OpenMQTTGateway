@@ -44,21 +44,21 @@ void MeasureTempAndHum() {
       float h = mySHTC3.toPercent();
       // Check if any reads failed and exit early (to try again).
       if (isnan(h) || isnan(t)) {
-        Logger.error(OMG_LOGID, F("Failed to read from SHTC3 sensor!" CR));
+        Logger.error(OMG_LOGID, F("Failed to read from SHTC3 sensor!"));
       } else {
-        Logger.debug(OMG_LOGID, F("Creating SHTC3 buffer" CR));
+        Logger.debug(OMG_LOGID, F("Creating SHTC3 buffer"));
         StaticJsonDocument<JSON_MSG_BUFFER> SHTC3dataBuffer;
         JsonObject SHTC3data = SHTC3dataBuffer.to<JsonObject>();
         if (h != persistedh || shtc3_always) {
           SHTC3data["hum"] = (float)h;
         } else {
-          Logger.debug(OMG_LOGID, F("Same hum don't send it" CR));
+          Logger.debug(OMG_LOGID, F("Same hum don't send it"));
         }
         if (t != persistedt || shtc3_always) {
           SHTC3data["tempc"] = (float)t;
           SHTC3data["tempf"] = mySHTC3.toDegF();
         } else {
-          Logger.debug(OMG_LOGID, F("Same temp don't send it" CR));
+          Logger.debug(OMG_LOGID, F("Same temp don't send it"));
         }
         SHTC3data["origin"] = SHTC3TOPIC;
         enqueueJsonObject(SHTC3data);
@@ -67,7 +67,7 @@ void MeasureTempAndHum() {
       persistedt = t;
     } else {
       errorDecoder(mySHTC3.lastStatus);
-      Logger.error(OMG_LOGID, F("Failed to read from SHTC3 sensor!" CR));
+      Logger.error(OMG_LOGID, F("Failed to read from SHTC3 sensor!"));
     }
   }
 }

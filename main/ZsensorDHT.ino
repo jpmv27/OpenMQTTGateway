@@ -39,7 +39,7 @@ DHT dht(OMG_DHT_DATA_GPIO, OMG_DHT_SENSOR_TYPE);
 unsigned long timedht = 0;
 
 void setupDHT() {
-  Logger.notice(OMG_LOGID, F("Reading DHT on pin: %d" CR), OMG_DHT_DATA_GPIO);
+  Logger.notice(OMG_LOGID, F("Reading DHT on pin: %d"), OMG_DHT_DATA_GPIO);
 }
 
 void MeasureTempAndHum() {
@@ -55,18 +55,18 @@ void MeasureTempAndHum() {
     if (isnan(h) || isnan(t) || h > 100.0) {
 
       if (++consecutive_errors >= OMG_DHT_LOG_AFTER_N_CONSECUTIVE_ERRORS) {
-        Logger.error(OMG_LOGID, F("Failed to read from DHT sensor!" CR));
+        Logger.error(OMG_LOGID, F("Failed to read from DHT sensor!"));
         consecutive_errors = 0;
       }
     } else {
       consecutive_errors = 0;
-      Logger.debug(OMG_LOGID, F("Creating DHT buffer" CR));
+      Logger.debug(OMG_LOGID, F("Creating DHT buffer"));
       StaticJsonDocument<JSON_MSG_BUFFER> DHTdataBuffer;
       JsonObject DHTdata = DHTdataBuffer.to<JsonObject>();
       if (h != persistedh || OMG_DHT_ALWAYS_SEND) {
         DHTdata["humidity_pct"] = (float)h;
       } else {
-        Logger.debug(OMG_LOGID, F("Same hum don't send it" CR));
+        Logger.debug(OMG_LOGID, F("Same hum don't send it"));
       }
       if (t != persistedt || OMG_DHT_ALWAYS_SEND) {
         DHTdata["temperature_c"] = (float)t;
@@ -74,7 +74,7 @@ void MeasureTempAndHum() {
         DHTdata["temperature_f"] = dht.convertCtoF(t);
 #endif
       } else {
-        Logger.debug(OMG_LOGID, F("Same temp don't send it" CR));
+        Logger.debug(OMG_LOGID, F("Same temp don't send it"));
       }
       DHTdata["origin"] = OMG_MQTT_DHT_TOPIC;
       enqueueJsonObject(DHTdata);

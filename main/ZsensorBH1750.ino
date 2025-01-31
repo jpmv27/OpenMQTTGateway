@@ -43,7 +43,7 @@
 #  include "math.h" // Library for trig and exponential functions
 
 void setupZsensorBH1750() {
-  Logger.notice(OMG_LOGID, F("Setup BH1750 on adress: %H" CR), BH1750_i2c_addr);
+  Logger.notice(OMG_LOGID, F("Setup BH1750 on adress: %H"), BH1750_i2c_addr);
   Wire.begin();
   Wire.beginTransmission(BH1750_i2c_addr);
   Wire.write(0x10); // Set resolution to 1 Lux
@@ -53,7 +53,7 @@ void setupZsensorBH1750() {
 
 void MeasureLightIntensity() {
   if (millis() > (timebh1750 + TimeBetweenReadingBH1750)) { //retrieving value of Lux, FtCd and Wattsm2 from BH1750
-    Logger.debug(OMG_LOGID, F("Creating BH1750 buffer" CR));
+    Logger.debug(OMG_LOGID, F("Creating BH1750 buffer"));
     StaticJsonDocument<JSON_MSG_BUFFER> BH1750dataBuffer;
     JsonObject BH1750data = BH1750dataBuffer.to<JsonObject>();
 
@@ -69,7 +69,7 @@ void MeasureLightIntensity() {
     // Check if reads failed and exit early (to try again).
     Wire.requestFrom(BH1750_i2c_addr, 2);
     if (Wire.available() != 2) {
-      Logger.error(OMG_LOGID, F("Failed to read from LightSensor BH1750!" CR));
+      Logger.error(OMG_LOGID, F("Failed to read from LightSensor BH1750!"));
     } else {
       i = Wire.read();
       i <<= 8;
@@ -84,21 +84,21 @@ void MeasureLightIntensity() {
       if (Lux != persistedll || bh1750_always) {
         BH1750data["lux"] = (unsigned int)Lux;
       } else {
-        Logger.debug(OMG_LOGID, F("Same lux don't send it" CR));
+        Logger.debug(OMG_LOGID, F("Same lux don't send it"));
       }
 
       // Generate FtCd
       if (ftcd != persistedlf || bh1750_always) {
         BH1750data["ftcd"] = (unsigned int)ftcd;
       } else {
-        Logger.debug(OMG_LOGID, F("Same ftcd don't send it" CR));
+        Logger.debug(OMG_LOGID, F("Same ftcd don't send it"));
       }
 
       // Generate Watts/m2
       if (Wattsm2 != persistedlw || bh1750_always) {
         BH1750data["wattsm2"] = (unsigned int)Wattsm2;
       } else {
-        Logger.debug(OMG_LOGID, F("Same wattsm2 don't send it" CR));
+        Logger.debug(OMG_LOGID, F("Same wattsm2 don't send it"));
       }
       BH1750data["origin"] = subjectBH1750toMQTT;
       enqueueJsonObject(BH1750data);

@@ -54,7 +54,7 @@ void setupZsensorBME280() {
 
   mySensor.settings.commInterface = I2C_MODE;
   mySensor.settings.I2CAddress = BME280_i2c_addr;
-  Logger.notice(OMG_LOGID, F("Setup BME280/BMP280 on address: %X" CR), BME280_i2c_addr);
+  Logger.notice(OMG_LOGID, F("Setup BME280/BMP280 on address: %X"), BME280_i2c_addr);
   //***Operation settings*****************************//
 
   // runMode Setting - Values:
@@ -113,11 +113,11 @@ void setupZsensorBME280() {
 
   int ret = mySensor.begin();
   if (ret == 0x60) {
-    Logger.notice(OMG_LOGID, F("Bosch BME280 successfully initialized: %X" CR), ret);
+    Logger.notice(OMG_LOGID, F("Bosch BME280 successfully initialized: %X"), ret);
   } else if (ret == 0x58) {
-    Logger.notice(OMG_LOGID, F("Bosch BMP280 successfully initialized: %X" CR), ret);
+    Logger.notice(OMG_LOGID, F("Bosch BMP280 successfully initialized: %X"), ret);
   } else {
-    Logger.notice(OMG_LOGID, F("Bosch BME280/BMP280 failed: %X" CR), ret);
+    Logger.notice(OMG_LOGID, F("Bosch BME280/BMP280 failed: %X"), ret);
   }
 }
 
@@ -148,38 +148,38 @@ void MeasureTempHumAndPressure() {
         || isnan(BmeTempF) || isnan(BmeAltiFt)
 #endif
         ) {
-      Logger.error(OMG_LOGID, F("Failed to read from BME280/BMP280!" CR));
+      Logger.error(OMG_LOGID, F("Failed to read from BME280/BMP280!"));
     } else {
-      Logger.debug(OMG_LOGID, F("Creating BME280/BMP280 buffer" CR));
+      Logger.debug(OMG_LOGID, F("Creating BME280/BMP280 buffer"));
       StaticJsonDocument<JSON_MSG_BUFFER> BME280dataBuffer;
       JsonObject BME280data = BME280dataBuffer.to<JsonObject>();
       // Generate Temperature in degrees C
       if (BmeTempC != persisted_bme_tempc || OMG_BME280_ALWAYS_SEND) {
         BME280data["temperature_c"] = (float)BmeTempC;
       } else {
-        Logger.debug(OMG_LOGID, F("Same Degrees C don't send it" CR));
+        Logger.debug(OMG_LOGID, F("Same Degrees C don't send it"));
       }
 
       // Generate Humidity in percent
       if (BmeHum != persisted_bme_hum || OMG_BME280_ALWAYS_SEND) {
         BME280data["humidity_pct"] = (float)BmeHum;
       } else {
-        Logger.debug(OMG_LOGID, F("Same Humidity don't send it" CR));
+        Logger.debug(OMG_LOGID, F("Same Humidity don't send it"));
       }
 
       // Generate Pressure in Pa
       if (BmePa != persisted_bme_pa || OMG_BME280_ALWAYS_SEND) {
         BME280data["pressure_pa"] = (float)BmePa;
       } else {
-        Logger.debug(OMG_LOGID, F("Same Pressure don't send it" CR));
+        Logger.debug(OMG_LOGID, F("Same Pressure don't send it"));
       }
 
       // Generate Altitude in Meter
       if (BmeAltiM != persisted_bme_altim || OMG_BME280_ALWAYS_SEND) {
-        Logger.debug(OMG_LOGID, F("Sending Altitude Meter to MQTT" CR));
+        Logger.debug(OMG_LOGID, F("Sending Altitude Meter to MQTT"));
         BME280data["altitude_m"] = (float)BmeAltiM;
       } else {
-        Logger.debug(OMG_LOGID, F("Same Altitude Meter don't send it" CR));
+        Logger.debug(OMG_LOGID, F("Same Altitude Meter don't send it"));
       }
 
 #if !OMG_BME280_METRIC_UNITS_ONLY
@@ -187,14 +187,14 @@ void MeasureTempHumAndPressure() {
       if (BmeTempF != persisted_bme_tempf || OMG_BME280_ALWAYS_SEND) {
         BME280data["temperature_f"] = (float)BmeTempF;
       } else {
-        Logger.debug(OMG_LOGID, F("Same Degrees F don't send it" CR));
+        Logger.debug(OMG_LOGID, F("Same Degrees F don't send it"));
       }
 
       // Generate Altitude in Feet
       if (BmeAltiFt != persisted_bme_altift || OMG_BME280_ALWAYS_SEND) {
         BME280data["altitude_ft"] = (float)BmeAltiFt;
       } else {
-        Logger.debug(OMG_LOGID, F("Same Altitude Feet don't send it" CR));
+        Logger.debug(OMG_LOGID, F("Same Altitude Feet don't send it"));
       }
 #endif
 

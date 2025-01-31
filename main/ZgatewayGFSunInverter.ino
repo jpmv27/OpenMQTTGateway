@@ -34,17 +34,17 @@ void GFSunInverterDataHandler(GfSun2000Data data) {
   JsonObject jdata = jdataBuffer.to<JsonObject>();
 
   jdata["device_id"] = (char*)data.deviceID;
-  Logger.debug(OMG_LOGID, F("Device ID     : %s\n" CR), data.deviceID);
+  Logger.debug(OMG_LOGID, F("Device ID     : %s\n"), data.deviceID);
   jdata["ac_voltage"] = data.ACVoltage;
-  Logger.debug(OMG_LOGID, F("AC Voltage    : %.1f\tV\n" CR), data.ACVoltage);
+  Logger.debug(OMG_LOGID, F("AC Voltage    : %.1f\tV\n"), data.ACVoltage);
   jdata["dc_voltage"] = data.DCVoltage;
-  Logger.debug(OMG_LOGID, F("DC Voltage    : %.1f\tV\n" CR), data.DCVoltage);
+  Logger.debug(OMG_LOGID, F("DC Voltage    : %.1f\tV\n"), data.DCVoltage);
   jdata["power"] = data.averagePower;
-  Logger.debug(OMG_LOGID, F("Output Power  : %.1f\tW (5min avg)\n" CR), data.averagePower);
+  Logger.debug(OMG_LOGID, F("Output Power  : %.1f\tW (5min avg)\n"), data.averagePower);
   jdata["c_energy"] = data.customEnergyCounter;
-  Logger.debug(OMG_LOGID, F("Custom Energy : %.1f\tkW/h (can be reseted)\n" CR), data.customEnergyCounter);
+  Logger.debug(OMG_LOGID, F("Custom Energy : %.1f\tkW/h (can be reseted)\n"), data.customEnergyCounter);
   jdata["t_energy"] = data.totalEnergyCounter;
-  Logger.debug(OMG_LOGID, F("Total Energy  : %.1f\tkW/h\n" CR), data.totalEnergyCounter);
+  Logger.debug(OMG_LOGID, F("Total Energy  : %.1f\tkW/h\n"), data.totalEnergyCounter);
 
 #  ifdef GFSUNINVERTER_DEVEL
   StaticJsonDocument<JSON_MSG_BUFFER> jregisterBuffer;
@@ -79,7 +79,7 @@ void setupGFSunInverter() {
   GF.setup(Serial2);
   GF.setDataHandler(GFSunInverterDataHandler);
   GF.setErrorHandler(GFSunInverterErrorHandler);
-  Logger.debug(OMG_LOGID, F("ZgatewayGFSunInverter setup done " CR));
+  Logger.debug(OMG_LOGID, F("ZgatewayGFSunInverter setup done "));
 }
 
 void ZgatewayGFSunInverterMQTT() {

@@ -51,7 +51,7 @@ static RTL_433device NO_RTL_433_DEVICE_FOUND = {{0},
 
 RTL_433device* getDeviceById(const char* id); // Declared here to avoid pre-compilation issue (misplaced auto declaration by pio)
 RTL_433device* getDeviceById(const char* id) {
-  DISCOVERY_TRACE_LOG(F("getDeviceById %s" CR), id);
+  DISCOVERY_TRACE_LOG(F("getDeviceById %s"), id);
 
   for (std::vector<RTL_433device*>::iterator it = RTL_433devices.begin(); it != RTL_433devices.end(); ++it) {
     if ((strcmp((*it)->uniqueId, id) == 0)) {
@@ -64,39 +64,39 @@ RTL_433device* getDeviceById(const char* id) {
 void dumpRTL_433Devices() {
   for (std::vector<RTL_433device*>::iterator it = RTL_433devices.begin(); it != RTL_433devices.end(); ++it) {
     RTL_433device* p = *it;
-    DISCOVERY_TRACE_LOG(F("uniqueId %s" CR), p->uniqueId);
-    DISCOVERY_TRACE_LOG(F("modelName %s" CR), p->modelName);
-    DISCOVERY_TRACE_LOG(F("type %s" CR), p->type);
-    DISCOVERY_TRACE_LOG(F("isDisc %d" CR), p->isDisc);
+    DISCOVERY_TRACE_LOG(F("uniqueId %s"), p->uniqueId);
+    DISCOVERY_TRACE_LOG(F("modelName %s"), p->modelName);
+    DISCOVERY_TRACE_LOG(F("type %s"), p->type);
+    DISCOVERY_TRACE_LOG(F("isDisc %d"), p->isDisc);
   }
 }
 
 void createOrUpdateDeviceRTL_433(const char* id, const char* model, const char* type, uint8_t flags) {
   if (xSemaphoreTake(semaphorecreateOrUpdateDeviceRTL_433, pdMS_TO_TICKS(30000)) == pdFALSE) {
-    Logger.error(OMG_LOGID, F("[rtl_433] semaphorecreateOrUpdateDeviceRTL_433 Semaphore NOT taken" CR));
+    Logger.error(OMG_LOGID, F("[rtl_433] semaphorecreateOrUpdateDeviceRTL_433 Semaphore NOT taken"));
     return;
   }
 
   RTL_433device* device = getDeviceById(id);
   if (device == &NO_RTL_433_DEVICE_FOUND) {
-    DISCOVERY_TRACE_LOG(F("add %s" CR), id);
+    DISCOVERY_TRACE_LOG(F("add %s"), id);
     //new device
     device = new RTL_433device();
     if (strlcpy(device->uniqueId, id, uniqueIdSize) > uniqueIdSize) {
-      Logger.warning(OMG_LOGID, F("[rtl_433] Device id %s exceeds available space" CR), id); // Remove from production release ?
+      Logger.warning(OMG_LOGID, F("[rtl_433] Device id %s exceeds available space"), id); // Remove from production release ?
     };
     if (strlcpy(device->modelName, model, modelNameSize) > modelNameSize) {
-      Logger.warning(OMG_LOGID, F("[rtl_433] Device model %s exceeds available space" CR), model); // Remove from production release ?
+      Logger.warning(OMG_LOGID, F("[rtl_433] Device model %s exceeds available space"), model); // Remove from production release ?
     };
     if (strlcpy(device->type, type, typeSize) > typeSize) {
-      Logger.warning(OMG_LOGID, F("[rtl_433] Device type %s exceeds available space" CR), type); // Remove from production release ?
+      Logger.warning(OMG_LOGID, F("[rtl_433] Device type %s exceeds available space"), type); // Remove from production release ?
     }
-    DISCOVERY_TRACE_LOG(F("[rtl_433] Device type is %s." CR), device->type); // Remove from production release ?
+    DISCOVERY_TRACE_LOG(F("[rtl_433] Device type is %s."), device->type); // Remove from production release ?
     device->isDisc = flags & device_flags_isDisc;
     RTL_433devices.push_back(device);
     newRTL_433Devices++;
   } else {
-    DISCOVERY_TRACE_LOG(F("update %s" CR), id);
+    DISCOVERY_TRACE_LOG(F("update %s"), id);
 
     if (flags & device_flags_isDisc) {
       device->isDisc = true;
@@ -112,7 +112,7 @@ void launchRTL_433Discovery(bool overrideDiscovery) {
   if (!overrideDiscovery && newRTL_433Devices == 0)
     return;
   if (xSemaphoreTake(semaphorecreateOrUpdateDeviceRTL_433, pdMS_TO_TICKS(QueueSemaphoreTimeOutLoop)) == pdFALSE) {
-    Logger.error(OMG_LOGID, F("[rtl_433] semaphorecreateOrUpdateDeviceRTL_433 Semaphore NOT taken" CR));
+    Logger.error(OMG_LOGID, F("[rtl_433] semaphorecreateOrUpdateDeviceRTL_433 Semaphore NOT taken"));
     return;
   }
   newRTL_433Devices = 0;
@@ -120,7 +120,7 @@ void launchRTL_433Discovery(bool overrideDiscovery) {
   xSemaphoreGive(semaphorecreateOrUpdateDeviceRTL_433);
   for (std::vector<RTL_433device*>::iterator it = localDevices.begin(); it != localDevices.end(); ++it) {
     RTL_433device* pdevice = *it;
-    DISCOVERY_TRACE_LOG(F("Device id %s" CR), pdevice->uniqueId);
+    DISCOVERY_TRACE_LOG(F("Device id %s"), pdevice->uniqueId);
     // Do not launch discovery for the RTL_433devices already discovered (unless we have overrideDiscovery) or that are not unique by their MAC Address (Ibeacon, GAEN and Microsoft Cdp)
     if (overrideDiscovery || !isDiscovered(pdevice)) {
       size_t numRows = sizeof(parameters) / sizeof(parameters[0]);
@@ -128,13 +128,13 @@ void launchRTL_433Discovery(bool overrideDiscovery) {
         char deviceKeyParameter[25];
         memcpy(deviceKeyParameter, &pdevice->uniqueId[strlen(pdevice->uniqueId) - strlen(parameters[i][0])], strlen(parameters[i][0]));
         deviceKeyParameter[strlen(parameters[i][0])] = '\0';
-        Logger.debug(OMG_LOGID, F("deviceKeyParameter: %s" CR), deviceKeyParameter);
+        Logger.debug(OMG_LOGID, F("deviceKeyParameter: %s"), deviceKeyParameter);
 
         if (strcmp(deviceKeyParameter, parameters[i][0]) == 0) {
           // Remove the key from the unique id to extract the device id
           String idWoKey = pdevice->uniqueId;
           idWoKey.remove(idWoKey.length() - (strlen(parameters[i][0]) + 1));
-          DISCOVERY_TRACE_LOG(F("idWoKey %s" CR), idWoKey.c_str());
+          DISCOVERY_TRACE_LOG(F("idWoKey %s"), idWoKey.c_str());
           String value_template = "";
           if (SYSConfig.ohdiscovery) {
             value_template = "{{ value_json." + String(parameters[i][0]) + " }}";
@@ -152,7 +152,7 @@ void launchRTL_433Discovery(bool overrideDiscovery) {
             idWoKeyAndModel.remove(0, (strlen(pdevice->modelName)));
             topic = topic + "/" + String(pdevice->modelName);
           }
-          DISCOVERY_TRACE_LOG(F("idWoKeyAndModel %s" CR), idWoKeyAndModel.c_str());
+          DISCOVERY_TRACE_LOG(F("idWoKeyAndModel %s"), idWoKeyAndModel.c_str());
           idWoKeyAndModel.replace("-", "/");
           topic = topic + idWoKeyAndModel;
 #    endif
@@ -240,10 +240,10 @@ void launchRTL_433Discovery(bool overrideDiscovery) {
         }
       }
       if (!pdevice->isDisc) {
-        DISCOVERY_TRACE_LOG(F("Device id %s was not discovered" CR), pdevice->uniqueId); // Remove from production release ?
+        DISCOVERY_TRACE_LOG(F("Device id %s was not discovered"), pdevice->uniqueId); // Remove from production release ?
       }
     } else {
-      DISCOVERY_TRACE_LOG(F("Device already discovered or that doesn't require discovery %s" CR), pdevice->uniqueId);
+      DISCOVERY_TRACE_LOG(F("Device already discovered or that doesn't require discovery %s"), pdevice->uniqueId);
     }
   }
 }
@@ -273,7 +273,7 @@ void rtl_433_Callback(char* message) {
   JsonObject RFrtl_433_ESPdata = jsonBuffer2.to<JsonObject>();
   auto error = deserializeJson(jsonBuffer2, message);
   if (error) {
-    Logger.error(OMG_LOGID, F("[rtl_433] deserializeJson() failed: %s" CR), error.c_str());
+    Logger.error(OMG_LOGID, F("[rtl_433] deserializeJson() failed: %s"), error.c_str());
     return;
   }
 
@@ -301,7 +301,7 @@ void rtl_433_Callback(char* message) {
 
   uniqueid.replace("/", "-");
 
-  DISCOVERY_TRACE_LOG(F("uniqueid: %s" CR), uniqueid.c_str());
+  DISCOVERY_TRACE_LOG(F("uniqueid: %s"), uniqueid.c_str());
   if (!isAduplicateSignal(MQTTvalue)) {
 #  ifdef OMG_MQTT_DISCOVERY
     if (SYSConfig.discovery)
@@ -312,7 +312,7 @@ void rtl_433_Callback(char* message) {
     storeSignalValue(MQTTvalue);
   }
 #  ifdef MEMORY_DEBUG
-  Logger.debug(OMG_LOGID, F("Post rtl_433_Callback: %d" CR), ESP.getFreeHeap());
+  Logger.debug(OMG_LOGID, F("Post rtl_433_Callback: %d"), ESP.getFreeHeap());
 #  endif
 }
 
@@ -322,8 +322,8 @@ void setupRTL_433() {
   semaphorecreateOrUpdateDeviceRTL_433 = xSemaphoreCreateBinary();
   xSemaphoreGive(semaphorecreateOrUpdateDeviceRTL_433);
 #  endif
-  Logger.debug(OMG_LOGID, F("ZgatewayRTL_433 command topic: %s%s%s" CR), mqtt_topic, g_gateway_name, subjectMQTTtoRFset);
-  Logger.notice(OMG_LOGID, F("ZgatewayRTL_433 setup done " CR));
+  Logger.debug(OMG_LOGID, F("ZgatewayRTL_433 command topic: %s%s%s"), mqtt_topic, g_gateway_name, subjectMQTTtoRFset);
+  Logger.notice(OMG_LOGID, F("ZgatewayRTL_433 setup done "));
 }
 
 void RTL_433Loop() {
@@ -331,13 +331,13 @@ void RTL_433Loop() {
 }
 
 extern void enableRTLreceive() {
-  Logger.notice(OMG_LOGID, F("Enable RTL_433 Receiver: %FMhz" CR), RFConfig.frequency);
+  Logger.notice(OMG_LOGID, F("Enable RTL_433 Receiver: %FMhz"), RFConfig.frequency);
   rtl_433.initReceiver(RF_MODULE_RECEIVER_GPIO, RFConfig.frequency);
   rtl_433.enableReceiver();
 }
 
 extern void disableRTLreceive() {
-  Logger.debug(OMG_LOGID, F("disableRTLreceive" CR));
+  Logger.debug(OMG_LOGID, F("disableRTLreceive"));
   rtl_433.disableReceiver();
 }
 

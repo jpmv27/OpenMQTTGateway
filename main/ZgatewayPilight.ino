@@ -44,7 +44,7 @@ bool pilightRawEnabled = 0;
 void pilightCallback(const String& protocol, const String& message, int status,
                      size_t repeats, const String& deviceID) {
   if (status == VALID) {
-    Logger.debug(OMG_LOGID, F("Creating RF PiLight buffer" CR));
+    Logger.debug(OMG_LOGID, F("Creating RF PiLight buffer"));
     StaticJsonDocument<JSON_MSG_BUFFER> RFPiLightdataBuffer;
     JsonObject RFPiLightdata = RFPiLightdataBuffer.to<JsonObject>();
     StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer2;
@@ -52,7 +52,7 @@ void pilightCallback(const String& protocol, const String& message, int status,
     if (message.length() > 0) {
       auto error = deserializeJson(jsonBuffer2, message);
       if (error) {
-        Logger.error(OMG_LOGID, F("deserializeJson() failed: %s" CR), error.c_str());
+        Logger.error(OMG_LOGID, F("deserializeJson() failed: %s"), error.c_str());
         return;
       }
       RFPiLightdata["message"] = msg;
@@ -83,7 +83,7 @@ void pilightCallback(const String& protocol, const String& message, int status,
     RFPiLightdata["origin"] = subjectPilighttoMQTT;
     enqueueJsonObject(RFPiLightdata);
     if (repeatPilightwMQTT) {
-      Logger.debug(OMG_LOGID, F("Pub Pilight for rpt" CR));
+      Logger.debug(OMG_LOGID, F("Pub Pilight for rpt"));
       RFPiLightdata["origin"] = subjectMQTTtoPilight;
       enqueueJsonObject(RFPiLightdata);
     }
@@ -95,7 +95,7 @@ void pilightRawCallback(const uint16_t* pulses, size_t length) {
   uint16_t pulse;
 
   if (!pilightRawEnabled) {
-    Logger.debug(OMG_LOGID, F("Pilight RAW not enabled" CR));
+    Logger.debug(OMG_LOGID, F("Pilight RAW not enabled"));
     return;
   }
 
@@ -113,13 +113,13 @@ void pilightRawCallback(const uint16_t* pulses, size_t length) {
 #  endif
 
 void savePilightConfig() {
-  Logger.debug(OMG_LOGID, F("saving Pilight config" CR));
+  Logger.debug(OMG_LOGID, F("saving Pilight config"));
   DynamicJsonDocument json(4096);
   deserializeJson(json, rf.enabledProtocols());
 
   File configFile = SPIFFS.open("/pilight.json", "w");
   if (!configFile) {
-    Logger.error(OMG_LOGID, F("failed to open config file for writing" CR));
+    Logger.error(OMG_LOGID, F("failed to open config file for writing"));
   }
 
   serializeJsonPretty(json, Serial);
@@ -128,14 +128,14 @@ void savePilightConfig() {
 }
 
 void loadPilightConfig() {
-  Logger.debug(OMG_LOGID, F("reading Pilight config file" CR));
+  Logger.debug(OMG_LOGID, F("reading Pilight config file"));
   File configFile = SPIFFS.open("/pilight.json", "r");
   if (configFile) {
-    Logger.debug(OMG_LOGID, F("opened Pilight config file" CR));
+    Logger.debug(OMG_LOGID, F("opened Pilight config file"));
     DynamicJsonDocument json(configFile.size() * 4);
     auto error = deserializeJson(json, configFile);
     if (error) {
-      Logger.error(OMG_LOGID, F("deserialize config failed: %s, buffer capacity: %u" CR), error.c_str(), json.capacity());
+      Logger.error(OMG_LOGID, F("deserialize config failed: %s, buffer capacity: %u"), error.c_str(), json.capacity());
     }
     serializeJson(json, Serial);
     if (!json.isNull()) {
@@ -143,7 +143,7 @@ void loadPilightConfig() {
       serializeJson(json, rflimit);
       rf.limitProtocols(rflimit);
     } else {
-      Logger.warning(OMG_LOGID, F("failed to load json config" CR));
+      Logger.warning(OMG_LOGID, F("failed to load json config"));
     }
     configFile.close();
   }
@@ -169,16 +169,16 @@ void XtoPilight(const char* topicOri, JsonObject& Pilightdata) {
       success = true;
     }
     if (Pilightdata.containsKey("enabled")) {
-      Logger.notice(OMG_LOGID, F("PiLight protocols enabled: %s" CR), rf.enabledProtocols().c_str());
+      Logger.notice(OMG_LOGID, F("PiLight protocols enabled: %s"), rf.enabledProtocols().c_str());
       success = true;
     }
     if (Pilightdata.containsKey("available")) {
-      Logger.notice(OMG_LOGID, F("PiLight protocols available: %s" CR), rf.availableProtocols().c_str());
+      Logger.notice(OMG_LOGID, F("PiLight protocols available: %s"), rf.availableProtocols().c_str());
       success = true;
     }
 #  ifdef Pilight_rawEnabled
     if (Pilightdata.containsKey("rawEnabled")) {
-      Logger.notice(OMG_LOGID, F("Setting PiLight raw output enabled: %T" CR), (bool)Pilightdata["rawEnabled"]);
+      Logger.notice(OMG_LOGID, F("Setting PiLight raw output enabled: %T"), (bool)Pilightdata["rawEnabled"]);
       pilightRawEnabled = (bool)Pilightdata["rawEnabled"];
       disablePilightReceive();
       delay(1);
@@ -193,13 +193,13 @@ void XtoPilight(const char* topicOri, JsonObject& Pilightdata) {
       enqueueJsonObject(Pilightdata);
     } else {
       pub(subjectGTWPilighttoMQTT, "{\"Status\": \"Error\"}"); // Fail feedback
-      Logger.error(OMG_LOGID, F("MQTTtoPilightProtocol Fail json" CR));
+      Logger.error(OMG_LOGID, F("MQTTtoPilightProtocol Fail json"));
     }
   } else if (cmpToMainTopic(topicOri, subjectMQTTtoPilight)) {
     const char* message = Pilightdata["message"];
-    Logger.notice(OMG_LOGID, F("MQTTtoPilight message: %s" CR), message);
+    Logger.notice(OMG_LOGID, F("MQTTtoPilight message: %s"), message);
     const char* protocol = Pilightdata["protocol"];
-    Logger.notice(OMG_LOGID, F("MQTTtoPilight protocol: %s" CR), protocol);
+    Logger.notice(OMG_LOGID, F("MQTTtoPilight protocol: %s"), protocol);
     const char* raw = Pilightdata["raw"];
     float txFrequency = Pilightdata["frequency"] | RFConfig.frequency;
     bool success = false;
@@ -207,7 +207,7 @@ void XtoPilight(const char* topicOri, JsonObject& Pilightdata) {
     initCC1101();
 #  ifdef OMG_RADIO_CC1101 // set Receive off and Transmitt on
     ELECHOUSE_cc1101.SetTx(txFrequency);
-    Logger.notice(OMG_LOGID, F("Transmit frequency: %F" CR), txFrequency);
+    Logger.notice(OMG_LOGID, F("Transmit frequency: %F"), txFrequency);
 #  endif
     pinMode(RF_EMITTER_GPIO, OUTPUT);
     if (raw) {
@@ -216,10 +216,10 @@ void XtoPilight(const char* topicOri, JsonObject& Pilightdata) {
       if (repeats < 0) {
         switch (repeats) {
           case ESPiLight::ERROR_INVALID_PULSETRAIN_MSG_R:
-            Logger.debug(OMG_LOGID, F("'r' not found in string, or has no data" CR));
+            Logger.debug(OMG_LOGID, F("'r' not found in string, or has no data"));
             break;
           case ESPiLight::ERROR_INVALID_PULSETRAIN_MSG_END:
-            Logger.debug(OMG_LOGID, F("';' or '@' not found in data string" CR));
+            Logger.debug(OMG_LOGID, F("';' or '@' not found in data string"));
             break;
         }
         repeats = 10;
@@ -227,73 +227,73 @@ void XtoPilight(const char* topicOri, JsonObject& Pilightdata) {
       int msgLength = rf.stringToPulseTrain(raw, codes, MAXPULSESTREAMLENGTH);
       if (msgLength > 0) {
         rf.sendPulseTrain(codes, msgLength, repeats);
-        Logger.notice(OMG_LOGID, F("MQTTtoPilight raw ok" CR));
+        Logger.notice(OMG_LOGID, F("MQTTtoPilight raw ok"));
         success = true;
       } else {
-        Logger.debug(OMG_LOGID, F("MQTTtoPilight raw KO" CR));
+        Logger.debug(OMG_LOGID, F("MQTTtoPilight raw KO"));
         switch (msgLength) {
           case ESPiLight::ERROR_INVALID_PULSETRAIN_MSG_C:
-            Logger.debug(OMG_LOGID, F("'c' not found in string, or has no data" CR));
+            Logger.debug(OMG_LOGID, F("'c' not found in string, or has no data"));
             break;
           case ESPiLight::ERROR_INVALID_PULSETRAIN_MSG_P:
-            Logger.debug(OMG_LOGID, F("'p' not found in string, or has no data" CR));
+            Logger.debug(OMG_LOGID, F("'p' not found in string, or has no data"));
             break;
           case ESPiLight::ERROR_INVALID_PULSETRAIN_MSG_END:
-            Logger.debug(OMG_LOGID, F("';' or '@' not found in data string" CR));
+            Logger.debug(OMG_LOGID, F("';' or '@' not found in data string"));
             break;
           case ESPiLight::ERROR_INVALID_PULSETRAIN_MSG_TYPE:
-            Logger.debug(OMG_LOGID, F("pulse type not defined" CR));
+            Logger.debug(OMG_LOGID, F("pulse type not defined"));
             break;
         }
-        Logger.error(OMG_LOGID, F("Invalid JSON: raw data malformed" CR));
+        Logger.error(OMG_LOGID, F("Invalid JSON: raw data malformed"));
       }
     }
     if (message && protocol) {
-      Logger.debug(OMG_LOGID, F("MQTTtoPilight msg & protocol ok" CR));
+      Logger.debug(OMG_LOGID, F("MQTTtoPilight msg & protocol ok"));
       int msgLength = rf.send(protocol, message);
       if (msgLength > 0) {
-        Logger.debug(OMG_LOGID, F("Adv data XtoPilight push state via PilighttoMQTT" CR));
+        Logger.debug(OMG_LOGID, F("Adv data XtoPilight push state via PilighttoMQTT"));
         // Acknowledgement
         pub(subjectGTWPilighttoMQTT, message);
         success = true;
       } else {
         switch (msgLength) {
           case ESPiLight::ERROR_UNAVAILABLE_PROTOCOL:
-            Logger.error(OMG_LOGID, F("protocol is not available" CR));
+            Logger.error(OMG_LOGID, F("protocol is not available"));
             break;
           case ESPiLight::ERROR_INVALID_PILIGHT_MSG:
-            Logger.error(OMG_LOGID, F("message is invalid" CR));
+            Logger.error(OMG_LOGID, F("message is invalid"));
             break;
           case ESPiLight::ERROR_INVALID_JSON:
-            Logger.error(OMG_LOGID, F("message is not a proper json object" CR));
+            Logger.error(OMG_LOGID, F("message is not a proper json object"));
             break;
           case ESPiLight::ERROR_NO_OUTPUT_PIN:
-            Logger.error(OMG_LOGID, F("no transmitter pin" CR));
+            Logger.error(OMG_LOGID, F("no transmitter pin"));
             break;
           default:
-            Logger.error(OMG_LOGID, F("Invalid JSON: can't read message/protocol" CR));
+            Logger.error(OMG_LOGID, F("Invalid JSON: can't read message/protocol"));
         }
       }
     }
     if (!success) {
       pub(subjectGTWPilighttoMQTT, "{\"Status\": \"Error\"}"); // Fail feedback
-      Logger.error(OMG_LOGID, F("MQTTtoPilight Fail json" CR));
+      Logger.error(OMG_LOGID, F("MQTTtoPilight Fail json"));
     }
     enableActiveReceiver();
   }
 }
 
 extern void disablePilightReceive() {
-  Logger.debug(OMG_LOGID, F("disablePilightReceive" CR));
+  Logger.debug(OMG_LOGID, F("disablePilightReceive"));
   rf.initReceiver(-1);
   rf.disableReceiver();
 };
 
 extern void enablePilightReceive() {
-  Logger.notice(OMG_LOGID, F("Switching to Pilight Receiver: %F" CR), RFConfig.frequency);
-  Logger.notice(OMG_LOGID, F("RF_EMITTER_GPIO: %d " CR), RF_EMITTER_GPIO);
-  Logger.notice(OMG_LOGID, F("RF_RECEIVER_GPIO: %d " CR), RF_RECEIVER_GPIO);
-  Logger.debug(OMG_LOGID, F("ZgatewayPilight command topic: %s%s%s" CR), mqtt_topic, g_gateway_name, subjectMQTTtoPilight);
+  Logger.notice(OMG_LOGID, F("Switching to Pilight Receiver: %F"), RFConfig.frequency);
+  Logger.notice(OMG_LOGID, F("RF_EMITTER_GPIO: %d "), RF_EMITTER_GPIO);
+  Logger.notice(OMG_LOGID, F("RF_RECEIVER_GPIO: %d "), RF_RECEIVER_GPIO);
+  Logger.debug(OMG_LOGID, F("ZgatewayPilight command topic: %s%s%s"), mqtt_topic, g_gateway_name, subjectMQTTtoPilight);
 
   initCC1101();
 
@@ -307,6 +307,6 @@ extern void enablePilightReceive() {
   pinMode(RF_EMITTER_GPIO, OUTPUT); // Set this here, because if this is the RX pin it was reset to INPUT by Serial.end();
   rf.enableReceiver();
   loadPilightConfig();
-  Logger.debug(OMG_LOGID, F("ZgatewayPilight setup done " CR));
+  Logger.debug(OMG_LOGID, F("ZgatewayPilight setup done "));
 };
 #endif

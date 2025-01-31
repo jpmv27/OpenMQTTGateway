@@ -52,11 +52,11 @@ void setupINA226() {
 void MeasureINA226() {
   if (millis() > (timeINA226 + TimeBetweenReadingINA226)) { //retrieving value of temperature and humidity of the box from DHT every xUL
     timeINA226 = millis();
-    Logger.debug(OMG_LOGID, F("Creating INA226 buffer" CR));
+    Logger.debug(OMG_LOGID, F("Creating INA226 buffer"));
     StaticJsonDocument<JSON_MSG_BUFFER> INA226dataBuffer;
     JsonObject INA226data = INA226dataBuffer.to<JsonObject>();
     // Topic on which we will send data
-    Logger.debug(OMG_LOGID, F("Retrieving electrical data" CR));
+    Logger.debug(OMG_LOGID, F("Retrieving electrical data"));
     // Bus Spannung, read-only, 16Bit, 0...40.96V max., LSB 1.25mV
     float volt = readRegister(0x02) * 0.00125;
     // Seite 24: Shunt Spannung +- 81,92mV mit 16 Bit, LSB 2,5uV

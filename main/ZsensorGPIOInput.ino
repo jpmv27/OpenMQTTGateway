@@ -37,7 +37,7 @@ int InputState = 3; // Set to 3 so that it reads on startup
 int previousInputState = 3;
 
 void setupGPIOInput() {
-  Logger.notice(OMG_LOGID, F("Reading GPIO at pin: %d" CR), INPUT_GPIO);
+  Logger.notice(OMG_LOGID, F("Reading GPIO at pin: %d"), INPUT_GPIO);
   pinMode(INPUT_GPIO, GPIO_INPUT_TYPE); // declare GPIOInput pin as input_pullup to prevent floating. Pin will be high when not connected to ground
 }
 
@@ -63,7 +63,7 @@ void MeasureGPIOInput() {
       if (resetTime == 0) {
         resetTime = millis();
       } else if ((millis() - resetTime) > 3000) {
-        Logger.debug(OMG_LOGID, F("Button Held" CR));
+        Logger.debug(OMG_LOGID, F("Button Held"));
         gatewayState = GatewayState::WAITING_ONBOARDING;
 // Switching off the relay during reset or failsafe operations
 #    ifdef OMG_ACTUATOR_ONOFF
@@ -72,7 +72,7 @@ void MeasureGPIOInput() {
           ActuatorTrigger();
         }
 #    endif
-        Logger.notice(OMG_LOGID, F("Erasing ESP Config, restarting" CR));
+        Logger.notice(OMG_LOGID, F("Erasing ESP Config, restarting"));
         erase(true);
       }
     } else {
@@ -81,7 +81,7 @@ void MeasureGPIOInput() {
 #  endif
     // if the Input state has changed:
     if (reading != InputState) {
-      Logger.debug(OMG_LOGID, F("Creating GPIOInput buffer" CR));
+      Logger.debug(OMG_LOGID, F("Creating GPIOInput buffer"));
       StaticJsonDocument<JSON_MSG_BUFFER> GPIOdataBuffer;
       JsonObject GPIOdata = GPIOdataBuffer.to<JsonObject>();
       if (InputState == HIGH) {

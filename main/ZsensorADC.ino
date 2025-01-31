@@ -40,7 +40,7 @@ static int persistedadc = -1024; // so that the first reading will always be pub
 unsigned long timeadc = 0;
 unsigned long timeadcpub = 0;
 void setupADC() {
-  Logger.notice(OMG_LOGID, F("ADC_GPIO: %d" CR), ADC_GPIO);
+  Logger.notice(OMG_LOGID, F("ADC_GPIO: %d"), ADC_GPIO);
 }
 
 void MeasureADC() {
@@ -59,11 +59,11 @@ void MeasureADC() {
       val = sum_val / NumberOfReadingsADC;
     }
     if (isnan(val)) {
-      Logger.error(OMG_LOGID, F("Failed to read from ADC !" CR));
+      Logger.error(OMG_LOGID, F("Failed to read from ADC !"));
     } else {
       if (val >= persistedadc + ThresholdReadingADC || val <= persistedadc - ThresholdReadingADC || (MinTimeInSecBetweenPublishingADC > 0 && millis() - timeadcpub > (MinTimeInSecBetweenPublishingADC * 1000UL))) {
         timeadcpub = millis();
-        Logger.debug(OMG_LOGID, F("Creating ADC buffer" CR));
+        Logger.debug(OMG_LOGID, F("Creating ADC buffer"));
         StaticJsonDocument<JSON_MSG_BUFFER> ADCdataBuffer;
         JsonObject ADCdata = ADCdataBuffer.to<JsonObject>();
         ADCdata["adc"] = (int)val;

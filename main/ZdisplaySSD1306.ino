@@ -69,15 +69,15 @@ module setup, for use in Arduino setup
 void setupSSD1306() {
   SSD1306Config_init();
   SSD1306Config_load();
-  Logger.debug(OMG_LOGID, F("Setup SSD1306 Display" CR));
-  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 command topic: %s" CR), subjectMQTTtoSSD1306set);
-  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 log-oled: %T" CR), logToOLEDDisplay);
-  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 json-oled: %T" CR), jsonDisplay);
-  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 DISPLAY_PAGE_INTERVAL: %d" CR), OMG_DISPLAY_PAGE_INTERVAL);
-  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 DISPLAY_IDLE_LOGO: %T" CR), idlelogo);
-  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 DISPLAY_FLIP: %T" CR), displayFlip);
+  Logger.debug(OMG_LOGID, F("Setup SSD1306 Display"));
+  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 command topic: %s"), subjectMQTTtoSSD1306set);
+  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 log-oled: %T"), logToOLEDDisplay);
+  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 json-oled: %T"), jsonDisplay);
+  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 DISPLAY_PAGE_INTERVAL: %d"), OMG_DISPLAY_PAGE_INTERVAL);
+  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 DISPLAY_IDLE_LOGO: %T"), idlelogo);
+  Logger.debug(OMG_LOGID, F("ZdisplaySSD1306 DISPLAY_FLIP: %T"), displayFlip);
   Oled.begin();
-  Logger.notice(OMG_LOGID, F("Setup SSD1306 Display end" CR));
+  Logger.notice(OMG_LOGID, F("Setup SSD1306 Display end"));
 
 #  if OMG_LOG_TO_OLED
   Logger.registerSerial(OMG_LOGID, OMG_LOG_LEVEL_OLED, "OMG", Oled); // Log on OLED following LOG_LEVEL_OLED
@@ -112,7 +112,7 @@ void loopSSD1306() {
   */
 
 #  ifdef DISPLAY_BLANKING
-  // Logger.debug(OMG_LOGID, F("touchAverage %d, touchCurrentReading %d, touchThreshold %d" CR), touchAverage, touchCurrentReading, touchThreshold);
+  // Logger.debug(OMG_LOGID, F("touchAverage %d, touchCurrentReading %d, touchThreshold %d"), touchAverage, touchCurrentReading, touchThreshold);
   touchTotal = touchTotal - touchReadings[touchIndex];
   touchCurrentReading = touchRead(DISPLAY_BLANKING_TOUCH_GPIO);
   touchReadings[touchIndex] = touchCurrentReading;
@@ -133,7 +133,7 @@ void loopSSD1306() {
   if (jsonDisplay && displayState) {
     if (uptime() >= nextDisplayPage && uxSemaphoreGetCount(semaphoreOLEDOperation) && currentWebUIMessage && newSSD1306Message) {
       if (!Oled.displayPage(currentWebUIMessage)) {
-        Logger.warning(OMG_LOGID, F("[ssd1306] displayPage failed: %s" CR), currentWebUIMessage->title);
+        Logger.warning(OMG_LOGID, F("[ssd1306] displayPage failed: %s"), currentWebUIMessage->title);
       }
       nextDisplayPage = uptime() + OMG_DISPLAY_PAGE_INTERVAL;
       logoDisplayed = false;
@@ -159,21 +159,21 @@ Handler for mqtt commands sent to the module
 void XtoSSD1306(const char* topicOri, JsonObject& SSD1306data) { // json object decoding
   bool success = false;
   if (cmpToMainTopic(topicOri, subjectMQTTtoSSD1306set)) {
-    Logger.debug(OMG_LOGID, F("MQTTtoSSD1306 json set" CR));
+    Logger.debug(OMG_LOGID, F("MQTTtoSSD1306 json set"));
     // properties
     if (SSD1306data.containsKey("onstate")) {
       displayState = SSD1306data["onstate"].as<bool>();
-      Logger.notice(OMG_LOGID, F("Set display state: %T" CR), displayState);
+      Logger.notice(OMG_LOGID, F("Set display state: %T"), displayState);
       success = true;
     }
     if (SSD1306data.containsKey("brightness")) {
       displayBrightness = SSD1306data["brightness"].as<int>();
-      Logger.notice(OMG_LOGID, F("Set brightness: %d" CR), displayBrightness);
+      Logger.notice(OMG_LOGID, F("Set brightness: %d"), displayBrightness);
       success = true;
     }
     if (SSD1306data.containsKey("log-oled")) {
       logToOLEDDisplay = SSD1306data["log-oled"].as<bool>();
-      Logger.notice(OMG_LOGID, F("Set OLED log: %T" CR), logToOLEDDisplay);
+      Logger.notice(OMG_LOGID, F("Set OLED log: %T"), logToOLEDDisplay);
       logToOLED(logToOLEDDisplay);
       if (logToOLEDDisplay) {
         jsonDisplay = false;
@@ -185,7 +185,7 @@ void XtoSSD1306(const char* topicOri, JsonObject& SSD1306data) { // json object 
         logToOLEDDisplay = false;
         logToOLED(logToOLEDDisplay);
       }
-      Logger.notice(OMG_LOGID, F("Set json-oled: %T" CR), jsonDisplay);
+      Logger.notice(OMG_LOGID, F("Set json-oled: %T"), jsonDisplay);
       success = true;
     }
     if (SSD1306data.containsKey("idlelogo")) {
@@ -194,7 +194,7 @@ void XtoSSD1306(const char* topicOri, JsonObject& SSD1306data) { // json object 
     }
     if (SSD1306data.containsKey("display-flip")) {
       displayFlip = SSD1306data["display-flip"].as<bool>();
-      Logger.notice(OMG_LOGID, F("Set display-flip: %T" CR), displayFlip);
+      Logger.notice(OMG_LOGID, F("Set display-flip: %T"), displayFlip);
       success = true;
     }
     // save, load, init, erase
@@ -204,13 +204,13 @@ void XtoSSD1306(const char* topicOri, JsonObject& SSD1306data) { // json object 
     } else if (SSD1306data.containsKey("load") && SSD1306data["load"]) {
       success = SSD1306Config_load();
       if (success) {
-        Logger.notice(OMG_LOGID, F("SSD1306 config loaded" CR));
+        Logger.notice(OMG_LOGID, F("SSD1306 config loaded"));
       }
     } else if (SSD1306data.containsKey("init") && SSD1306data["init"]) {
       SSD1306Config_init();
       success = true;
       if (success) {
-        Logger.notice(OMG_LOGID, F("SSD1306 config initialised" CR));
+        Logger.notice(OMG_LOGID, F("SSD1306 config initialised"));
       }
     } else if (SSD1306data.containsKey("erase") && SSD1306data["erase"]) {
       // Erase config from NVS (non-volatile storage)
@@ -220,13 +220,13 @@ void XtoSSD1306(const char* topicOri, JsonObject& SSD1306data) { // json object 
       }
       preferences.end();
       if (success) {
-        Logger.notice(OMG_LOGID, F("SSD1306 config erased" CR));
+        Logger.notice(OMG_LOGID, F("SSD1306 config erased"));
       }
     }
     if (success) {
       stateSSD1306Display();
     } else {
-      Logger.error(OMG_LOGID, F("[ SSD1306 ] XtoSSD1306 Fail json" CR), SSD1306data);
+      Logger.error(OMG_LOGID, F("[ SSD1306 ] XtoSSD1306 Fail json"), SSD1306data);
     }
   }
 }
@@ -246,7 +246,7 @@ void SSD1306Config_save() {
   preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
   int result = preferences.putString("SSD1306Config", conf);
   preferences.end();
-  Logger.notice(OMG_LOGID, F("SSD1306 Config_save: %s, result: %d" CR), conf.c_str(), result);
+  Logger.notice(OMG_LOGID, F("SSD1306 Config_save: %s, result: %d"), conf.c_str(), result);
 }
 
 void SSD1306Config_init() {
@@ -256,7 +256,7 @@ void SSD1306Config_init() {
   jsonDisplay = OMG_JSON_TO_OLED;
   idlelogo = OMG_DISPLAY_IDLE_LOGO;
   displayFlip = OMG_DISPLAY_FLIP;
-  Logger.notice(OMG_LOGID, F("SSD1306 config initialised" CR));
+  Logger.notice(OMG_LOGID, F("SSD1306 config initialised"));
 }
 
 bool SSD1306Config_load() {
@@ -266,11 +266,11 @@ bool SSD1306Config_load() {
     auto error = deserializeJson(jsonBuffer, preferences.getString("SSD1306Config", "{}"));
     preferences.end();
     if (error) {
-      Logger.error(OMG_LOGID, F("SSD1306 config deserialization failed: %s, buffer capacity: %u" CR), error.c_str(), jsonBuffer.capacity());
+      Logger.error(OMG_LOGID, F("SSD1306 config deserialization failed: %s, buffer capacity: %u"), error.c_str(), jsonBuffer.capacity());
       return false;
     }
     if (jsonBuffer.isNull()) {
-      Logger.warning(OMG_LOGID, F("SSD1306 config is null" CR));
+      Logger.warning(OMG_LOGID, F("SSD1306 config is null"));
       return false;
     }
     JsonObject jo = jsonBuffer.as<JsonObject>();
@@ -280,11 +280,11 @@ bool SSD1306Config_load() {
     jsonDisplay = jo["json-oled"].as<bool>();
     idlelogo = jo["idlelogo"].as<bool>();
     displayFlip = jo["display-flip"].as<bool>();
-    Logger.notice(OMG_LOGID, F("Saved SSD1306 config loaded" CR));
+    Logger.notice(OMG_LOGID, F("Saved SSD1306 config loaded"));
     return true;
   } else {
     preferences.end();
-    Logger.notice(OMG_LOGID, F("No SSD1306 config to load" CR));
+    Logger.notice(OMG_LOGID, F("No SSD1306 config to load"));
     return false;
   }
 }

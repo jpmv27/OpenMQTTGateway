@@ -34,8 +34,8 @@
 unsigned long timeHCSR04 = 0;
 
 void setupHCSR04() {
-  Logger.notice(OMG_LOGID, F("HCSR04 trigger pin: %d" CR), HCSR04_TRI_GPIO);
-  Logger.notice(OMG_LOGID, F("HCSR04 echo pin: %d" CR), HCSR04_ECH_GPIO);
+  Logger.notice(OMG_LOGID, F("HCSR04 trigger pin: %d"), HCSR04_TRI_GPIO);
+  Logger.notice(OMG_LOGID, F("HCSR04 echo pin: %d"), HCSR04_ECH_GPIO);
   pinMode(HCSR04_TRI_GPIO, OUTPUT); // declare HC SR-04 trigger GPIO as output
   pinMode(HCSR04_ECH_GPIO, INPUT); // declare HC SR-04 echo GPIO as input
 }
@@ -43,7 +43,7 @@ void setupHCSR04() {
 void MeasureDistance() {
   if (millis() > (timeHCSR04 + TimeBetweenReadingHCSR04)) {
     timeHCSR04 = millis();
-    Logger.debug(OMG_LOGID, F("Creating HCSR04 buffer" CR));
+    Logger.debug(OMG_LOGID, F("Creating HCSR04 buffer"));
     StaticJsonDocument<JSON_MSG_BUFFER> HCSR04dataBuffer;
     JsonObject HCSR04data = HCSR04dataBuffer.to<JsonObject>();
     digitalWrite(HCSR04_TRI_GPIO, LOW);
@@ -53,20 +53,20 @@ void MeasureDistance() {
     digitalWrite(HCSR04_TRI_GPIO, LOW);
     unsigned long duration = pulseIn(HCSR04_ECH_GPIO, HIGH);
     if (isnan(duration)) {
-      Logger.error(OMG_LOGID, F("Failed to read from HC SR04 sensor!" CR));
+      Logger.error(OMG_LOGID, F("Failed to read from HC SR04 sensor!"));
     } else {
       static unsigned int distance = 99999;
       unsigned int d = duration / 58.2;
       HCSR04data["distance"] = (int)d;
       if (d > distance) {
         HCSR04data["direction"] = "away";
-        Logger.debug(OMG_LOGID, F("HC SR04 Distance changed" CR));
+        Logger.debug(OMG_LOGID, F("HC SR04 Distance changed"));
       } else if (d < distance) {
         HCSR04data["direction"] = "towards";
-        Logger.debug(OMG_LOGID, F("HC SR04 Distance changed" CR));
+        Logger.debug(OMG_LOGID, F("HC SR04 Distance changed"));
       } else if (HCSR04_always) {
         HCSR04data["direction"] = "static";
-        Logger.debug(OMG_LOGID, F("HC SR04 Distance hasn't changed" CR));
+        Logger.debug(OMG_LOGID, F("HC SR04 Distance hasn't changed"));
       }
       distance = d;
       enqueueJsonObject(HCSR04data);

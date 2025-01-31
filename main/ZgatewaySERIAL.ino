@@ -78,7 +78,7 @@ void setupSERIAL() {
   Serial.swap(); // swap UART0 ports from (GPIO1,GPIO3) to (GPIO15,GPIO13)
 #      endif
   SERIALStream = &Serial;
-  Logger.notice(OMG_LOGID, F("SERIAL HW UART0" CR));
+  Logger.notice(OMG_LOGID, F("SERIAL HW UART0"));
 
 #    elif SERIAL_UART == 1 // init UART1
   Serial1.end(); // stop if already initialized
@@ -88,7 +88,7 @@ void setupSERIAL() {
   Serial1.begin(SERIALBaud, SERIAL_8N1);
 #      endif
   SERIALStream = &Serial1;
-  Logger.notice(OMG_LOGID, F("SERIAL HW UART1" CR));
+  Logger.notice(OMG_LOGID, F("SERIAL HW UART1"));
 
 #    elif SERIAL_UART == 2 // init UART2
   Serial2.end(); // stop if already initialized
@@ -98,13 +98,13 @@ void setupSERIAL() {
   Serial2.begin(SERIALBaud, SERIAL_8N1);
 #      endif
   SERIALStream = &Serial2;
-  Logger.notice(OMG_LOGID, F("SERIAL HW UART2" CR));
+  Logger.notice(OMG_LOGID, F("SERIAL HW UART2"));
 
 #    elif SERIAL_UART == 3 // init UART3
   Serial3.end(); // stop if already initialized
   Serial3.begin(SERIALBaud, SERIAL_8N1);
   SERIALStream = &Serial3;
-  Logger.notice(OMG_LOGID, F("SERIAL HW UART3" CR));
+  Logger.notice(OMG_LOGID, F("SERIAL HW UART3"));
 #    endif
 
 #  else // Software serial
@@ -114,14 +114,14 @@ void setupSERIAL() {
   SERIALSoftSerial.begin(SERIALBaud);
   SERIALStream = &SERIALSoftSerial; // get stream of serial
 
-  Logger.notice(OMG_LOGID, F("SERIAL_RX_GPIO: %d" CR), SERIAL_RX_GPIO);
-  Logger.notice(OMG_LOGID, F("SERIAL_TX_GPIO: %d" CR), SERIAL_TX_GPIO);
+  Logger.notice(OMG_LOGID, F("SERIAL_RX_GPIO: %d"), SERIAL_RX_GPIO);
+  Logger.notice(OMG_LOGID, F("SERIAL_TX_GPIO: %d"), SERIAL_TX_GPIO);
 #  endif
 
 #  ifdef ESP32
   serialSemaphore = xSemaphoreCreateMutex();
   if (serialSemaphore == NULL) {
-    Logger.error(OMG_LOGID, F("Failed to create serialSemaphore" CR));
+    Logger.error(OMG_LOGID, F("Failed to create serialSemaphore"));
   }
 #  endif
 
@@ -129,8 +129,8 @@ void setupSERIAL() {
   while (SERIALStream->available() > 0)
     SERIALStream->read();
 
-  Logger.notice(OMG_LOGID, F("SERIALBaud: %d" CR), SERIALBaud);
-  Logger.debug(OMG_LOGID, F("ZgatewaySERIAL setup done" CR));
+  Logger.notice(OMG_LOGID, F("SERIALBaud: %d"), SERIALBaud);
+  Logger.debug(OMG_LOGID, F("ZgatewaySERIAL setup done"));
 }
 
 #  if SERIALtoMQTTmode == 0 // Convert received data to single MQTT topic
@@ -138,7 +138,7 @@ void SERIALtoX() {
   // Send all SERIAL output (up to SERIALInPost char revieved) as MQTT message
   //This function is Blocking, but there should only ever be a few bytes, usually an ACK or a NACK.
   if (SERIALStream->available()) {
-    Logger.debug(OMG_LOGID, F("SERIALtoMQTT" CR));
+    Logger.debug(OMG_LOGID, F("SERIALtoMQTT"));
     static char SERIALdata[MAX_INPUT];
     static unsigned int input_pos = 0;
     static char inChar;
@@ -153,7 +153,7 @@ void SERIALtoX() {
     input_pos = 0;
 
     char* output = SERIALdata + sizeof(SERIALPre) - 1;
-    Logger.notice(OMG_LOGID, F("SERIAL data: %s" CR), output);
+    Logger.notice(OMG_LOGID, F("SERIAL data: %s"), output);
     pub(subjectSERIALtoMQTT, output);
   }
 }
@@ -165,10 +165,10 @@ void sendHeartbeat() {
     SERIALStream->print("{\"type\":\"heartbeat\"}");
     SERIALStream->print(SERIALPost);
     SERIALStream->flush();
-    Logger.notice(OMG_LOGID, F("Sent Serial heartbeat" CR));
+    Logger.notice(OMG_LOGID, F("Sent Serial heartbeat"));
     SEMAPHORE_SERIAL_GIVE;
   } else {
-    Logger.error(OMG_LOGID, F("Failed to take serialSemaphore" CR));
+    Logger.error(OMG_LOGID, F("Failed to take serialSemaphore"));
   }
 }
 
@@ -178,10 +178,10 @@ void sendHeartbeatAck() {
     SERIALStream->print("{\"type\":\"heartbeat_ack\"}");
     SERIALStream->print(SERIALPost);
     SERIALStream->flush();
-    Logger.notice(OMG_LOGID, F("Sent heartbeat ack" CR));
+    Logger.notice(OMG_LOGID, F("Sent heartbeat ack"));
     SEMAPHORE_SERIAL_GIVE;
   } else {
-    Logger.error(OMG_LOGID, F("Failed to take serialSemaphore" CR));
+    Logger.error(OMG_LOGID, F("Failed to take serialSemaphore"));
   }
 }
 
@@ -202,7 +202,7 @@ void SERIALtoX() {
       // No ack received, increase the interval (with a maximum limit)
       unsigned long newHeartbeatInterval = heartbeatInterval * 1.25;
       heartbeatInterval = min(newHeartbeatInterval, maxHeartbeatInterval);
-      Logger.warning(OMG_LOGID, F("No heartbeat ack received. Increasing interval to %lu ms" CR), heartbeatInterval);
+      Logger.warning(OMG_LOGID, F("No heartbeat ack received. Increasing interval to %lu ms"), heartbeatInterval);
       receiverReady = false;
     } else {
       // Ack received, reset the interval
@@ -237,10 +237,10 @@ void SERIALtoX() {
         } else if (SERIALdata.containsKey("type") && strcmp(SERIALdata["type"], "heartbeat_ack") == 0) {
           lastHeartbeatAckReceived = now;
           receiverReady = true;
-          Logger.notice(OMG_LOGID, F("Heartbeat ack received" CR));
+          Logger.notice(OMG_LOGID, F("Heartbeat ack received"));
         } else {
           // Process normal messages
-          Logger.notice(OMG_LOGID, F("SERIAL msg received: %s" CR), jsonString.c_str());
+          Logger.notice(OMG_LOGID, F("SERIAL msg received: %s"), jsonString.c_str());
 #    if OMG_MQTT_JSON_PUBLISHING
           if (SERIALdata.containsKey("target")) {
             receivingDATA("", jsonString.c_str());
@@ -268,18 +268,18 @@ void SERIALtoX() {
         }
       } else {
         // Print error to serial log
-        Logger.error(OMG_LOGID, F("Error in SERIALJSONtoMQTT, deserializeJson() returned %s" CR), err.c_str());
+        Logger.error(OMG_LOGID, F("Error in SERIALJSONtoMQTT, deserializeJson() returned %s"), err.c_str());
       }
 
       // Clear the buffer for the next message
       buffer = "";
     } else if (buffer.endsWith(SERIALPost)) {
       // If the buffer ends with the postfix but does not start with the prefix, clear it
-      Logger.error(OMG_LOGID, F("Buffer error, clearing buffer. Partial content: %s" CR), buffer.c_str());
+      Logger.error(OMG_LOGID, F("Buffer error, clearing buffer. Partial content: %s"), buffer.c_str());
       buffer = "";
     } else if (buffer.length() > JSON_MSG_BUFFER) {
       // If the buffer gets too large without finding a complete message, clear it
-      Logger.error(OMG_LOGID, F("Buffer overflow, clearing buffer. Partial content: %s" CR), buffer.c_str());
+      Logger.error(OMG_LOGID, F("Buffer overflow, clearing buffer. Partial content: %s"), buffer.c_str());
       buffer = "";
       isOverflow = true;
     }
@@ -294,7 +294,7 @@ void sendMQTTfromNestedJson(JsonVariant obj, char* topic, int level, int maxLeve
     for (JsonPair pair : obj.as<JsonObject>()) {
       // check if new key still fits in topic cstring
       const char* key = pair.key().c_str();
-      Logger.debug(OMG_LOGID, F("level=%d, key='%s'" CR), level, pair.key().c_str());
+      Logger.debug(OMG_LOGID, F("level=%d, key='%s'"), level, pair.key().c_str());
       if (topicLength + 2 + strlen(key) <= mqtt_topic_max_size) {
         // add new level to existing topic cstring
         topic[topicLength] = '/'; // add slash
@@ -330,7 +330,7 @@ bool XtoSERIAL(const char* topicOri, JsonObject& SERIALdata) {
     if (receiverReady && (cmpToMainTopic(topicOri, subjectMQTTtoSERIAL) ||
                           (SYSConfig.serial && SERIALdata.containsKey("origin") && SERIALdata["origin"].is<const char*>()) ||
                           (SYSConfig.serial && SERIALdata.containsKey("topic") && SERIALdata["topic"].is<const char*>()))) {
-      Logger.debug(OMG_LOGID, F("XtoSERIAL" CR));
+      Logger.debug(OMG_LOGID, F("XtoSERIAL"));
       // Prepare the data string
       std::string data;
       if (SYSConfig.serial ||
@@ -350,13 +350,13 @@ bool XtoSERIAL(const char* topicOri, JsonObject& SERIALdata) {
       SERIALStream->print(postfix);
       SERIALStream->flush();
 
-      Logger.notice(OMG_LOGID, F("[ OMG->SERIAL ] data sent: %s" CR), data.c_str());
+      Logger.notice(OMG_LOGID, F("[ OMG->SERIAL ] data sent: %s"), data.c_str());
       res = true;
       delay(100);
     }
     SEMAPHORE_SERIAL_GIVE;
   } else {
-    Logger.error(OMG_LOGID, F("Failed to take serialSemaphore" CR));
+    Logger.error(OMG_LOGID, F("Failed to take serialSemaphore"));
   }
   return res;
 }

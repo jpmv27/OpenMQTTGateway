@@ -31,7 +31,7 @@
 #ifdef OMG_SENSOR_HCSR501
 
 void setupHCSR501() {
-  Logger.notice(OMG_LOGID, F("HCSR501 pin: %d" CR), HCSR501_GPIO);
+  Logger.notice(OMG_LOGID, F("HCSR501 pin: %d"), HCSR501_GPIO);
   pinMode(HCSR501_GPIO, INPUT); // declare HC SR-501 GPIO as input
 #  ifdef HCSR501_LED_NOTIFY_GPIO
   pinMode(HCSR501_LED_NOTIFY_GPIO, OUTPUT);
