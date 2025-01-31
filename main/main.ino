@@ -1318,6 +1318,7 @@ void setup() {
   }
 #endif
   Logger.always(OMG_LOGID, F("************* WELCOME TO OpenMQTTGateway **************"));
+  Logger.always(OMG_LOGID, F("OpenMQTTGateway Gateway Name: %s"), g_gateway_name);
 #if defined(TRIGGER_GPIO) && !defined(OMG_ESP_WIFI_MANUAL_SETUP)
   pinMode(TRIGGER_GPIO, INPUT_PULLUP);
   checkButton();
