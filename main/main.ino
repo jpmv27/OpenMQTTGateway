@@ -1310,7 +1310,8 @@ void setup() {
   Logger.registerSerial(OMG_LOGID, OMG_LOG_LEVEL, "OMG");
 #if OMG_LOG_TO_SYSLOG
   if (strcmp(g_syslog_server, "") != 0 && strcmp(g_syslog_port, "") != 0) {
-    Logger.configureSyslog(g_syslog_server, String(g_syslog_port).toInt(), g_gateway_name);
+    Logger.configureSyslog(g_syslog_server, String(g_syslog_port).toInt(), g_gateway_name,
+        OMG_SYSLOG_WAIT_IF_NOT_READY, OMG_SYSLOG_MAX_WAIT_MILLISECONDS);
     Logger.registerSyslog(OMG_LOGID, OMG_LOG_LEVEL_SYSLOG, OMG_SYSLOG_FACILITY, "OMG");
   } else {
     Logger.error(OMG_LOGID, F("Invalid syslog configuration, skipping registration" CR));
