@@ -1674,6 +1674,9 @@ void setOTA() {
 #  ifdef OMG_GATEWAY_BT
     stopProcessing();
 #  endif
+#  ifdef OMG_GATEWAY_RTL_433
+    disableRTLreceive();
+#  endif
 #endif
     lpDisplayPrint("OTA in progress");
   });
