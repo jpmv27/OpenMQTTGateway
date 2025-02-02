@@ -755,6 +755,20 @@ enum PowerMode { DEACTIVATED = -1,
                  INTERVAL,
                  ACTION };
 
+/*--------------------Check for time hogs--------------------*/
+#ifndef OMG_LOOP_TIME_LIMIT
+#  define OMG_LOOP_TIME_LIMIT 100
+#endif
+
+#define CheckElapsedTime(proc) {                                                                        \
+                                 unsigned long const start = millis();                                  \
+                                 proc;                                                                  \
+                                 unsigned long const diff = millis() - start;                           \
+                                 if (diff > OMG_LOOP_TIME_LIMIT) {                                      \
+                                   Logger.warning(OMG_LOGID, F("Call to " #proc " took %lu ms"), diff); \
+                                 }                                                                      \
+                               }
+
 /*--------------------Minimum freeHeap--------------------*/
 // Below this parameter we trigger a restart, this avoid stuck boards like seen in https://github.com/1technophile/OpenMQTTGateway/issues/1693
 #define MinimumMemory 40000

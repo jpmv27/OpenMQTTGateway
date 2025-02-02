@@ -2513,15 +2513,15 @@ void loop() {
   g_last_loop_time = now;
 
 #ifndef OMG_ESP_WIFI_MANUAL_SETUP
-  checkButton(); // check if a reset of wifi/mqtt settings is asked
+  CheckElapsedTime(checkButton()); // check if a reset of wifi/mqtt settings is asked
 #endif
 
 #ifdef ESP8266
-  updateAndHandleLEDsTask(); // With ESP8266 we need to update the LEDs in the loop
+  CheckElapsedTime(updateAndHandleLEDsTask()); // With ESP8266 we need to update the LEDs in the loop
 #endif
   if (!SYSConfig.offline) { // Online mode
     if (mqttSetupPending) {
-      setupMQTT();
+      CheckElapsedTime(setupMQTT());
       mqttSetupPending = false;
     }
     // When online the MQTT connection callback release the processes
@@ -2542,33 +2542,33 @@ void loop() {
   }
 
 #ifdef OMG_GATEWAY_SERIAL // Serial is a module and a communication layer so it's always processed
-  SERIALtoX();
+  CheckElapsedTime(SERIALtoX());
 #endif
 
   if (ethConnected || WiFi.status() == WL_CONNECTED) {
     if (ethConnected && WiFi.status() == WL_CONNECTED) {
-      WiFi.disconnect(); // we disconnect the wifi as we are connected to ethernet
+      CheckElapsedTime(WiFi.disconnect()); // we disconnect the wifi as we are connected to ethernet
     }
-    ArduinoOTA.handle();
+    CheckElapsedTime(ArduinoOTA.handle());
     failure_number_ntwk = 0;
     if (now > (timer_sys_checks + (TimeBetweenCheckingSYS * 1000)) || !timer_sys_checks) {
 #if OMG_MQTT_MESSAGE_UTC_TIMESTAMP || OMG_MQTT_MESSAGE_UNIX_TIMESTAMP || OMG_MQTT_MESSAGE_LOCAL_TIMESTAMP
-      TheengsUtils::syncNTP();
+      CheckElapsedTime(TheengsUtils::syncNTP());
 #if OMG_MQTT_MESSAGE_LOCAL_TIMESTAMP
-      TheengsUtils::setTimezone(OMG_TIMEZONE);
+      CheckElapsedTime(TheengsUtils::setTimezone(OMG_TIMEZONE));
 #endif
 #endif
       if (!timer_sys_checks) { // Update check at start up only
 #if defined(ESP32) && OMG_OTA_CHECK_OTA_UPDATE != OMG_OTA_NONE
-        checkForUpdates();
+        CheckElapsedTime(checkForUpdates());
 #endif
       }
       timer_sys_checks = millis();
     }
 #if defined(OMG_WEBUI) && defined(ESP32)
-    WebUILoop();
+    CheckElapsedTime(WebUILoop());
 #endif
-    mqtt->loop();
+    CheckElapsedTime(mqtt->loop());
     if (mqtt->connected()) { // MQTT client is still connected
       failure_number_ntwk = 0;
 
@@ -2582,7 +2582,9 @@ void loop() {
   } else if (!SYSConfig.offline && !SYSConfig.serial) { // disconnected from network
     Logger.warning(OMG_LOGID, F("Network disconnected"));
     gatewayState = GatewayState::NTWK_DISCONNECTED;
-    if (!wifi_reconnect_bypass()) {
+    bool reconnect_bypass = false;
+    CheckElapsedTime(reconnect_bypass = wifi_reconnect_bypass());
+    if (!reconnect_bypass) {
       sleep();
     } else {
       gatewayState = GatewayState::NTWK_CONNECTED;
@@ -2591,148 +2593,152 @@ void loop() {
   if (!ProcessLock) {
     if (now > (timer_sys_measures + (TimeBetweenReadingSYS * 1000)) || !timer_sys_measures) {
       timer_sys_measures = millis();
-      stateMeasures();
+      CheckElapsedTime(stateMeasures());
 #ifdef OMG_GATEWAY_BT
-      stateBTMeasures(false);
+      CheckElapsedTime(stateBTMeasures(false));
 #endif
 #ifdef OMG_ACTUATOR_ONOFF
-      stateONOFFMeasures();
+      CheckElapsedTime(stateONOFFMeasures());
 #endif
 #ifdef OMG_DISPLAY_SSD1306
-      stateSSD1306Display();
+      CheckElapsedTime(stateSSD1306Display());
 #endif
 #ifdef OMG_GATEWAY_LORA
-      stateLORAMeasures();
+      CheckElapsedTime(stateLORAMeasures());
 #endif
 #if defined(OMG_GATEWAY_RTL_433) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_RF2) || defined(OMG_ACTUATOR_SOMFY)
-      stateRFMeasures();
+      CheckElapsedTime(stateRFMeasures());
 #endif
 #if defined(OMG_WEBUI) && defined(ESP32)
-      stateWebUIStatus();
+      CheckElapsedTime(stateWebUIStatus());
 #endif
     }
 // Function that doesn't need an active connection
 #if defined(OMG_BOARD_M5STICKC) || defined(OMG_BOARD_M5STICKCP) || defined(OMG_BOARD_M5STACK) || defined(OMG_BOARD_M5TOUGH)
-    loopM5();
+    CheckElapsedTime(loopM5());
 #endif
 #if defined(OMG_DISPLAY_SSD1306)
-    loopSSD1306();
+    CheckElapsedTime(loopSSD1306());
 #endif
 #ifdef OMG_SENSOR_BME280
-    MeasureTempHumAndPressure(); //Addon to measure Temperature, Humidity, Pressure and Altitude with a Bosch BME280/BMP280
+    CheckElapsedTime(MeasureTempHumAndPressure()); //Addon to measure Temperature, Humidity, Pressure and Altitude with a Bosch BME280/BMP280
 #endif
 #ifdef OMG_SENSOR_HTU21
-    MeasureTempHum(); //Addon to measure Temperature, Humidity, of a HTU21 sensor
+    CheckElapsedTime(MeasureTempHum()); //Addon to measure Temperature, Humidity, of a HTU21 sensor
 #endif
 #ifdef OMG_SENSOR_LM75
-    MeasureTemp(); //Addon to measure Temperature of an LM75 sensor
+    CheckElapsedTime(MeasureTemp()); //Addon to measure Temperature of an LM75 sensor
 #endif
 #ifdef OMG_SENSOR_AHTX0
-    MeasureAHTTempHum(); //Addon to measure Temperature, Humidity, of an 'AHTx0' sensor
+    CheckElapsedTime(MeasureAHTTempHum()); //Addon to measure Temperature, Humidity, of an 'AHTx0' sensor
 #endif
 #ifdef OMG_SENSOR_HCSR04
-    MeasureDistance(); //Addon to measure distance with a HC-SR04
+    CheckElapsedTime(MeasureDistance()); //Addon to measure distance with a HC-SR04
 #endif
 #ifdef OMG_SENSOR_BH1750
-    MeasureLightIntensity(); //Addon to measure Light Intensity with a BH1750
+    CheckElapsedTime(MeasureLightIntensity()); //Addon to measure Light Intensity with a BH1750
 #endif
 #ifdef OMG_SENSOR_MQ2
-    MeasureGasMQ2();
+    CheckElapsedTime(MeasureGasMQ2());
 #endif
 #ifdef OMG_SENSOR_TEMT6000
-    MeasureLightIntensityTEMT6000();
+    CheckElapsedTime(MeasureLightIntensityTEMT6000());
 #endif
 #ifdef OMG_SENSOR_TSL2561
-    MeasureLightIntensityTSL2561();
+    CheckElapsedTime(MeasureLightIntensityTSL2561());
 #endif
 #ifdef OMG_SENSOR_C37_YL83_HMRD
-    MeasureC37_YL83_HMRDWater(); //Addon for leak detection with a C-37 YL-83 H-MRD
+    CheckElapsedTime(MeasureC37_YL83_HMRDWater()); //Addon for leak detection with a C-37 YL-83 H-MRD
 #endif
 #ifdef OMG_SENSOR_DHT
-    MeasureTempAndHum(); //Addon to measure the temperature with a DHT
+    CheckElapsedTime(MeasureTempAndHum()); //Addon to measure the temperature with a DHT
 #endif
 #ifdef OMG_SENSOR_SHTC3
-    MeasureTempAndHum(); //Addon to measure the temperature with a DHT
+    CheckElapsedTime(MeasureTempAndHum()); //Addon to measure the temperature with a DHT
 #endif
 #ifdef OMG_SENSOR_DS1820
-    MeasureDS1820Temp(); //Addon to measure the temperature with DS1820 sensor(s)
+    CheckElapsedTime(MeasureDS1820Temp(); //Addon to measure the temperature with DS1820 sensor(s))
 #endif
 #ifdef OMG_SENSOR_INA226
-    MeasureINA226();
+    CheckElapsedTime(MeasureINA226());
 #endif
 #ifdef OMG_SENSOR_HCSR501
-    MeasureHCSR501();
+    CheckElapsedTime(MeasureHCSR501());
 #endif
 #ifdef OMG_SENSOR_GPIOINPUT
-    MeasureGPIOInput();
+    CheckElapsedTime(MeasureGPIOInput());
 #endif
 #ifdef OMG_SENSOR_GPIOKEYCODE
-    MeasureGPIOKeyCode();
+    CheckElapsedTime(MeasureGPIOKeyCode());
 #endif
 #ifdef OMG_SENSOR_ADC
-    MeasureADC(); //Addon to measure the analog value of analog pin
+    CheckElapsedTime(MeasureADC()); //Addon to measure the analog value of analog pin
 #endif
 #ifdef OMG_SENSOR_TOUCH
-    MeasureTouch();
+    CheckElapsedTime(MeasureTouch());
 #endif
 #ifdef OMG_GATEWAY_LORA
-    LORAtoX();
+    CheckElapsedTime(LORAtoX());
 #  ifdef OMG_MQTT_DISCOVERY
     if (SYSConfig.discovery)
-      launchLORADiscovery(false);
+      CheckElapsedTime(launchLORADiscovery(false));
 #  endif
 #endif
 #ifdef OMG_GATEWAY_RF
-    RFtoX();
+    CheckElapsedTime(RFtoX());
 #endif
 #ifdef OMG_GATEWAY_RF2
-    RF2toX();
+    CheckElapsedTime(RF2toX());
 #endif
 #ifdef OMG_GATEWAY_WEATHERSTATION
-    ZgatewayWeatherStationtoX();
+    CheckElapsedTime(ZgatewayWeatherStationtoX());
 #endif
 #ifdef OMG_GATEWAY_GFSUNINVERTER
-    ZgatewayGFSunInverterMQTT();
+    CheckElapsedTime(ZgatewayGFSunInverterMQTT());
 #endif
 #ifdef OMG_GATEWAY_PILIGHT
-    PilighttoX();
+    CheckElapsedTime(PilighttoX());
 #endif
 #ifdef OMG_GATEWAY_BT
 #  ifdef OMG_MQTT_DISCOVERY
     if (SYSConfig.discovery)
-      launchBTDiscovery(false);
+      CheckElapsedTime(launchBTDiscovery(false));
 #  endif
 #endif
 #ifdef OMG_GATEWAY_SRFB
-    SRFBtoX();
+    CheckElapsedTime(SRFBtoX());
 #endif
 #ifdef OMG_GATEWAY_IR
-    IRtoX();
+    CheckElapsedTime(IRtoX());
 #endif
 #ifdef OMG_GATEWAY_2G
-    if (_2GtoX())
+    bool 2gtox = false;
+    CheckElapsedTime(2gtox = _2GtoX());
+    if (2gtox)
       Logger.debug(OMG_LOGID, F("2GtoMQTT OK"));
 #endif
 #ifdef OMG_GATEWAY_RFM69
-    if (RFM69toX())
+    bool rfm69tox = false;
+    CheckElapsedTime(rfm69tox = RFM69toX());
+    if (rfm69tox)
       Logger.debug(OMG_LOGID, F("RFM69toMQTT OK"));
 #endif
 #ifdef OMG_ACTUATOR_FASTLED
-    FASTLEDLoop();
+    CheckElapsedTime(FASTLEDLoop());
 #endif
 #ifdef OMG_ACTUATOR_PWM
-    PWMLoop();
+    CheckElapsedTime(PWMLoop());
 #endif
 #ifdef OMG_GATEWAY_RTL_433
-    RTL_433Loop();
+    CheckElapsedTime(RTL_433Loop());
 #  ifdef OMG_MQTT_DISCOVERY
     if (SYSConfig.discovery)
-      launchRTL_433Discovery(false);
+      CheckElapsedTime(launchRTL_433Discovery(false));
 #  endif
 #endif
   }
   // Empty the queue
-  emptyQueue();
+  CheckElapsedTime(emptyQueue());
   // Sleep if ready
   if (ready_to_sleep) {
     sleep();
