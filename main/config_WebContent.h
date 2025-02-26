@@ -133,7 +133,6 @@ const char config_rf_body[] = body_header
     "<p><b>Active library</b><br>"
     "<select id='ar' name='ar'>%s</select></p>"
 
-    /* // Need testing
     "<p><b>OOK Threshold</b><br>"
     "<input type='number' id='oo' name='oo' step='any' value='%d'></p>"
 
@@ -142,7 +141,7 @@ const char config_rf_body[] = body_header
 
     "<p><b>Auto RSSI Threshold Delta</b><br>"
     "<input type='number' id='rd' name='rd' step='any' value='%d'></p>"
-*/
+
     "<br><button name='save' type='submit' class='button bgrn'>Save</button>"
     "</form>"
     "</fieldset>" body_footer_config_menu;

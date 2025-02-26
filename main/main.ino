@@ -1507,21 +1507,21 @@ void setup() {
 #endif
 #ifdef OMG_GATEWAY_RF
   modules.add(OMG_GATEWAY_RF);
-#  define ACTIVE_RECEIVER ACTIVE_RF
+#  define OMG_ACTIVE_RECEIVER ACTIVE_RF
 #endif
 #ifdef OMG_GATEWAY_RF2
   modules.add(OMG_GATEWAY_RF2);
-#  ifdef ACTIVE_RECEIVER
-#    undef ACTIVE_RECEIVER
+#  ifdef OMG_ACTIVE_RECEIVER
+#    undef OMG_ACTIVE_RECEIVER
 #  endif
-#  define ACTIVE_RECEIVER ACTIVE_RF2
+#  define OMG_ACTIVE_RECEIVER ACTIVE_RF2
 #endif
 #ifdef OMG_GATEWAY_PILIGHT
   modules.add(OMG_GATEWAY_PILIGHT);
-#  ifdef ACTIVE_RECEIVER
-#    undef ACTIVE_RECEIVER
+#  ifdef OMG_ACTIVE_RECEIVER
+#    undef OMG_ACTIVE_RECEIVER
 #  endif
-#  define ACTIVE_RECEIVER ACTIVE_PILIGHT
+#  define OMG_ACTIVE_RECEIVER ACTIVE_PILIGHT
 #endif
 #ifdef OMG_GATEWAY_WEATHERSTATION
   setupWeatherStation();
@@ -1572,10 +1572,10 @@ void setup() {
   modules.add(OMG_ACTUATOR_PWM);
 #endif
 #ifdef OMG_ACTUATOR_SOMFY
-#  ifdef ACTIVE_RECEIVER
-#    undef ACTIVE_RECEIVER
+#  ifdef OMG_ACTIVE_RECEIVER
+#    undef OMG_ACTIVE_RECEIVER
 #  endif
-#  define ACTIVE_RECEIVER ACTIVE_NONE
+#  define OMG_ACTIVE_RECEIVER ACTIVE_NONE
   setupSomfy();
   modules.add(OMG_ACTUATOR_SOMFY);
 #endif
@@ -1603,10 +1603,10 @@ void setup() {
   setupSHTC3();
 #endif
 #ifdef OMG_GATEWAY_RTL_433
-#  ifdef ACTIVE_RECEIVER
-#    undef ACTIVE_RECEIVER
+#  ifdef OMG_ACTIVE_RECEIVER
+#    undef OMG_ACTIVE_RECEIVER
 #  endif
-#  define ACTIVE_RECEIVER ACTIVE_RTL
+#  define OMG_ACTIVE_RECEIVER ACTIVE_RTL
   setupRTL_433();
   modules.add(OMG_GATEWAY_RTL_433);
 #endif

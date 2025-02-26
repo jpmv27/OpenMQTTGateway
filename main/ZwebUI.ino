@@ -1287,7 +1287,8 @@ void handleRF() {
   response += String(script);
   response += String(style);
 
-  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_rf_body, jsonChar, g_gateway_name, RFConfig.frequency, activeReceiverHtml.c_str());
+  snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_rf_body, jsonChar, g_gateway_name, RFConfig.frequency,
+      activeReceiverHtml.c_str(), RFConfig.ookThreshold, RFConfig.rssiThreshold, RFConfig.rssiThresholdDelta);
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);

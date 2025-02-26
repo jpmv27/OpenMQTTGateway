@@ -190,8 +190,8 @@ const char parameters[51][4][24] = {
 
 /*-------------------RF frequency----------------------*/
 //Match frequency to the hardware version of the radio used.
-#ifndef RF_FREQUENCY
-#  define RF_FREQUENCY 433.92
+#ifndef OMG_RF_FREQUENCY
+#  define OMG_RF_FREQUENCY 433.92
 #endif
 
 /**

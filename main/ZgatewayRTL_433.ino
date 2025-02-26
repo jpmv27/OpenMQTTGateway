@@ -373,7 +373,7 @@ extern int getAndResetRTL433QueueOverflows() {
   return ret;
 }
 
-#  if defined(RF_SX1276) || defined(RF_SX1278)
+#  ifdef OMG_RADIO_SX127X
 extern int getOOKThresh() {
   return rtl_433.OokFixedThreshold;
 }

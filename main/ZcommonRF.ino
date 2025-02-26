@@ -228,7 +228,7 @@ void RFConfig_fromJson(JsonObject& RFdata) {
     rtl_433.setRSSIThresholdDelta(RFConfig.rssiThresholdDelta);
     success = true;
   }
-#    if defined(RF_SX1276) || defined(RF_SX1278)
+#    ifdef OMG_RADIO_SX127X
   if (RFdata.containsKey("ookthreshold")) {
     Config_update(RFdata, "ookthreshold", RFConfig.ookThreshold);
     Logger.notice(OMG_LOGID, F("RTL_433 ookThreshold %d"), RFConfig.ookThreshold);
@@ -266,11 +266,12 @@ void RFConfig_fromJson(JsonObject& RFdata) {
     JsonObject jo = jsonBuffer.to<JsonObject>();
     jo["frequency"] = RFConfig.frequency;
     jo["active"] = RFConfig.activeReceiver;
-// Don't save those for now, need to be tested
 #    ifdef OMG_GATEWAY_RTL_433
-//jo["rssithreshold"] = RFConfig.rssiThreshold;
-//jo["rssithresholddelta"] = RFConfig.rssiThresholdDelta;
-//jo["ookthreshold"] = RFConfig.ookThreshold;
+    jo["rssithreshold"] = RFConfig.rssiThreshold;
+    jo["rssithresholddelta"] = RFConfig.rssiThresholdDelta;
+#    endif
+#    ifdef OMG_RADIO_SX127X
+    jo["ookthreshold"] = RFConfig.ookThreshold;
 #    endif
     // Save config into NVS (non-volatile storage)
     String conf = "";
@@ -284,11 +285,20 @@ void RFConfig_fromJson(JsonObject& RFdata) {
 }
 
 void RFConfig_init() {
-  RFConfig.frequency = RF_FREQUENCY;
-  RFConfig.activeReceiver = ACTIVE_RECEIVER;
+  RFConfig.frequency = OMG_RF_FREQUENCY;
+  RFConfig.activeReceiver = OMG_ACTIVE_RECEIVER;
+#    ifdef OMG_GATEWAY_RTL_433
+  RFConfig.rssiThreshold = getRTLrssiThreshold();
+  RFConfig.rssiThresholdDelta = getRTLrssiThresholdDelta();
+#    else
   RFConfig.rssiThreshold = 0;
   RFConfig.rssiThresholdDelta = 0;
+#    endif
+#    ifdef OMG_RADIO_SX127X
+  RFConfig.ookThreshold = getOOKThresh();
+#    else
   RFConfig.ookThreshold = 0;
+#    endif
 }
 
 void RFConfig_load() {

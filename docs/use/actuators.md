@@ -137,7 +137,7 @@ Optionally it can contain the following property:
 The middle button on physical Somfy RTS Remote controls is called "My".
 :::
 
-The frequency key is optional, if not set the gateway will use the default frequency defined by MQTTtoRF command at runtime or `RF_FREQUENCY` at buildtime.
+The frequency key is optional, if not set the gateway will use the default frequency defined by MQTTtoRF command at runtime or `OMG_RF_FREQUENCY` at buildtime.
 
 Send PROG command with remote 0:
 
