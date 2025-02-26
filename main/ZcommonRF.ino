@@ -179,6 +179,7 @@ String stateRFMeasures() {
   if (RFConfig.activeReceiver == ACTIVE_RTL) {
 #    ifdef OMG_GATEWAY_RTL_433
     RFdata["rssithreshold"] = (int)getRTLrssiThreshold();
+    RFdata["rssithresholddelta"] = (int)getRTLrssiThresholdDelta();
     RFdata["rssi"] = (int)getRTLCurrentRSSI();
     RFdata["avgrssi"] = (int)getRTLAverageRSSI();
     RFdata["count"] = (int)getRTLMessageCount();
@@ -221,11 +222,17 @@ void RFConfig_fromJson(JsonObject& RFdata) {
     rtl_433.setRSSIThreshold(RFConfig.rssiThreshold);
     success = true;
   }
+  if (RFdata.containsKey("rssithresholddelta")) {
+    Logger.notice(OMG_LOGID, F("RTL_433 RSSI Threshold Delta : %d "), RFConfig.rssiThresholdDelta);
+    Config_update(RFdata, "rssithresholddelta", RFConfig.rssiThresholdDelta);
+    rtl_433.setRSSIThresholdDelta(RFConfig.rssiThresholdDelta);
+    success = true;
+  }
 #    if defined(RF_SX1276) || defined(RF_SX1278)
   if (RFdata.containsKey("ookthreshold")) {
-    Config_update(RFdata, "ookthreshold", RFConfig.newOokThreshold);
-    Logger.notice(OMG_LOGID, F("RTL_433 ookThreshold %d"), RFConfig.newOokThreshold);
-    rtl_433.setOOKThreshold(RFConfig.newOokThreshold);
+    Config_update(RFdata, "ookthreshold", RFConfig.ookThreshold);
+    Logger.notice(OMG_LOGID, F("RTL_433 ookThreshold %d"), RFConfig.ookThreshold);
+    rtl_433.setOOKThreshold(RFConfig.ookThreshold);
     success = true;
   }
 #    endif
@@ -262,7 +269,8 @@ void RFConfig_fromJson(JsonObject& RFdata) {
 // Don't save those for now, need to be tested
 #    ifdef OMG_GATEWAY_RTL_433
 //jo["rssithreshold"] = RFConfig.rssiThreshold;
-//jo["ookthreshold"] = RFConfig.newOokThreshold;
+//jo["rssithresholddelta"] = RFConfig.rssiThresholdDelta;
+//jo["ookthreshold"] = RFConfig.ookThreshold;
 #    endif
     // Save config into NVS (non-volatile storage)
     String conf = "";
@@ -279,7 +287,8 @@ void RFConfig_init() {
   RFConfig.frequency = RF_FREQUENCY;
   RFConfig.activeReceiver = ACTIVE_RECEIVER;
   RFConfig.rssiThreshold = 0;
-  RFConfig.newOokThreshold = 0;
+  RFConfig.rssiThresholdDelta = 0;
+  RFConfig.ookThreshold = 0;
 }
 
 void RFConfig_load() {

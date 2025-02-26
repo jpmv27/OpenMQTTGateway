@@ -1250,15 +1250,22 @@ void handleRF() {
         }
       }
       if (server.hasArg("oo")) {
-        RFConfig.newOokThreshold = server.arg("oo").toInt();
-        WEBtoRF["ookthreshold"] = RFConfig.newOokThreshold;
+        RFConfig.ookThreshold = server.arg("oo").toInt();
+        WEBtoRF["ookthreshold"] = RFConfig.ookThreshold;
         update = true;
       }
+#  ifdef OMG_GATEWAY_RTL_433
       if (server.hasArg("rs")) {
         RFConfig.rssiThreshold = server.arg("rs").toInt();
         WEBtoRF["rssithreshold"] = RFConfig.rssiThreshold;
         update = true;
       }
+      if (server.hasArg("rd")) {
+        RFConfig.rssiThresholdDelta = server.arg("rd").toInt();
+        WEBtoRF["rssithresholdDelta"] = RFConfig.rssiThresholdDelta;
+        update = true;
+      }
+#  endif
       if (update) {
         Logger.notice(OMG_LOGID, F("[WebUI] Save data"));
         WEBtoRF["save"] = true;

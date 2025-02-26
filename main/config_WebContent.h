@@ -139,6 +139,9 @@ const char config_rf_body[] = body_header
 
     "<p><b>RSSI Threshold</b><br>"
     "<input type='number' id='rs' name='rs' step='any' value='%d'></p>"
+
+    "<p><b>Auto RSSI Threshold Delta</b><br>"
+    "<input type='number' id='rd' name='rd' step='any' value='%d'></p>"
 */
     "<br><button name='save' type='submit' class='button bgrn'>Save</button>"
     "</form>"

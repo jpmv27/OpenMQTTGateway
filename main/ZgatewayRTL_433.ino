@@ -345,6 +345,10 @@ extern int getRTLrssiThreshold() {
   return rtl_433.rssiThreshold;
 }
 
+extern int getRTLrssiThresholdDelta() {
+  return rtl_433.rssiThresholdDelta;
+}
+
 extern int getRTLAverageRSSI() {
   return rtl_433.averageRssi;
 }

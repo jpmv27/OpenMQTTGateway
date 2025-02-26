@@ -61,6 +61,7 @@ extern void setupRTL_433();
 extern void enableRTLreceive();
 extern void disableRTLreceive();
 extern int getRTLrssiThreshold();
+extern int getRTLrssiThresholdDelta();
 extern int getRTLCurrentRSSI();
 extern int getRTLMessageCount();
 extern int getRTLAverageRSSI();
@@ -204,7 +205,8 @@ const char parameters[51][4][24] = {
 struct RFConfig_s {
   float frequency;
   int rssiThreshold;
-  int newOokThreshold;
+  int rssiThresholdDelta;
+  int ookThreshold;
   int activeReceiver;
 };
 
