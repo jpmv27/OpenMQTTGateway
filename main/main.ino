@@ -681,7 +681,7 @@ bool pubMQTT(const char* topic, const char* payload, bool retainFlag) {
     }
 #endif
     if (mqtt && mqtt->connected()) {
-      Logger.notice(OMG_LOGID, F("[ OMG->MQTT ] topic: %s msg: %s "), topic, payload);
+      Logger.info(OMG_LOGID, F("[ OMG->MQTT ] topic: %s msg: %s "), topic, payload);
       res = mqtt->publish(topic, payload, 0, retainFlag);
     } else {
       Logger.warning(OMG_LOGID, F("MQTT not connected, aborting the publication"));
@@ -2916,7 +2916,7 @@ String stateMeasures() {
 
   String output;
   serializeJson(SYSdata, output);
-  Logger.notice(OMG_LOGID, F("SYS json: %s"), output.c_str());
+  Logger.info(OMG_LOGID, F("SYS json: %s"), output.c_str());
   return output;
 }
 
