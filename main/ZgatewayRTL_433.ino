@@ -278,10 +278,18 @@ void rtl_433_Callback(char* message) {
   }
 
   unsigned long MQTTvalue = (int)RFrtl_433_ESPdata["id"] + round((float)RFrtl_433_ESPdata["temperature_C"]);
-  String topic = subjectRTL_433toMQTT;
   String model = RFrtl_433_ESPdata["model"];
+  String protocol = RFrtl_433_ESPdata["protocol"];
   String type = RFrtl_433_ESPdata["type"];
+  String topic;
   String uniqueid;
+
+  // Special handling for status reports
+  if (model == "status" && protocol == "rtl_433_ESP status message") {
+    topic = subjectcommonRFtoMQTT;
+  } else {
+    topic = subjectRTL_433toMQTT;
+  }
 
   const char naming_keys[5][8] = {"type", "model", "subtype", "channel", "id"}; // from rtl_433_mqtt_hass.py
   size_t numRows = sizeof(naming_keys) / sizeof(naming_keys[0]);
