@@ -241,10 +241,18 @@ void RFConfig_fromJson(JsonObject& RFdata) {
     rtl_433.getStatus();
     success = true;
   }
+#  endif
+  if (RFdata.containsKey("noreset") && RFdata["noreset"].as<bool>()) {
+    Logger.notice(OMG_LOGID, F("RF suppress reset"));
+    return;
+  }
+  if (RFdata.containsKey("reset") && RFdata["reset"].as<bool>()) {
+    Logger.notice(OMG_LOGID, F("RF force reset"));
+    success = true;
+  }
   if (!success) {
     Logger.error(OMG_LOGID, F("MQTTtoRF Fail json"));
   }
-#  endif
   disableCurrentReceiver();
   enableActiveReceiver();
 #  ifdef ESP32
