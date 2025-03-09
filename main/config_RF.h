@@ -65,9 +65,9 @@ extern int getRTLrssiThresholdDelta();
 extern int getRTLCurrentRSSI();
 extern int getRTLMessageCount();
 extern int getRTLAverageRSSI();
-extern int getOOKThresh();
+extern int getOOKFixedThreshold();
 extern int getRTLPulseTrainsOverruns();
-extern int getRTL433QueueOverflows();
+extern int getRTLDecoderQueueOverflows();
 
 #  ifdef OMG_MQTT_DISCOVERY
 extern void launchRTL_433Discovery(bool overrideDiscovery);
@@ -206,7 +206,7 @@ struct RFConfig_s {
   float frequency;
   int rssiThreshold;
   int rssiThresholdDelta;
-  int ookThreshold;
+  int ookFixedThreshold;
   int activeReceiver;
 };
 

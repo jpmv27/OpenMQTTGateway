@@ -131,7 +131,7 @@ void disableCurrentReceiver() {
 }
 
 void enableActiveReceiver() {
-  Logger.debug(OMG_LOGID, F("enableActiveReceiver: %d"), RFConfig.activeReceiver);
+  Logger.debug(OMG_LOGID, F("activeReceiver: %d"), RFConfig.activeReceiver);
   switch (RFConfig.activeReceiver) {
 #  ifdef OMG_GATEWAY_PILIGHT
     case ACTIVE_PILIGHT:
@@ -173,25 +173,25 @@ String stateRFMeasures() {
   //Publish RTL_433 state
   StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
   JsonObject RFdata = jsonBuffer.to<JsonObject>();
-  RFdata["active"] = RFConfig.activeReceiver;
+  RFdata["activeReceiver"] = RFConfig.activeReceiver;
 #  if defined(OMG_RADIO_CC1101) || defined(OMG_RADIO_SX127X)
   RFdata["frequency"] = RFConfig.frequency;
   if (RFConfig.activeReceiver == ACTIVE_RTL) {
 #    ifdef OMG_GATEWAY_RTL_433
-    RFdata["rssithreshold"] = (int)getRTLrssiThreshold();
-    RFdata["rssithresholddelta"] = (int)getRTLrssiThresholdDelta();
-    RFdata["rssi"] = (int)getRTLCurrentRSSI();
-    RFdata["avgrssi"] = (int)getRTLAverageRSSI();
-    RFdata["count"] = (int)getRTLMessageCount();
-    RFdata["pulse_trains_overruns"] = (int)getRTLPulseTrainsOverruns();
-    RFdata["rtl_433_queue_overflows"] = (int)getRTL433QueueOverflows();
+    RFdata["rssiThreshold"] = (int)getRTLrssiThreshold();
+    RFdata["rssiThresholdDelta"] = (int)getRTLrssiThresholdDelta();
+    RFdata["currentRssi"] = (int)getRTLCurrentRSSI();
+    RFdata["averageRssi"] = (int)getRTLAverageRSSI();
+    RFdata["messageCount"] = (int)getRTLMessageCount();
+    RFdata["pulseTrainsOverruns"] = (int)getRTLPulseTrainsOverruns();
+    RFdata["decoderQueueOverflows"] = (int)getRTLDecoderQueueOverflows();
     // Capture high water mark of rtl_433_Decoder stack since it can run out and trigger reboot
     extern TaskHandle_t rtl_433_DecoderHandle;
-    RFdata["rtl433_stack"] = (int)uxTaskGetStackHighWaterMark(rtl_433.rtl_433_ReceiverHandle);
-    RFdata["dcd433_stack"] = (int)uxTaskGetStackHighWaterMark(rtl_433_DecoderHandle);
+    RFdata["Receiver_HWM"] = (int)uxTaskGetStackHighWaterMark(rtl_433.rtl_433_ReceiverHandle);
+    RFdata["Decoder_HWM"] = (int)uxTaskGetStackHighWaterMark(rtl_433_DecoderHandle);
 #    endif
 #    ifdef OMG_RADIO_SX127X
-    RFdata["ookthreshold"] = (int)getOOKThresh();
+    RFdata["ookFixedThreshhold"] = (int)getOOKFixedThreshold();
 #    endif
   }
 #  endif
@@ -210,29 +210,29 @@ void RFConfig_fromJson(JsonObject& RFdata) {
     Logger.notice(OMG_LOGID, F("RF Receive mhz: %F"), RFConfig.frequency);
     success = true;
   }
-  if (RFdata.containsKey("active")) {
+  if (RFdata.containsKey("activeReceiver")) {
     Logger.notice(OMG_LOGID, F("RF receiver active: %d"), RFConfig.activeReceiver);
-    Config_update(RFdata, "active", RFConfig.activeReceiver);
+    Config_update(RFdata, "activeReceiver", RFConfig.activeReceiver);
     success = true;
   }
 #  ifdef OMG_GATEWAY_RTL_433
-  if (RFdata.containsKey("rssithreshold")) {
+  if (RFdata.containsKey("rssiThreshold")) {
     Logger.notice(OMG_LOGID, F("RTL_433 RSSI Threshold : %d "), RFConfig.rssiThreshold);
-    Config_update(RFdata, "rssithreshold", RFConfig.rssiThreshold);
+    Config_update(RFdata, "rssiThreshold", RFConfig.rssiThreshold);
     rtl_433.setRSSIThreshold(RFConfig.rssiThreshold);
     success = true;
   }
-  if (RFdata.containsKey("rssithresholddelta")) {
+  if (RFdata.containsKey("rssiThresholdDelta")) {
     Logger.notice(OMG_LOGID, F("RTL_433 RSSI Threshold Delta : %d "), RFConfig.rssiThresholdDelta);
-    Config_update(RFdata, "rssithresholddelta", RFConfig.rssiThresholdDelta);
+    Config_update(RFdata, "rssiThresholdDelta", RFConfig.rssiThresholdDelta);
     rtl_433.setRSSIThresholdDelta(RFConfig.rssiThresholdDelta);
     success = true;
   }
 #    ifdef OMG_RADIO_SX127X
-  if (RFdata.containsKey("ookthreshold")) {
-    Config_update(RFdata, "ookthreshold", RFConfig.ookThreshold);
-    Logger.notice(OMG_LOGID, F("RTL_433 ookThreshold %d"), RFConfig.ookThreshold);
-    rtl_433.setOOKThreshold(RFConfig.ookThreshold);
+  if (RFdata.containsKey("ookFixedThreshold")) {
+    Config_update(RFdata, "ookFixedThreshold", RFConfig.ookFixedThreshold);
+    Logger.notice(OMG_LOGID, F("RTL_433 ookFixedThreshold %d"), RFConfig.ookFixedThreshold);
+    rtl_433.setOOKFixedThreshold(RFConfig.ookFixedThreshold);
     success = true;
   }
 #    endif
@@ -265,13 +265,13 @@ void RFConfig_fromJson(JsonObject& RFdata) {
     StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
     JsonObject jo = jsonBuffer.to<JsonObject>();
     jo["frequency"] = RFConfig.frequency;
-    jo["active"] = RFConfig.activeReceiver;
+    jo["activeReceiver"] = RFConfig.activeReceiver;
 #    ifdef OMG_GATEWAY_RTL_433
-    jo["rssithreshold"] = RFConfig.rssiThreshold;
-    jo["rssithresholddelta"] = RFConfig.rssiThresholdDelta;
+    jo["rssiThreshold"] = RFConfig.rssiThreshold;
+    jo["rssiThresholdDelta"] = RFConfig.rssiThresholdDelta;
 #    endif
 #    ifdef OMG_RADIO_SX127X
-    jo["ookthreshold"] = RFConfig.ookThreshold;
+    jo["ookFixedThreshold"] = RFConfig.ookFixedThreshold;
 #    endif
     // Save config into NVS (non-volatile storage)
     String conf = "";
@@ -295,9 +295,9 @@ void RFConfig_init() {
   RFConfig.rssiThresholdDelta = 0;
 #    endif
 #    ifdef OMG_RADIO_SX127X
-  RFConfig.ookThreshold = getOOKThresh();
+  RFConfig.ookFixedThreshold = getOOKFixedThreshold();
 #    else
-  RFConfig.ookThreshold = 0;
+  RFConfig.ookFixedThreshold = 0;
 #    endif
 }
 

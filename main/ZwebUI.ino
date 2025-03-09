@@ -1243,26 +1243,26 @@ void handleRF() {
         int selectedReceiver = server.arg("ar").toInt();
         if (isValidReceiver(selectedReceiver)) { // Assuming isValidReceiver is a validation function
           RFConfig.activeReceiver = selectedReceiver;
-          WEBtoRF["activereceiver"] = RFConfig.activeReceiver;
+          WEBtoRF["activeReceiver"] = RFConfig.activeReceiver;
           update = true;
         } else {
           Logger.warning(OMG_LOGID, F("[WebUI] Invalid Active Receiver"));
         }
       }
       if (server.hasArg("oo")) {
-        RFConfig.ookThreshold = server.arg("oo").toInt();
-        WEBtoRF["ookthreshold"] = RFConfig.ookThreshold;
+        RFConfig.ookFixedThreshold = server.arg("oo").toInt();
+        WEBtoRF["ookFixedThreshold"] = RFConfig.ookFixedThreshold;
         update = true;
       }
 #  ifdef OMG_GATEWAY_RTL_433
       if (server.hasArg("rs")) {
         RFConfig.rssiThreshold = server.arg("rs").toInt();
-        WEBtoRF["rssithreshold"] = RFConfig.rssiThreshold;
+        WEBtoRF["rssiThreshold"] = RFConfig.rssiThreshold;
         update = true;
       }
       if (server.hasArg("rd")) {
         RFConfig.rssiThresholdDelta = server.arg("rd").toInt();
-        WEBtoRF["rssithresholdDelta"] = RFConfig.rssiThresholdDelta;
+        WEBtoRF["rssiThresholdDelta"] = RFConfig.rssiThresholdDelta;
         update = true;
       }
 #  endif
@@ -1288,7 +1288,7 @@ void handleRF() {
   response += String(style);
 
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, config_rf_body, jsonChar, g_gateway_name, RFConfig.frequency,
-      activeReceiverHtml.c_str(), RFConfig.ookThreshold, RFConfig.rssiThreshold, RFConfig.rssiThresholdDelta);
+      activeReceiverHtml.c_str(), RFConfig.ookFixedThreshold, RFConfig.rssiThreshold, RFConfig.rssiThresholdDelta);
   response += String(buffer);
   snprintf(buffer, WEB_TEMPLATE_BUFFER_MAX_SIZE, footer, OMG_VERSION);
   response += String(buffer);

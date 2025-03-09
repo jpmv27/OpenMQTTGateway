@@ -366,13 +366,13 @@ extern int getRTLPulseTrainsOverruns() {
   return ret;
 }
 
-extern int getRTL433QueueOverflows() {
+extern int getRTLDecoderQueueOverflows() {
   int ret = rtl_433.decoderQueueOverflows;
   return ret;
 }
 
 #  ifdef OMG_RADIO_SX127X
-extern int getOOKThresh() {
+extern int getOOKFixedThreshold() {
   return rtl_433.ookFixedThreshold;
 }
 #  endif
