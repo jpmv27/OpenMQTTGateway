@@ -134,7 +134,7 @@ void rf2Callback(unsigned int period, unsigned long address, unsigned long group
 #  if OMG_MQTT_SIMPLE_RECEIVING
 void XtoRF2(const char* topicOri, const char* datacallback) {
   NewRemoteReceiver::disable();
-  pinMode(RF_EMITTER_GPIO, OUTPUT);
+  pinMode(OMG_RF_EMITTER_GPIO, OUTPUT);
   initCC1101();
 
   // RF DATA ANALYSIS
@@ -191,7 +191,7 @@ void XtoRF2(const char* topicOri, const char* datacallback) {
       valuePERIOD = 272;
     NewRemoteReceiver::disable();
     Logger.debug(OMG_LOGID, F("Creating transmitter"));
-    NewRemoteTransmitter transmitter(valueCODE, RF_EMITTER_GPIO, valuePERIOD, RF2_EMITTER_REPEAT);
+    NewRemoteTransmitter transmitter(valueCODE, OMG_RF_EMITTER_GPIO, valuePERIOD, RF2_EMITTER_REPEAT);
     Logger.debug(OMG_LOGID, F("Sending data"));
     if (valueGROUP) {
       if (isDimCommand) {
@@ -249,7 +249,7 @@ void XtoRF2(const char* topicOri, JsonObject& RF2data) { // json object decoding
     bool success = false;
     if (boolSWITCHTYPE != 99) {
       NewRemoteReceiver::disable();
-      pinMode(RF_EMITTER_GPIO, OUTPUT);
+      pinMode(OMG_RF_EMITTER_GPIO, OUTPUT);
       initCC1101();
       Logger.debug(OMG_LOGID, F("MQTTtoRF2 switch type ok"));
       bool isDimCommand = boolSWITCHTYPE == 2;
@@ -267,7 +267,7 @@ void XtoRF2(const char* topicOri, JsonObject& RF2data) { // json object decoding
         if (valuePERIOD == 0)
           valuePERIOD = 272;
         NewRemoteReceiver::disable();
-        NewRemoteTransmitter transmitter(valueCODE, RF_EMITTER_GPIO, valuePERIOD, RF2_EMITTER_REPEAT);
+        NewRemoteTransmitter transmitter(valueCODE, OMG_RF_EMITTER_GPIO, valuePERIOD, RF2_EMITTER_REPEAT);
         Logger.debug(OMG_LOGID, F("Sending"));
         if (valueGROUP) {
           if (isDimCommand) {
@@ -308,13 +308,13 @@ void disableRF2Receive() {
 
 void enableRF2Receive() {
   Logger.debug(OMG_LOGID, F("enableRF2Receive"));
-  NewRemoteReceiver::init(RF_RECEIVER_GPIO, 2, rf2Callback);
+  NewRemoteReceiver::init(OMG_RF_RECEIVER_GPIO, 2, rf2Callback);
 
-  Logger.notice(OMG_LOGID, F("RF_EMITTER_GPIO: %d "), RF_EMITTER_GPIO);
-  Logger.notice(OMG_LOGID, F("RF_RECEIVER_GPIO: %d "), RF_RECEIVER_GPIO);
+  Logger.notice(OMG_LOGID, F("OMG_RF_EMITTER_GPIO: %d "), OMG_RF_EMITTER_GPIO);
+  Logger.notice(OMG_LOGID, F("OMG_RF_RECEIVER_GPIO: %d "), OMG_RF_RECEIVER_GPIO);
   Logger.debug(OMG_LOGID, F("ZgatewayRF2 command topic: %s%s%s"), mqtt_topic, g_gateway_name, subjectMQTTtoRF2);
-  pinMode(RF_EMITTER_GPIO, OUTPUT);
-  digitalWrite(RF_EMITTER_GPIO, LOW);
+  pinMode(OMG_RF_EMITTER_GPIO, OUTPUT);
+  digitalWrite(OMG_RF_EMITTER_GPIO, LOW);
   Logger.debug(OMG_LOGID, F("ZgatewayRF2 setup done "));
 }
 

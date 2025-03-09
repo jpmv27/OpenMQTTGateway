@@ -86,8 +86,8 @@ build_flags =
   '-DOMG_GW_PASSWORD="12345678"'
   '-DLED_RECEIVE=LED_BUILTIN'        ; Comment 1
   '-DLED_RECEIVE_ON=LOW'             ; Comment 2
-  '-DRF_RECEIVER_GPIO=13'
-  '-DRF_EMITTER_GPIO=15'
+  '-DOMG_RF_RECEIVER_GPIO=13'
+  '-DOMG_RF_EMITTER_GPIO=15'
   '-DOMG_MQTT_SIMPLE_RECEIVING=false'
   '-UOMG_MQTT_DISCOVERY'                 ; Disable HA discovery
 monitor_speed = 115200

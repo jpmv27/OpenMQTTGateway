@@ -66,8 +66,8 @@ extern int getRTLCurrentRSSI();
 extern int getRTLMessageCount();
 extern int getRTLAverageRSSI();
 extern int getOOKThresh();
-extern int getAndResetRTLPulseTrainsOverruns();
-extern int getAndResetRTL433QueueOverflows();
+extern int getRTLPulseTrainsOverruns();
+extern int getRTL433QueueOverflows();
 
 #  ifdef OMG_MQTT_DISCOVERY
 extern void launchRTL_433Discovery(bool overrideDiscovery);
@@ -222,28 +222,28 @@ RFConfig_s RFConfig;
 /*-------------------CC1101 DefaultTXPower----------------------*/
 //Adjust the default TX-Power for sending radio if ZradioCC1101 is used.
 //The following settings are possible depending on the frequency band.  (-30  -20  -15  -10  -6    0    5    7    10   11   12) Default is max!
-#ifndef RF_CC1101_TXPOWER
-#  define RF_CC1101_TXPOWER 12
+#ifndef OMG_RF_CC1101_TXPOWER
+#  define OMG_RF_CC1101_TXPOWER 12
 #endif
 
 /*-------------------PIN DEFINITIONS----------------------*/
-#ifndef RF_RECEIVER_GPIO
+#ifndef OMG_RF_RECEIVER_GPIO
 #  ifdef ESP8266
-#    define RF_RECEIVER_GPIO 0 // D3 on nodemcu // put 4 with rf bridge direct mod
+#    define OMG_RF_RECEIVER_GPIO 0 // D3 on nodemcu // put 4 with rf bridge direct mod
 #  elif ESP32
-#    define RF_RECEIVER_GPIO 27 // D27 on DOIT ESP32
+#    define OMG_RF_RECEIVER_GPIO 27 // D27 on DOIT ESP32
 #  endif
 #endif
 
-#ifndef RF_EMITTER_GPIO
+#ifndef OMG_RF_EMITTER_GPIO
 #  ifdef ESP8266
-#    define RF_EMITTER_GPIO 3 // RX on nodemcu if it doesn't work with 3, try with 4 (D2) // put 5 with rf bridge direct mod
+#    define OMG_RF_EMITTER_GPIO 3 // RX on nodemcu if it doesn't work with 3, try with 4 (D2) // put 5 with rf bridge direct mod
 #  elif ESP32
-#    define RF_EMITTER_GPIO 12 // D12 on DOIT ESP32
+#    define OMG_RF_EMITTER_GPIO 12 // D12 on DOIT ESP32
 #  else
 //IMPORTANT NOTE: On arduino UNO connect IR emitter pin to D9 , comment #define IR_USE_TIMER2 and uncomment #define IR_USE_TIMER1 on library <library>IRremote/boarddefs.h so as to free pin D3 for RF RECEIVER PIN
 //RF PIN definition
-#    define RF_EMITTER_GPIO 4 //4 = D4 on arduino
+#    define OMG_RF_EMITTER_GPIO 4 //4 = D4 on arduino
 #  endif
 #endif
 

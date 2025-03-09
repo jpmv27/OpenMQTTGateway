@@ -30,10 +30,10 @@ Regarding the IR led emitter you can replace it with a normal led and see if it 
 
 try with D2 instead of D3
 and put
-`#define RF_RECEIVER_GPIO 4 // D2 on nodemcu`
+`#define OMG_RF_RECEIVER_GPIO 4 // D2 on nodemcu`
 in config_rf.h
 instead of
-`#define RF_RECEIVER_GPIO 0 // D3 on nodemcu`
+`#define OMG_RF_RECEIVER_GPIO 0 // D3 on nodemcu`
 
 ## Repetitive MQTT disconnections or/and commands sent to the gateway not taken into account
 Most probably a network issue, don't use a guest network and if going through a firewall check its rules. To put aside gateway issue, try to connect to a local broker on the same network.

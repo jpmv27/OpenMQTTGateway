@@ -34,8 +34,8 @@
 #  endif
 
 void setupSomfy() {
-  pinMode(RF_EMITTER_GPIO, OUTPUT);
-  digitalWrite(RF_EMITTER_GPIO, LOW);
+  pinMode(OMG_RF_EMITTER_GPIO, OUTPUT);
+  digitalWrite(OMG_RF_EMITTER_GPIO, LOW);
 
 #  if defined(ESP32)
   if (!EEPROM.begin(max(4, SOMFY_REMOTE_NUM * 2))) {
@@ -70,7 +70,7 @@ void XtoSomfy(const char* topicOri, JsonObject& jsonData) {
     const int repeat = jsonData["repeat"] | 4;
 
     EEPROMRollingCodeStorage rollingCodeStorage(EEPROM_ADDRESS_START + remoteIndex * 2);
-    SomfyRemote somfyRemote(RF_EMITTER_GPIO, somfyRemotes[remoteIndex], &rollingCodeStorage);
+    SomfyRemote somfyRemote(OMG_RF_EMITTER_GPIO, somfyRemotes[remoteIndex], &rollingCodeStorage);
     somfyRemote.sendCommand(command, repeat);
     initCC1101();
     enableActiveReceiver();

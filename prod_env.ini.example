@@ -89,8 +89,8 @@ lib_deps =
 build_flags =
 	${com-esp.build_flags}
 	'-DOMG_GATEWAY_PILIGHT="Pilight"'
-	'-DRF_RECEIVER_GPIO=4'
-	'-DRF_EMITTER_GPIO=5'
+	'-DOMG_RF_RECEIVER_GPIO=4'
+	'-DOMG_RF_EMITTER_GPIO=5'
 	'-DLED_INFO=13'
 	'-DLED_INFO_ON=0'
 	'-DOMG_SENSOR_GPIOINPUT="GPIOInput"'
@@ -115,8 +115,8 @@ lib_deps =
 build_flags =
 	${com-esp.build_flags}
 	'-DOMG_GATEWAY_PILIGHT="Pilight"'
-	'-DRF_RECEIVER_GPIO=4'
-	'-DRF_EMITTER_GPIO=5'
+	'-DOMG_RF_RECEIVER_GPIO=4'
+	'-DOMG_RF_EMITTER_GPIO=5'
 	'-DLED_INFO=13'
 	'-DLED_INFO_ON=0'
 	'-DOMG_SENSOR_GPIOINPUT="GPIOInput"'
@@ -169,8 +169,8 @@ build_flags =
   ; '-DOMG_NET_DNS="1.1.1.1"'
   '-DLED_RECEIVE=LED_BUILTIN'
   '-DLED_RECEIVE_ON=LOW'
-  '-DRF_RECEIVER_GPIO=4'
-  '-DRF_EMITTER_GPIO=5'
+  '-DOMG_RF_RECEIVER_GPIO=4'
+  '-DOMG_RF_EMITTER_GPIO=5'
   ;; Assign erase/reset button
   ; '-DTRIGGER_GPIO=0'
 

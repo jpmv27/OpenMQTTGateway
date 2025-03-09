@@ -332,7 +332,7 @@ void RTL_433Loop() {
 
 extern void enableRTLreceive() {
   Logger.notice(OMG_LOGID, F("Enable RTL_433 Receiver: %FMhz"), RFConfig.frequency);
-  rtl_433.initReceiver(RF_MODULE_RECEIVER_GPIO, RFConfig.frequency);
+  rtl_433.initReceiver(RTL433_RF_MODULE_RECEIVER_GPIO, RFConfig.frequency);
   rtl_433.enableReceiver();
 }
 
@@ -361,21 +361,19 @@ extern int getRTLMessageCount() {
   return rtl_433.messageCount;
 }
 
-extern int getAndResetRTLPulseTrainsOverruns() {
+extern int getRTLPulseTrainsOverruns() {
   int ret = rtl_433.pulseTrainsOverruns;
-  rtl_433.pulseTrainsOverruns = 0;
   return ret;
 }
 
-extern int getAndResetRTL433QueueOverflows() {
-  int ret = rtl_433.rtl433QueueOverflows;
-  rtl_433.rtl433QueueOverflows = 0;
+extern int getRTL433QueueOverflows() {
+  int ret = rtl_433.decoderQueueOverflows;
   return ret;
 }
 
 #  ifdef OMG_RADIO_SX127X
 extern int getOOKThresh() {
-  return rtl_433.OokFixedThreshold;
+  return rtl_433.ookFixedThreshold;
 }
 #  endif
 

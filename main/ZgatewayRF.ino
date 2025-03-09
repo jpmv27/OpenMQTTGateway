@@ -167,7 +167,7 @@ void XtoRF(const char* topicOri, const char* datacallback) {
   Logger.notice(OMG_LOGID, F("Transmit frequency: %F"), RFConfig.frequency);
 #    endif
   mySwitch.disableReceive();
-  mySwitch.enableTransmit(RF_EMITTER_GPIO);
+  mySwitch.enableTransmit(OMG_RF_EMITTER_GPIO);
   uint64_t data = strtoull(datacallback, NULL, 10); // we will not be able to pass values > 4294967295 on Arduino boards
 
   // RF DATA ANALYSIS
@@ -218,7 +218,7 @@ void XtoRF(const char* topicOri, const char* datacallback) {
 #    ifdef OMG_RADIO_CC1101 // set Receive on and Transmitt off
   ELECHOUSE_cc1101.SetRx(RFConfig.frequency);
   mySwitch.disableTransmit();
-  mySwitch.enableReceive(RF_RECEIVER_GPIO);
+  mySwitch.enableReceive(OMG_RF_RECEIVER_GPIO);
 #    endif
 }
 #  endif
@@ -239,14 +239,14 @@ void XtoRF(const char* topicOri, JsonObject& RFdata) { // json object decoding
 #    ifdef OMG_RADIO_CC1101
       disableCurrentReceiver();
       initCC1101();
-      int txPower = RFdata["txpower"] | RF_CC1101_TXPOWER;
+      int txPower = RFdata["txpower"] | OMG_RF_CC1101_TXPOWER;
       ELECHOUSE_cc1101.setPA((int)txPower);
       Logger.notice(OMG_LOGID, F("CC1101 TX Power: %d"), txPower);
       float txFrequency = RFdata["frequency"] | RFConfig.frequency;
       ELECHOUSE_cc1101.SetTx(txFrequency);
       Logger.notice(OMG_LOGID, F("Transmit frequency: %F"), txFrequency);
 #    endif
-      mySwitch.enableTransmit(RF_EMITTER_GPIO);
+      mySwitch.enableTransmit(OMG_RF_EMITTER_GPIO);
       mySwitch.setRepeatTransmit(valueRPT);
       mySwitch.setProtocol(valuePRT, valuePLSL);
       mySwitch.send(data, valueBITS);
@@ -272,15 +272,15 @@ void disableRFReceive() {
 void enableRFReceive() {
   Logger.notice(OMG_LOGID, F("Enable RF Receiver: %FMhz"), RFConfig.frequency);
   //RF init parameters
-  Logger.notice(OMG_LOGID, F("RF_EMITTER_GPIO: %d "), RF_EMITTER_GPIO);
-  Logger.notice(OMG_LOGID, F("RF_RECEIVER_GPIO: %d "), RF_RECEIVER_GPIO);
+  Logger.notice(OMG_LOGID, F("OMG_RF_EMITTER_GPIO: %d "), OMG_RF_EMITTER_GPIO);
+  Logger.notice(OMG_LOGID, F("OMG_RF_RECEIVER_GPIO: %d "), OMG_RF_RECEIVER_GPIO);
 
 #  ifdef RF_DISABLE_TRANSMIT
   mySwitch.disableTransmit();
 #  else
-  mySwitch.enableTransmit(RF_EMITTER_GPIO);
+  mySwitch.enableTransmit(OMG_RF_EMITTER_GPIO);
 #  endif
-  receiveInterupt = RF_RECEIVER_GPIO;
+  receiveInterupt = OMG_RF_RECEIVER_GPIO;
   mySwitch.setRepeatTransmit(RF_EMITTER_REPEAT);
   mySwitch.enableReceive(receiveInterupt);
   Logger.debug(OMG_LOGID, F("ZgatewayRF command topic: %s%s%s"), mqtt_topic, g_gateway_name, subjectMQTTtoRF);

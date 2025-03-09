@@ -34,7 +34,7 @@
 #  endif
 
 #  include <ESPiLight.h>
-ESPiLight rf(RF_EMITTER_GPIO); // use -1 to disable transmitter
+ESPiLight rf(OMG_RF_EMITTER_GPIO); // use -1 to disable transmitter
 
 #  ifdef Pilight_rawEnabled
 // raw output support
@@ -209,7 +209,7 @@ void XtoPilight(const char* topicOri, JsonObject& Pilightdata) {
     ELECHOUSE_cc1101.SetTx(txFrequency);
     Logger.notice(OMG_LOGID, F("Transmit frequency: %F"), txFrequency);
 #  endif
-    pinMode(RF_EMITTER_GPIO, OUTPUT);
+    pinMode(OMG_RF_EMITTER_GPIO, OUTPUT);
     if (raw) {
       uint16_t codes[MAXPULSESTREAMLENGTH];
       int repeats = rf.stringToRepeats(raw);
@@ -291,8 +291,8 @@ extern void disablePilightReceive() {
 
 extern void enablePilightReceive() {
   Logger.notice(OMG_LOGID, F("Switching to Pilight Receiver: %F"), RFConfig.frequency);
-  Logger.notice(OMG_LOGID, F("RF_EMITTER_GPIO: %d "), RF_EMITTER_GPIO);
-  Logger.notice(OMG_LOGID, F("RF_RECEIVER_GPIO: %d "), RF_RECEIVER_GPIO);
+  Logger.notice(OMG_LOGID, F("OMG_RF_EMITTER_GPIO: %d "), OMG_RF_EMITTER_GPIO);
+  Logger.notice(OMG_LOGID, F("OMG_RF_RECEIVER_GPIO: %d "), OMG_RF_RECEIVER_GPIO);
   Logger.debug(OMG_LOGID, F("ZgatewayPilight command topic: %s%s%s"), mqtt_topic, g_gateway_name, subjectMQTTtoPilight);
 
   initCC1101();
@@ -303,8 +303,8 @@ extern void enablePilightReceive() {
     rf.setPulseTrainCallBack(pilightRawCallback);
   }
 #  endif
-  rf.initReceiver(RF_RECEIVER_GPIO);
-  pinMode(RF_EMITTER_GPIO, OUTPUT); // Set this here, because if this is the RX pin it was reset to INPUT by Serial.end();
+  rf.initReceiver(OMG_RF_RECEIVER_GPIO);
+  pinMode(OMG_RF_EMITTER_GPIO, OUTPUT); // Set this here, because if this is the RX pin it was reset to INPUT by Serial.end();
   rf.enableReceiver();
   loadPilightConfig();
   Logger.debug(OMG_LOGID, F("ZgatewayPilight setup done "));
