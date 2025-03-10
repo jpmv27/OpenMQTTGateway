@@ -43,6 +43,21 @@ enum GatewayState {
 };
 GatewayState gatewayState = GatewayState::WAITING_ONBOARDING;
 
+static char const* const gatewayStateNames[] = {
+  "WAITING ONBOARDING",
+  "ONBOARDING",
+  "OFFLINE",
+  "NETWORK CONNECTED",
+  "BROKER CONNECTED",
+  "PROCESSING",
+  "NETWORK DISCONNECTED",
+  "BROKER DISCONNECTED",
+  "LOCAL OTA IN PROGRESS",
+  "REMOTE OTA IN PROGRESS",
+  "SLEEPING",
+  "ERROR"
+};
+
 // Macros and structure to enable the duplicates removing on the following gateways
 #if defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_IR) || defined(OMG_GATEWAY_SRFB) || defined(OMG_GATEWAY_WEATHERSTATION) || defined(OMG_GATEWAY_RTL_433)
 // array to store previous received RFs, IRs codes and their timestamps
@@ -2818,6 +2833,8 @@ String stateMeasures() {
   SYSdata["uptime"] = uptime();
 
   SYSdata["version"] = OMG_VERSION;
+  SYSdata["gatewaystate"] = gatewayStateNames[gatewayState];
+
 #ifdef LED_ADDRESSABLE
   SYSdata["rgbb"] = SYSConfig.rgbbrightness;
 #endif
@@ -2833,6 +2850,7 @@ String stateMeasures() {
   SYSdata["env"] = ENV_NAME;
   uint32_t freeMem;
   uint32_t minFreeMem;
+  uint32_t maxAllocMem;
   freeMem = ESP.getFreeHeap();
 #ifdef OMG_GATEWAY_RTL_433
   // Some RTL_433 decoders have memory leak, this is a temporary workaround
@@ -2856,6 +2874,8 @@ String stateMeasures() {
 #ifdef ESP32
   minFreeMem = ESP.getMinFreeHeap();
   SYSdata["minmem"] = minFreeMem;
+  maxAllocMem = ESP.getMaxAllocHeap();
+  SYSdata["maxallocmem"] = maxAllocMem;
 #  ifndef NO_INT_TEMP_READING
   SYSdata["tempc"] = TheengsUtils::round2(intTemperatureRead());
 #  endif
