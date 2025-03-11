@@ -438,7 +438,7 @@ bool jsonDispatch(JsonObject& data) {
 }
 
 // Add a document to the queue
-boolean enqueueJsonObject(const StaticJsonDocument<JSON_MSG_BUFFER>& jsonDoc, int timeout) {
+boolean enqueueJsonObject(const StaticJsonDocument<JSON_MSG_BUFFER>& jsonDoc, int timeout = QueueSemaphoreTimeOutLoop) {
   receivedMessages++;
   if (jsonDoc.size() == 0) {
     Logger.error(OMG_LOGID, F("Empty JSON, skipping"));
@@ -470,10 +470,6 @@ boolean enqueueJsonObject(const StaticJsonDocument<JSON_MSG_BUFFER>& jsonDoc, in
   return true;
 }
 
-// Semaphore check before enqueueing a document with default timeout QueueSemaphoreTimeOutLoop
-bool enqueueJsonObject(const StaticJsonDocument<JSON_MSG_BUFFER>& jsonDoc) {
-  return enqueueJsonObject(jsonDoc, QueueSemaphoreTimeOutLoop);
-}
 
 #ifdef ESP32
 #  include "mbedtls/sha256.h"
@@ -568,6 +564,77 @@ void emptyQueue() {
   }
 }
 
+bool pubMQTT(String const& topic, const char* payload, bool retainFlag = OMG_MQTT_SENSOR_RETAIN) {
+  bool res = false;
+  if (SYSConfig.mqtt && !SYSConfig.offline) {
+#ifdef ESP32
+    if (xSemaphoreTake(xMqttMutex, pdMS_TO_TICKS(QueueSemaphoreTimeOutTask)) == pdFALSE) {
+      Logger.error(OMG_LOGID, F("xMqttMutex not taken"));
+      gatewayState = GatewayState::ERROR;
+      return res;
+    }
+#endif
+    if (mqtt && mqtt->connected()) {
+      Logger.info(OMG_LOGID, F("[ OMG->MQTT ] topic: %s msg: %s "), topic.c_str(), payload);
+      res = mqtt->publish(topic.c_str(), payload, 0, retainFlag);
+    } else {
+      Logger.warning(OMG_LOGID, F("MQTT not connected, aborting the publication"));
+    }
+#ifdef ESP32
+    xSemaphoreGive(xMqttMutex);
+#endif
+  } else {
+    Logger.notice(OMG_LOGID, F("[ OMG->MQTT deactivated or offline] topic: %s msg: %s "), topic.c_str(), payload);
+  }
+  return res;
+}
+
+bool pubMQTT(String const& topic, String payload, bool retainFlag = OMG_MQTT_SENSOR_RETAIN) {
+  return pubMQTT(topic, payload.c_str(), retainFlag);
+}
+
+bool pubMQTT(String const& topic, int payload, bool retainFlag = OMG_MQTT_SENSOR_RETAIN) {
+  char val[12];
+  sprintf(val, "%d", payload);
+  return pubMQTT(topic, val, retainFlag);
+}
+
+bool pubMQTT(String const& topic, unsigned long long payload, bool retainFlag = OMG_MQTT_SENSOR_RETAIN) {
+  char val[21];
+  sprintf(val, "%llu", payload);
+  return pubMQTT(topic, val, retainFlag);
+}
+
+bool pubMQTT(String const& topic, float payload, bool retainFlag = OMG_MQTT_SENSOR_RETAIN) {
+  char val[12];
+  dtostrf(payload, 3, 1, val);
+  return pubMQTT(topic, val, retainFlag);
+}
+
+bool pubMQTT(String const& topic, unsigned long payload, bool retainFlag = OMG_MQTT_SENSOR_RETAIN) {
+  char val[11];
+  sprintf(val, "%lu", payload);
+  return pubMQTT(topic, val, retainFlag);
+}
+
+bool pubMQTT(String const& topic, unsigned int payload, bool retainFlag = OMG_MQTT_SENSOR_RETAIN) {
+  char val[12];
+  sprintf(val, "%u", payload, retainFlag);
+  return pubMQTT(topic, val);
+}
+
+bool pubMQTT(String const& topic, long payload, bool retainFlag = OMG_MQTT_SENSOR_RETAIN) {
+  char val[11];
+  sprintf(val, "%ld", payload, retainFlag);
+  return pubMQTT(topic, val);
+}
+
+bool pubMQTT(String const& topic, double payload, bool retainFlag = OMG_MQTT_SENSOR_RETAIN) {
+  char val[16];
+  sprintf(val, "%f", payload, retainFlag);
+  return pubMQTT(topic, val);
+}
+
 /**
  * @brief Publish the payload on default MQTT topic.
  *
@@ -577,7 +644,7 @@ void emptyQueue() {
  */
 bool pub(const char* topicori, const char* payload, bool retainFlag) {
   String topic = String(mqtt_topic) + String(g_gateway_name) + String(topicori);
-  return pubMQTT(topic.c_str(), payload, retainFlag);
+  return pubMQTT(topic, payload, retainFlag);
 }
 
 /**
@@ -629,7 +696,7 @@ bool pub(JsonObject& data) {
 #if OMG_MQTT_JSON_PUBLISHING
   String dataAsString = "";
   serializeJson(data, dataAsString);
-  res = pubMQTT(topic.c_str(), dataAsString.c_str(), ret);
+  res = pubMQTT(topic, dataAsString.c_str(), ret);
 #endif
 
 #if OMG_MQTT_SIMPLE_PUBLISHING
@@ -686,142 +753,6 @@ bool pub(JsonObject& data) {
 bool pub(const char* topicori, const char* payload) {
   String topic = String(mqtt_topic) + String(g_gateway_name) + String(topicori);
   return pubMQTT(topic, payload);
-}
-
-/**
- * @brief Low level MQTT functions without retain
- *
- * @param topic  the topic
- * @param payload  the payload
- */
-bool pubMQTT(const char* topic, const char* payload) {
-  return pubMQTT(topic, payload, OMG_MQTT_SENSOR_RETAIN);
-}
-
-/**
- * @brief Very Low level MQTT functions with retain Flag
- *
- * @param topic the topic
- * @param payload the payload
- * @param retainFlag  true if retain the retain Flag
- */
-bool pubMQTT(const char* topic, const char* payload, bool retainFlag) {
-  bool res = false;
-  if (SYSConfig.mqtt && !SYSConfig.offline) {
-#ifdef ESP32
-    if (xSemaphoreTake(xMqttMutex, pdMS_TO_TICKS(QueueSemaphoreTimeOutTask)) == pdFALSE) {
-      Logger.error(OMG_LOGID, F("xMqttMutex not taken"));
-      gatewayState = GatewayState::ERROR;
-      return res;
-    }
-#endif
-    if (mqtt && mqtt->connected()) {
-      Logger.info(OMG_LOGID, F("[ OMG->MQTT ] topic: %s msg: %s "), topic, payload);
-      res = mqtt->publish(topic, payload, 0, retainFlag);
-    } else {
-      Logger.warning(OMG_LOGID, F("MQTT not connected, aborting the publication"));
-    }
-#ifdef ESP32
-    xSemaphoreGive(xMqttMutex);
-#endif
-  } else {
-    Logger.notice(OMG_LOGID, F("[ OMG->MQTT deactivated or offline] topic: %s msg: %s "), topic, payload);
-  }
-  return res;
-}
-
-bool pubMQTT(const char* topic, unsigned long payload) {
-  char val[11];
-  sprintf(val, "%lu", payload);
-  return pubMQTT(topic, val);
-}
-
-bool pubMQTT(const char* topic, unsigned long long payload) {
-  char val[21];
-  sprintf(val, "%llu", payload);
-  return pubMQTT(topic, val);
-}
-
-bool pubMQTT(const char* topic, String payload) {
-  return pubMQTT(topic, payload.c_str());
-}
-
-bool pubMQTT(const char* topic, float payload) {
-  char val[12];
-  dtostrf(payload, 3, 1, val);
-  return pubMQTT(topic, val);
-}
-
-bool pubMQTT(const char* topic, int payload) {
-  char val[12];
-  sprintf(val, "%d", payload);
-  return pubMQTT(topic, val);
-}
-
-bool pubMQTT(const char* topic, unsigned int payload) {
-  char val[12];
-  sprintf(val, "%u", payload);
-  return pubMQTT(topic, val);
-}
-
-bool pubMQTT(const char* topic, long payload) {
-  char val[11];
-  sprintf(val, "%ld", payload);
-  return pubMQTT(topic, val);
-}
-
-bool pubMQTT(const char* topic, double payload) {
-  char val[16];
-  sprintf(val, "%f", payload);
-  return pubMQTT(topic, val);
-}
-
-bool pubMQTT(String const& topic, const char* payload) {
-  return pubMQTT(topic, payload, OMG_MQTT_SENSOR_RETAIN);
-}
-
-bool pubMQTT(String const& topic, const char* payload, bool retainFlag) {
-  return pubMQTT(topic.c_str(), payload, retainFlag);
-}
-
-bool pubMQTT(String const& topic, String payload) {
-  return pubMQTT(topic.c_str(), payload.c_str());
-}
-
-bool pubMQTT(String const& topic, int payload) {
-  return pubMQTT(topic, payload, OMG_MQTT_SENSOR_RETAIN);
-}
-
-bool pubMQTT(String const& topic, int payload, bool retainFlag) {
-  char val[12];
-  sprintf(val, "%d", payload);
-  return pubMQTT(topic.c_str(), val, retainFlag);
-}
-
-bool pubMQTT(String const& topic, unsigned long long payload) {
-  return pubMQTT(topic, payload, OMG_MQTT_SENSOR_RETAIN);
-}
-
-bool pubMQTT(String const& topic, unsigned long long payload, bool retainFlag) {
-  char val[21];
-  sprintf(val, "%llu", payload);
-  return pubMQTT(topic.c_str(), val, retainFlag);
-}
-
-bool pubMQTT(String const& topic, float payload) {
-  return pubMQTT(topic, payload, OMG_MQTT_SENSOR_RETAIN);
-}
-
-bool pubMQTT(String const& topic, float payload, bool retainFlag) {
-  char val[12];
-  dtostrf(payload, 3, 1, val);
-  return pubMQTT(topic.c_str(), val, retainFlag);
-}
-
-bool pubMQTT(String const& topic, unsigned long payload) {
-  char val[11];
-  sprintf(val, "%lu", payload);
-  return pubMQTT(topic.c_str(), val);
 }
 
 void delayWithOTA(long waitMillis) {
