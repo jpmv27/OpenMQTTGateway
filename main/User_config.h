@@ -517,6 +517,9 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #ifndef OMG_MQTT_MESSAGE_UNIX_TIMESTAMP
 #  define OMG_MQTT_MESSAGE_UNIX_TIMESTAMP false //define true if you want messages to have an unix timestamp (e.g.: "unixtime"=1679015107)
 #endif
+#ifndef OMG_MQTT_MESSAGE_RETAIN_TIMESTAMP
+#  define OMG_MQTT_MESSAGE_RETAIN_TIMESTAMP true
+#endif
 
 // LED index depending on state, each state can have a different LED index or be grouped if there is a limited number of LEDs
 #ifndef LED_ERROR

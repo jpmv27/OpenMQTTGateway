@@ -406,14 +406,22 @@ bool jsonDispatch(JsonObject& data) {
   if (data.containsKey("origin") || data.containsKey("topic")) {
     GatewayState previousGatewayState = gatewayState;
     gatewayState = GatewayState::PROCESSING;
-#if OMG_MQTT_MESSAGE_UTC_TIMESTAMP == true
-    data["UTCtime"] = TheengsUtils::UTCtimestamp();
+#if !OMG_MQTT_MESSAGE_RETAIN_TIMESTAMP && \
+    (OMG_MQTT_MESSAGE_UTC_TIMESTAMP || OMG_MQTT_MESSAGE_LOCAL_TIMESTAMP || OMG_MQTT_MESSAGE_UNIX_TIMESTAMP)
+    if (!data.containsKey("retain") || !data["retain"].as<bool>()) {
 #endif
-#if OMG_MQTT_MESSAGE_LOCAL_TIMESTAMP == true
-    data["time"] = TheengsUtils::localtimestamp();
+#if OMG_MQTT_MESSAGE_UTC_TIMESTAMP
+      data["UTCtime"] = TheengsUtils::UTCtimestamp();
 #endif
-#if OMG_MQTT_MESSAGE_UNIX_TIMESTAMP == true
-    data["unixtime"] = TheengsUtils::unixtimestamp();
+#if OMG_MQTT_MESSAGE_LOCAL_TIMESTAMP
+      data["time"] = TheengsUtils::localtimestamp();
+#endif
+#if OMG_MQTT_MESSAGE_UNIX_TIMESTAMP
+      data["unixtime"] = TheengsUtils::unixtimestamp();
+#endif
+#if !OMG_MQTT_MESSAGE_RETAIN_TIMESTAMP && \
+    (OMG_MQTT_MESSAGE_UTC_TIMESTAMP || OMG_MQTT_MESSAGE_LOCAL_TIMESTAMP || OMG_MQTT_MESSAGE_UNIX_TIMESTAMP)
+    }
 #endif
     if (data.containsKey("origin")) {
       pubWebUI((char*)data["origin"].as<const char*>(), data);
