@@ -641,16 +641,36 @@ bool pub(JsonObject& data) {
 #  endif
     if (p.value().is<uint64_t>() && strcmp(p.key().c_str(), "rssi") != 0) { //test rssi , bypass solution due to the fact that a int is considered as an uint64_t
       if (strcmp(p.key().c_str(), "value") == 0) { // if data is a value we don't integrate the name into the topic
+#if OMG_MQTT_SIMPLE_PUBLISHING_OVERRIDE_RETAIN
+        res = pubMQTT(topic, p.value().as<uint64_t>(), ret);
+#else
         res = pubMQTT(topic, p.value().as<uint64_t>());
+#endif
       } else { // if data is not a value we integrate the name into the topic
+#if OMG_MQTT_SIMPLE_PUBLISHING_OVERRIDE_RETAIN
+        res = pubMQTT(topic + "/" + String(p.key().c_str()), p.value().as<uint64_t>(), ret);
+#else
         res = pubMQTT(topic + "/" + String(p.key().c_str()), p.value().as<uint64_t>());
+#endif
       }
     } else if (p.value().is<int>()) {
+#if OMG_MQTT_SIMPLE_PUBLISHING_OVERRIDE_RETAIN
+      res = pubMQTT(topic + "/" + String(p.key().c_str()), p.value().as<int>(), ret);
+#else
       res = pubMQTT(topic + "/" + String(p.key().c_str()), p.value().as<int>());
+#endif
     } else if (p.value().is<float>()) {
+#if OMG_MQTT_SIMPLE_PUBLISHING_OVERRIDE_RETAIN
+      res = pubMQTT(topic + "/" + String(p.key().c_str()), p.value().as<float>(), ret);
+#else
       res = pubMQTT(topic + "/" + String(p.key().c_str()), p.value().as<float>());
+#endif
     } else if (p.value().is<char*>()) {
+#if OMG_MQTT_SIMPLE_PUBLISHING_OVERRIDE_RETAIN
+      res = pubMQTT(topic + "/" + String(p.key().c_str()), p.value().as<const char*>(), ret);
+#else
       res = pubMQTT(topic + "/" + String(p.key().c_str()), p.value().as<const char*>());
+#endif
     }
   }
 #endif
@@ -710,10 +730,6 @@ bool pubMQTT(const char* topic, const char* payload, bool retainFlag) {
   return res;
 }
 
-bool pubMQTT(String topic, const char* payload) {
-  return pubMQTT(topic.c_str(), payload);
-}
-
 bool pubMQTT(const char* topic, unsigned long payload) {
   char val[11];
   sprintf(val, "%lu", payload);
@@ -728,28 +744,6 @@ bool pubMQTT(const char* topic, unsigned long long payload) {
 
 bool pubMQTT(const char* topic, String payload) {
   return pubMQTT(topic, payload.c_str());
-}
-
-bool pubMQTT(String topic, String payload) {
-  return pubMQTT(topic.c_str(), payload.c_str());
-}
-
-bool pubMQTT(String topic, int payload) {
-  char val[12];
-  sprintf(val, "%d", payload);
-  return pubMQTT(topic.c_str(), val);
-}
-
-bool pubMQTT(String topic, unsigned long long payload) {
-  char val[21];
-  sprintf(val, "%llu", payload);
-  return pubMQTT(topic.c_str(), val);
-}
-
-bool pubMQTT(String topic, float payload) {
-  char val[12];
-  dtostrf(payload, 3, 1, val);
-  return pubMQTT(topic.c_str(), val);
 }
 
 bool pubMQTT(const char* topic, float payload) {
@@ -782,7 +776,49 @@ bool pubMQTT(const char* topic, double payload) {
   return pubMQTT(topic, val);
 }
 
-bool pubMQTT(String topic, unsigned long payload) {
+bool pubMQTT(String const& topic, const char* payload) {
+  return pubMQTT(topic, payload, sensor_Retain);
+}
+
+bool pubMQTT(String const& topic, const char* payload, bool retainFlag) {
+  return pubMQTT(topic.c_str(), payload, retainFlag);
+}
+
+bool pubMQTT(String const& topic, String payload) {
+  return pubMQTT(topic.c_str(), payload.c_str());
+}
+
+bool pubMQTT(String const& topic, int payload) {
+  return pubMQTT(topic, payload, sensor_Retain);
+}
+
+bool pubMQTT(String const& topic, int payload, bool retainFlag) {
+  char val[12];
+  sprintf(val, "%d", payload);
+  return pubMQTT(topic.c_str(), val, retainFlag);
+}
+
+bool pubMQTT(String const& topic, unsigned long long payload) {
+  return pubMQTT(topic, payload, sensor_Retain);
+}
+
+bool pubMQTT(String const& topic, unsigned long long payload, bool retainFlag) {
+  char val[21];
+  sprintf(val, "%llu", payload);
+  return pubMQTT(topic.c_str(), val, retainFlag);
+}
+
+bool pubMQTT(String const& topic, float payload) {
+  return pubMQTT(topic, payload, sensor_Retain);
+}
+
+bool pubMQTT(String const& topic, float payload, bool retainFlag) {
+  char val[12];
+  dtostrf(payload, 3, 1, val);
+  return pubMQTT(topic.c_str(), val, retainFlag);
+}
+
+bool pubMQTT(String const& topic, unsigned long payload) {
   char val[11];
   sprintf(val, "%lu", payload);
   return pubMQTT(topic.c_str(), val);
@@ -2547,15 +2583,17 @@ void loop() {
   if (firstStart) {
 #ifdef OMG_GATEWAY_SERIAL
     if (SYSConfig.serial && isSerialReady()) {
-#  ifdef OMG_GATEWAY_BT
+#endif
+#ifdef OMG_GATEWAY_BT
       BTProcessLock = !BTConfig.enabled;
-#  endif
+#endif
+#ifdef ESP32
+      publishDeviceInfo();
+#endif
       ProcessLock = false;
       firstStart = false;
+#ifdef OMG_GATEWAY_SERIAL
     }
-#else
-    ProcessLock = false;
-    firstStart = false;
 #endif
   }
 
@@ -3808,3 +3846,67 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
     }
   }
 }
+
+#ifdef ESP32
+void publishDeviceInfo() {
+  char buffer[40];
+
+  // Version
+  String deviceData = String(OMG_VERSION) + "|";
+
+  // Flash
+  snprintf(buffer, sizeof(buffer), "Flash: %dkB ", ESP.getFlashChipSize() / 1024);
+  deviceData += buffer;
+
+  snprintf(buffer, sizeof(buffer), "Speed:%dMHz ", ESP.getFlashChipSpeed() / 1000000);
+  deviceData += buffer;
+
+  switch (ESP.getFlashChipMode()) {
+    case FM_QIO:
+      deviceData += "Mode:QIO|";
+      break;
+    case FM_QOUT:
+      deviceData += "Mode:QUAD|";
+      break;
+    case FM_DIO:
+      deviceData += "Mode:DIO|";
+      break;
+    case FM_FAST_READ:
+      deviceData += "Mode:FASTRD|";
+      break;
+    case FM_SLOW_READ:
+      deviceData += "Mode:SLOWRD|";
+      break;
+    case FM_DOUT:
+    default:
+      deviceData += "Mode:DUAL|";
+      break;
+  }
+
+  // Chip
+  deviceData += String("Chip: ") + ESP.getChipModel() + " ";
+
+  snprintf(buffer, sizeof(buffer), "Cores:%d ", ESP.getChipCores());
+  deviceData += buffer;
+
+  snprintf(buffer, sizeof(buffer), "Revision:%d|", ESP.getChipRevision());
+  deviceData += buffer;
+
+  // SDK
+  deviceData += String("ESP-IDF: ") + ESP.getSdkVersion() + "|";
+
+  // MAC
+  uint64_t mac = ESP.getEfuseMac();
+  snprintf(buffer, sizeof(buffer), "EFuse MAC: %02llX:%02llX:%02llX:%02llX:%02llX:%02llX",
+      mac & 0xff, (mac >> 8) & 0xff, (mac >> 16) & 0xff, (mac >> 24) & 0xff,
+      (mac >> 32) & 0xff, (mac >> 40) & 0xff);
+  deviceData += buffer;
+
+  StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
+  JsonObject info = jsonBuffer.to<JsonObject>();
+  info["deviceinfo"] = deviceData;
+  info["origin"] = subjectSYStoMQTT;
+  info["retain"] = true;
+  enqueueJsonObject(info);
+}
+#endif

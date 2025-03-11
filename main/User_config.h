@@ -499,6 +499,9 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 #ifndef OMG_MQTT_SIMPLE_PUBLISHING
 #  define OMG_MQTT_SIMPLE_PUBLISHING false //define true if you want to use simple publishing (one topic for one parameter)
 #endif
+#ifndef OMG_MQTT_SIMPLE_PUBLISHING_OVERRIDE_RETAIN
+#  define OMG_MQTT_SIMPLE_PUBLISHING_OVERRIDE_RETAIN false
+#endif
 //example
 // home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4/rssi -63.0
 // home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4/servicedata fe0000000000000000000000000000000000000000
