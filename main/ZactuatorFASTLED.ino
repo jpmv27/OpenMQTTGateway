@@ -97,7 +97,7 @@ void FASTLEDLoop() {
 boolean FASTLEDtoX() {
   return false;
 }
-#  if jsonReceiving
+#  if OMG_MQTT_JSON_RECEIVING
 void XtoFASTLED(const char* topicOri, JsonObject& jsonData) {
   currentLEDState = GENERAL;
   //trc(topicOri);

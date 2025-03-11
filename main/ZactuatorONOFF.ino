@@ -133,7 +133,7 @@ void setupONOFF() {
   Logger.debug(OMG_LOGID, F("ZactuatorONOFF setup done"));
 }
 
-#  if jsonReceiving
+#  if OMG_MQTT_JSON_RECEIVING
 void XtoONOFF(const char* topicOri, JsonObject& ONOFFdata) {
   if (cmpToMainTopic(topicOri, subjectMQTTtoONOFF)) {
     Logger.debug(OMG_LOGID, F("MQTTtoONOFF json data analysis"));

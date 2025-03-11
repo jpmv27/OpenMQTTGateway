@@ -195,7 +195,7 @@ boolean PWMtoX() {
   return false;
 }
 
-#  if jsonReceiving
+#  if OMG_MQTT_JSON_RECEIVING
 void XtoPWM(const char* topicOri, JsonObject& jsonData) {
   if (cmpToMainTopic(topicOri, subjectMQTTtoPWMset)) {
     Logger.debug(OMG_LOGID, F("MQTTtoPWM JSON analysis"));

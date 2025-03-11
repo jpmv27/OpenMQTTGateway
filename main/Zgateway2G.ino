@@ -126,7 +126,7 @@ void Xto2G(const char* topicOri, const char* datacallback) {
 }
 #  endif
 
-#  if jsonReceiving
+#  if OMG_MQTT_JSON_RECEIVING
 void Xto2G(const char* topicOri, JsonObject& SMSdata) {
   if (cmpToMainTopic(topicOri, subjectMQTTto2G)) {
     const char* sms = SMSdata["message"];

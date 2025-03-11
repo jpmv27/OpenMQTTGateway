@@ -1039,7 +1039,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
             String tracker_id = macWOdots + "-tracker";
             createDiscovery("device_tracker",
                             discovery_topic.c_str(), tracker_name.c_str(), tracker_id.c_str(),
-                            will_Topic, "occupancy", "{% if value_json.get('rssi') -%}home{%- else -%}not_home{%- endif %}",
+                            OMG_MQTT_WILL_TOPIC, "occupancy", "{% if value_json.get('rssi') -%}home{%- else -%}not_home{%- endif %}",
                             "", "", "",
                             0, "", "", false, "",
                             model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
@@ -1050,7 +1050,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
             String sensor_id = macWOdots + "-moving";
             createDiscovery("binary_sensor",
                             discovery_topic.c_str(), sensor_name.c_str(), sensor_id.c_str(),
-                            will_Topic, "moving", "{% if value_json.get('accx') -%}on{%- else -%}off{%- endif %}",
+                            OMG_MQTT_WILL_TOPIC, "moving", "{% if value_json.get('accx') -%}on{%- else -%}off{%- endif %}",
                             "on", "off", "",
                             0, "", "", false, "",
                             model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
@@ -1083,9 +1083,9 @@ void launchBTDiscovery(bool overrideDiscovery) {
                 String payload_off = "{\"model_id\":\"X1\",\"cmd\":\"off\",\"id\":\"" + String(p->macAdr) + "\"}";
                 createDiscovery("switch", //set Type
                                 discovery_topic.c_str(), entity_name.c_str(), unique_id.c_str(),
-                                will_Topic, "switch", value_template.c_str(),
+                                OMG_MQTT_WILL_TOPIC, "switch", value_template.c_str(),
                                 payload_on.c_str(), payload_off.c_str(), "", 0,
-                                Gateway_AnnouncementMsg, will_Message, false, subjectMQTTtoBT,
+                                OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, will_Message, false, subjectMQTTtoBT,
                                 model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
                                 stateClassNone, "off", "on");
                 unique_id = macWOdots + "-press";
@@ -1093,10 +1093,10 @@ void launchBTDiscovery(bool overrideDiscovery) {
                 String payload_press = "{\"model_id\":\"X1\",\"cmd\":\"press\",\"id\":\"" + String(p->macAdr) + "\"}";
                 createDiscovery("button", //set Type
                                 discovery_topic.c_str(), entity_name.c_str(), unique_id.c_str(),
-                                will_Topic, "button", "",
+                                OMG_MQTT_WILL_TOPIC, "button", "",
                                 payload_press.c_str(), "", "", //set,payload_on,payload_off,unit_of_meas,
                                 0, //set  off_delay
-                                Gateway_AnnouncementMsg, will_Message, false, subjectMQTTtoBT,
+                                OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, will_Message, false, subjectMQTTtoBT,
                                 model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
                                 stateClassNone);
 #endif // OMG_BT_SBS1
@@ -1106,9 +1106,9 @@ void launchBTDiscovery(bool overrideDiscovery) {
                 String command_template = "{\"model_id\":\"W270160X\",\"tilt\":{{ value | int }},\"id\":\"" + String(p->macAdr) + "\"}";
                 createDiscovery("cover", //set Type
                                 discovery_topic.c_str(), entity_name.c_str(), unique_id.c_str(),
-                                will_Topic, "cover", value_template.c_str(),
+                                OMG_MQTT_WILL_TOPIC, "cover", value_template.c_str(),
                                 "50", "", "", 0,
-                                Gateway_AnnouncementMsg, will_Message, false, subjectMQTTtoBT,
+                                OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, will_Message, false, subjectMQTTtoBT,
                                 model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
                                 "blind", nullptr, nullptr, nullptr, command_template.c_str());
               }
@@ -1118,9 +1118,9 @@ void launchBTDiscovery(bool overrideDiscovery) {
                 String command_template = "{\"model_id\":\"W070160X\",\"position\":{{ value | int }},\"id\":\"" + String(p->macAdr) + "\"}";
                 createDiscovery("cover", //set Type
                                 discovery_topic.c_str(), entity_name.c_str(), unique_id.c_str(),
-                                will_Topic, "cover", "{{ value_json.position }}",
+                                OMG_MQTT_WILL_TOPIC, "cover", "{{ value_json.position }}",
                                 "0", "100", "", 0,
-                                Gateway_AnnouncementMsg, will_Message, false, subjectMQTTtoBT,
+                                OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, will_Message, false, subjectMQTTtoBT,
                                 model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
                                 "curtain", nullptr, nullptr, nullptr, command_template.c_str());
               }
@@ -1129,7 +1129,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
                          strcmp(prop.key().c_str(), "weighing_mode") == 0) {
                 createDiscovery("sensor",
                                 discovery_topic.c_str(), entity_name.c_str(), unique_id.c_str(),
-                                will_Topic, "enum", value_template.c_str(),
+                                OMG_MQTT_WILL_TOPIC, "enum", value_template.c_str(),
                                 "", "", prop.value()["unit"],
                                 0, "", "", false, "",
                                 model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
@@ -1138,7 +1138,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
                          strcmp(prop.key().c_str(), "unit") == 0) {
                 createDiscovery("sensor",
                                 discovery_topic.c_str(), entity_name.c_str(), unique_id.c_str(),
-                                will_Topic, "enum", value_template.c_str(),
+                                OMG_MQTT_WILL_TOPIC, "enum", value_template.c_str(),
                                 "", "", prop.value()["unit"],
                                 0, "", "", false, "",
                                 model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
@@ -1146,7 +1146,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
               } else if (strcmp(prop.value()["unit"], "string") == 0 && strcmp(prop.key().c_str(), "mac") != 0) {
                 createDiscovery("sensor",
                                 discovery_topic.c_str(), entity_name.c_str(), unique_id.c_str(),
-                                will_Topic, prop.value()["name"], value_template.c_str(),
+                                OMG_MQTT_WILL_TOPIC, prop.value()["name"], value_template.c_str(),
                                 "", "", "",
                                 0, "", "", false, "",
                                 model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
@@ -1154,7 +1154,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
               } else if (p->sensorModel_id == TheengsDecoder::MUE4094RT && strcmp(prop.value()["unit"], "status") == 0) { // This device does not a broadcast when there is nothing detected so adding a timeout
                 createDiscovery("binary_sensor",
                                 discovery_topic.c_str(), entity_name.c_str(), unique_id.c_str(),
-                                will_Topic, prop.value()["name"], value_template.c_str(),
+                                OMG_MQTT_WILL_TOPIC, prop.value()["name"], value_template.c_str(),
                                 "True", "False", "",
                                 BTConfig.presenceAwayTimer / 1000, "", "", false, "",
                                 model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
@@ -1162,7 +1162,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
               } else if (strcmp(prop.value()["unit"], "status") == 0) {
                 createDiscovery("binary_sensor",
                                 discovery_topic.c_str(), entity_name.c_str(), unique_id.c_str(),
-                                will_Topic, prop.value()["name"], value_template.c_str(),
+                                OMG_MQTT_WILL_TOPIC, prop.value()["name"], value_template.c_str(),
                                 "True", "False", "",
                                 0, "", "", false, "",
                                 model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
@@ -1170,7 +1170,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
               } else if (strcmp(prop.key().c_str(), "device") != 0 && strcmp(prop.key().c_str(), "mac") != 0) { // Exception on device and mac as these ones are not sensors
                 createDiscovery("sensor",
                                 discovery_topic.c_str(), entity_name.c_str(), unique_id.c_str(),
-                                will_Topic, prop.value()["name"], value_template.c_str(),
+                                OMG_MQTT_WILL_TOPIC, prop.value()["name"], value_template.c_str(),
                                 "", "", prop.value()["unit"],
                                 0, "", "", false, "",
                                 model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,
@@ -1202,7 +1202,7 @@ void launchBTDiscovery(bool overrideDiscovery) {
               String tracker_id = macWOdots + "-tracker";
               createDiscovery("device_tracker",
                               discovery_topic.c_str(), "BM2-tracker", tracker_id.c_str(),
-                              will_Topic, "occupancy", "{% if value_json.get('rssi') -%}home{%- else -%}not_home{%- endif %}",
+                              OMG_MQTT_WILL_TOPIC, "occupancy", "{% if value_json.get('rssi') -%}home{%- else -%}not_home{%- endif %}",
                               "", "", "",
                               0, "", "", false, "",
                               model.c_str(), brand.c_str(), model_id.c_str(), macWOdots.c_str(), false,

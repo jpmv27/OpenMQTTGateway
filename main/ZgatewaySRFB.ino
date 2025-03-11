@@ -240,7 +240,7 @@ void XtoSRFB(const char* topicOri, const char* datacallback) {
   }
 }
 #  endif
-#  if jsonReceiving
+#  if OMG_MQTT_JSON_RECEIVING
 void XtoSRFB(const char* topicOri, JsonObject& SRFBdata) {
   // RF DATA ANALYSIS
   const char* raw = SRFBdata["raw"];

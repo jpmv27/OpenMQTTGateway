@@ -161,7 +161,7 @@ void IRtoX() {
 
 bool sendIdentifiedProtocol(const char* protocol_name, uint64_t data, const char* hex, unsigned int valueBITS, uint16_t valueRPT);
 
-#  if jsonReceiving
+#  if OMG_MQTT_JSON_RECEIVING
 void XtoIR(const char* topicOri, JsonObject& IRdata) {
   if (cmpToMainTopic(topicOri, subjectMQTTtoIR)) {
     Logger.debug(OMG_LOGID, F("MQTTtoIR json"));

@@ -482,7 +482,7 @@ void LORAtoX() {
   }
 }
 
-#  if jsonReceiving
+#  if OMG_MQTT_JSON_RECEIVING
 void XtoLORA(const char* topicOri, JsonObject& LORAdata) { // json object decoding
   if (cmpToMainTopic(topicOri, subjectMQTTtoLORA)) {
     Logger.debug(OMG_LOGID, F("MQTTtoLORA json"));

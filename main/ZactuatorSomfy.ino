@@ -48,7 +48,7 @@ void setupSomfy() {
   Logger.debug(OMG_LOGID, F("ZactuatorSomfy setup done "));
 }
 
-#  if jsonReceiving
+#  if OMG_MQTT_JSON_RECEIVING
 void XtoSomfy(const char* topicOri, JsonObject& jsonData) {
   if (cmpToMainTopic(topicOri, subjectMQTTtoSomfy)) {
     Logger.debug(OMG_LOGID, F("MQTTtoSomfy json data analysis"));

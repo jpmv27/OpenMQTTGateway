@@ -200,7 +200,7 @@ void XtoRFM69(const char* topicOri, const char* datacallback) {
   }
 }
 #  endif
-#  if jsonReceiving
+#  if OMG_MQTT_JSON_RECEIVING
 void XtoRFM69(const char* topicOri, JsonObject& RFM69data) {
   if (cmpToMainTopic(topicOri, subjectMQTTtoRFM69)) {
     const char* data = RFM69data["data"];

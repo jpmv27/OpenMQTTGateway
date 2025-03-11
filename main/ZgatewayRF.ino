@@ -223,7 +223,7 @@ void XtoRF(const char* topicOri, const char* datacallback) {
 }
 #  endif
 
-#  if jsonReceiving
+#  if OMG_MQTT_JSON_RECEIVING
 void XtoRF(const char* topicOri, JsonObject& RFdata) { // json object decoding
   if (cmpToMainTopic(topicOri, subjectMQTTtoRF)) {
     Logger.debug(OMG_LOGID, F("MQTTtoRF json"));

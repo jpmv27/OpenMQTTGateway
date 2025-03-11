@@ -216,13 +216,13 @@ You can deactivate Json or simple mode following theses instructions:
 // home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4/rssi -63.0
 // home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4/servicedata fe0000000000000000000000000000000000000000
 #define OMG_MQTT_SIMPLE_RECEIVING true //define false if you don't want to use old way reception analysis
-#define jsonReceiving true //define false if you don't want to use Json  reception analysis
+#define OMG_MQTT_JSON_RECEIVING true //define false if you don't want to use Json  reception analysis
 ```
 
 If you are using platformio you can also comment the definitions above and define your parameters into platformio.ini file by setting the following `build_flags`:
 ```cpp
   '-DOMG_MQTT_JSON_PUBLISHING=true'
-  '-DjsonReceiving=true'
+  '-DOMG_MQTT_JSON_RECEIVING=true'
   '-DOMG_MQTT_SIMPLE_RECEIVING=true'
   '-DOMG_MQTT_SIMPLE_PUBLISHING=true'
 ```

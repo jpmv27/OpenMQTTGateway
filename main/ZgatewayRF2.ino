@@ -93,7 +93,7 @@ void RF2toMQTTdiscovery(JsonObject& data) {
   // The two separate on/off icons allow for subsequent on commands to support
   // the dimming feature of KAKU switches like ACM-300.
   createDiscovery(switchRF[0], "", switchRF[1],
-                  (char*)getUniqueId(switchRF[1], "").c_str(), will_Topic,
+                  (char*)getUniqueId(switchRF[1], "").c_str(), OMG_MQTT_WILL_TOPIC,
                   switchRF[3], switchRF[4], switchRF[5], switchRF[6],
                   switchRF[7], 0, "", "", true, subjectMQTTtoRF2,
                   "", "", "", "", false,
@@ -240,7 +240,7 @@ void XtoRF2(const char* topicOri, const char* datacallback) {
 }
 #  endif
 
-#  if jsonReceiving
+#  if OMG_MQTT_JSON_RECEIVING
 void XtoRF2(const char* topicOri, JsonObject& RF2data) { // json object decoding
 
   if (cmpToMainTopic(topicOri, subjectMQTTtoRF2)) {

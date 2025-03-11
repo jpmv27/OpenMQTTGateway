@@ -469,31 +469,31 @@ ss_cnt_parameters cnt_parameters_array[cnt_parameters_array_size] = {
 //#define OMG_GATEWAY_SERIAL   "SERIAL"  //ESP8266, Arduino, ESP32
 
 /*-------------DEFINE YOUR MQTT ADVANCED PARAMETERS BELOW----------------*/
-#ifndef will_Topic
-#  define will_Topic "/LWT"
+#ifndef OMG_MQTT_WILL_TOPIC
+#  define OMG_MQTT_WILL_TOPIC "/LWT"
 #endif
-#ifndef will_QoS
-#  define will_QoS 0
+#ifndef OMG_MQTT_WILL_QOS
+#  define OMG_MQTT_WILL_QOS 0
 #endif
-#ifndef will_Retain
-#  define will_Retain true
+#ifndef OMG_MQTT_WILL_RETAIN
+#  define OMG_MQTT_WILL_RETAIN true
 #endif
-#ifndef sensor_Retain
-#  define sensor_Retain false
+#ifndef OMG_MQTT_SENSOR_RETAIN
+#  define OMG_MQTT_SENSOR_RETAIN false
 #endif
-#ifndef will_Message
-#  define will_Message "offline"
+#ifndef OMG_MQTT_WILL_MESSAGE
+#  define OMG_MQTT_WILL_MESSAGE "offline"
 #endif
-#ifndef Gateway_AnnouncementMsg
-#  define Gateway_AnnouncementMsg "online"
+#ifndef OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE
+#  define OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE "online"
 #endif
 
 #ifndef OMG_MQTT_JSON_PUBLISHING
 #  define OMG_MQTT_JSON_PUBLISHING true //define false if you don't want to use Json publishing (one topic for all the parameters)
 #endif
 //example home/OpenMQTTGateway_ESP32_DEVKIT/BTtoMQTT/4XXXXXXXXXX4 {"rssi":-63,"servicedata":"fe0000000000000000000000000000000000000000"}
-#ifndef jsonReceiving
-#  define jsonReceiving true //define false if you don't want to use Json  reception analysis
+#ifndef OMG_MQTT_JSON_RECEIVING
+#  define OMG_MQTT_JSON_RECEIVING true //define false if you don't want to use Json  reception analysis
 #endif
 
 #ifndef OMG_MQTT_SIMPLE_PUBLISHING

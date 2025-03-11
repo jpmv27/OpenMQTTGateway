@@ -588,7 +588,7 @@ bool pub(const char* topicori, const char* payload, bool retainFlag) {
  */
 bool pub(JsonObject& data) {
   bool res = false;
-  bool ret = sensor_Retain;
+  bool ret = OMG_MQTT_SENSOR_RETAIN;
   if (data.containsKey("retain") && data["retain"].is<bool>()) {
     ret = data["retain"];
     data.remove("retain");
@@ -695,7 +695,7 @@ bool pub(const char* topicori, const char* payload) {
  * @param payload  the payload
  */
 bool pubMQTT(const char* topic, const char* payload) {
-  return pubMQTT(topic, payload, sensor_Retain);
+  return pubMQTT(topic, payload, OMG_MQTT_SENSOR_RETAIN);
 }
 
 /**
@@ -777,7 +777,7 @@ bool pubMQTT(const char* topic, double payload) {
 }
 
 bool pubMQTT(String const& topic, const char* payload) {
-  return pubMQTT(topic, payload, sensor_Retain);
+  return pubMQTT(topic, payload, OMG_MQTT_SENSOR_RETAIN);
 }
 
 bool pubMQTT(String const& topic, const char* payload, bool retainFlag) {
@@ -789,7 +789,7 @@ bool pubMQTT(String const& topic, String payload) {
 }
 
 bool pubMQTT(String const& topic, int payload) {
-  return pubMQTT(topic, payload, sensor_Retain);
+  return pubMQTT(topic, payload, OMG_MQTT_SENSOR_RETAIN);
 }
 
 bool pubMQTT(String const& topic, int payload, bool retainFlag) {
@@ -799,7 +799,7 @@ bool pubMQTT(String const& topic, int payload, bool retainFlag) {
 }
 
 bool pubMQTT(String const& topic, unsigned long long payload) {
-  return pubMQTT(topic, payload, sensor_Retain);
+  return pubMQTT(topic, payload, OMG_MQTT_SENSOR_RETAIN);
 }
 
 bool pubMQTT(String const& topic, unsigned long long payload, bool retainFlag) {
@@ -809,7 +809,7 @@ bool pubMQTT(String const& topic, unsigned long long payload, bool retainFlag) {
 }
 
 bool pubMQTT(String const& topic, float payload) {
-  return pubMQTT(topic, payload, sensor_Retain);
+  return pubMQTT(topic, payload, OMG_MQTT_SENSOR_RETAIN);
 }
 
 bool pubMQTT(String const& topic, float payload, bool retainFlag) {
@@ -1039,10 +1039,10 @@ void setupMQTT() {
   mqtt->will.qos = 0;
   mqtt->will.retain = false;
 #  else
-  mqtt->will.topic = String(mqtt_topic) + g_gateway_name + will_Topic;
-  mqtt->will.payload = will_Message;
-  mqtt->will.qos = will_QoS;
-  mqtt->will.retain = will_Retain;
+  mqtt->will.topic = String(mqtt_topic) + g_gateway_name + OMG_MQTT_WILL_TOPIC;
+  mqtt->will.payload = OMG_MQTT_WILL_MESSAGE;
+  mqtt->will.qos = OMG_MQTT_WILL_QOS;
+  mqtt->will.retain = OMG_MQTT_WILL_RETAIN;
 #  endif
 
   mqtt->connected_callback = [] {
@@ -1080,7 +1080,7 @@ void setupMQTT() {
     gatewayState = GatewayState::BROKER_CONNECTED;
     failure_number_mqtt = 0;
     // Once connected, publish an announcement...
-    pub(will_Topic, Gateway_AnnouncementMsg, will_Retain);
+    pub(OMG_MQTT_WILL_TOPIC, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_RETAIN);
 
     if (cnt_parameters_backup) {
       // this was the first attempt to connect to a new server and it succeeded
@@ -3092,7 +3092,7 @@ void receivingDATA(const char* topicOri, const char* datacallback) {
 #if defined(OMG_GATEWAY_RTL_433) || defined(OMG_GATEWAY_PILIGHT) || defined(OMG_GATEWAY_RF) || defined(OMG_GATEWAY_RF2) || defined(OMG_ACTUATOR_SOMFY)
     XtoRFset(strTopicOri.c_str(), jsondata);
 #endif
-#if jsonReceiving
+#if OMG_MQTT_JSON_RECEIVING
 #  ifdef OMG_GATEWAY_LORA
     XtoLORA(strTopicOri.c_str(), jsondata);
 #  endif

@@ -106,7 +106,7 @@ void pubOneWire_HADiscovery() {
                       (char*)(String(OW_TOPIC) + "/" + ds1820_addr[index]).c_str(),
                       (char*)("DS12B20_" + String(index + 1) + "_c").c_str(),
                       (char*)(ds1820_addr[index] + "_c").c_str(),
-                      will_Topic,
+                      OMG_MQTT_WILL_TOPIC,
                       "temperature",
                       jsonTempc,
                       "", "", "°C",

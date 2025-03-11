@@ -78,7 +78,7 @@ void createDiscoveryFromList(const char* mac,
 
     createDiscovery(sensorList[i][0],
                     discovery_topic.c_str(), sensorList[i][1], unique_id.c_str(),
-                    will_Topic, sensorList[i][3], sensorList[i][4],
+                    OMG_MQTT_WILL_TOPIC, sensorList[i][3], sensorList[i][4],
                     sensorList[i][5], sensorList[i][6], sensorList[i][7],
                     0, "", "", false, "",
                     device_name, device_manufacturer, device_model, mac, false,
@@ -470,10 +470,10 @@ void eraseTopic(const char* sensor_type, const char* unique_id) {
 void btPresenceParametersDiscovery() {
   createDiscovery("number", //set Type
                   subjectBTtoMQTT, "BT: Presence/Tracker timeout", (char*)getUniqueId("presenceawaytimer", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.presenceawaytimer/60000 }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.presenceawaytimer/60000 }}", //set availability_topic,device_class,value_template,
                   "{\"presenceawaytimer\":{{value*60000}},\"save\":true}", "", "min", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain,
                   stateClassNone //State Class
   );
@@ -481,19 +481,19 @@ void btPresenceParametersDiscovery() {
 void btScanParametersDiscovery() {
   createDiscovery("number", //set Type
                   subjectBTtoMQTT, "BT: Interval between scans", (char*)getUniqueId("interval", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.interval/1000 }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.interval/1000 }}", //set availability_topic,device_class,value_template,
                   "{\"interval\":{{value*1000}},\"save\":true}", "", "s", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain,
                   stateClassNone //State Class
   );
   createDiscovery("number", //set Type
                   subjectBTtoMQTT, "BT: Interval between active scans", (char*)getUniqueId("intervalacts", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.intervalacts/1000 }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.intervalacts/1000 }}", //set availability_topic,device_class,value_template,
                   "{\"intervalacts\":{{value*1000}},\"save\":true}", "", "s", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain,
                   stateClassNone //State Class
   );
@@ -507,10 +507,10 @@ void pubMqttDiscovery() {
   String uptimeId = "uptime-" + String(OMG_SECONDARY_MODULE);
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTTSecondaryModule, uptimeName.c_str(), (char*)getUniqueId(uptimeId, "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "duration", "{{ value_json.uptime }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "duration", "{{ value_json.uptime }}", //set availability_topic,device_class,value_template,
                   "", "", "s", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassMeasurement //State Class
   );
@@ -518,77 +518,77 @@ void pubMqttDiscovery() {
   String freememId = "freemem-" + String(OMG_SECONDARY_MODULE);
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTTSecondaryModule, freememName.c_str(), (char*)getUniqueId(freememId, "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "data_size", "{{ value_json.freemem }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "data_size", "{{ value_json.freemem }}", //set availability_topic,device_class,value_template,
                   "", "", "B", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassMeasurement //State Class
   );
   String restartName = "SYS: Restart " + String(OMG_SECONDARY_MODULE);
   String restartId = "restart-" + String(OMG_SECONDARY_MODULE);
   createDiscovery("button", //set Type
-                  will_Topic, restartName.c_str(), (char*)getUniqueId(restartId, "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "restart", "", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, restartName.c_str(), (char*)getUniqueId(restartId, "").c_str(), //set state_topic,name,uniqueId
+                  OMG_MQTT_WILL_TOPIC, "restart", "", //set availability_topic,device_class,value_template,
                   "{\"cmd\":\"restart\"}", "", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoSYSsetSecondaryModule, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoSYSsetSecondaryModule, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
 #  endif
   createDiscovery("binary_sensor", //set Type
-                  will_Topic, "SYS: Connectivity", (char*)getUniqueId("connectivity", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "connectivity", "", //set availability_topic,device_class,value_template,
-                  Gateway_AnnouncementMsg, will_Message, "", //set,payload_on,payload_off,unit_of_meas,
+                  OMG_MQTT_WILL_TOPIC, "SYS: Connectivity", (char*)getUniqueId("connectivity", "").c_str(), //set state_topic,name,uniqueId
+                  OMG_MQTT_WILL_TOPIC, "connectivity", "", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTT, "SYS: Uptime", (char*)getUniqueId("uptime", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "duration", "{{ value_json.uptime }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "duration", "{{ value_json.uptime }}", //set availability_topic,device_class,value_template,
                   "", "", "s", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassMeasurement //State Class
   );
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTT, "SYS: Free memory", (char*)getUniqueId("freemem", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "data_size", "{{ value_json.freemem }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "data_size", "{{ value_json.freemem }}", //set availability_topic,device_class,value_template,
                   "", "", "B", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassMeasurement //State Class
   );
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTT, "SYS: IP", (char*)getUniqueId("ip", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.ip }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.ip }}", //set availability_topic,device_class,value_template,
                   "", "", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
   createDiscovery("switch", //set Type
                   subjectSYStoMQTT, "SYS: Auto discovery", (char*)getUniqueId("disc", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.disc }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.disc }}", //set availability_topic,device_class,value_template,
                   "{\"disc\":true,\"save\":true}", "{\"disc\":false,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoSYSset, //set,payload_avalaible,payload_not avalaible   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoSYSset, //set,payload_avalaible,payload_not avalaible   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain,
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
   );
   createDiscovery("switch", //set Type
                   subjectSYStoMQTT, "SYS: OpenHAB discovery", (char*)getUniqueId("ohdisc", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.ohdisc }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.ohdisc }}", //set availability_topic,device_class,value_template,
                   "{\"ohdisc\":true,\"save\":true}", "{\"ohdisc\":false,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoSYSset, //set,payload_avalaible,payload_not avalaible   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoSYSset, //set,payload_avalaible,payload_not avalaible   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain,
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
@@ -596,10 +596,10 @@ void pubMqttDiscovery() {
 #  ifdef LED_ADDRESSABLE
   createDiscovery("number", //set Type
                   subjectSYStoMQTT, "SYS: LED Brightness", (char*)getUniqueId("rgbb", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ (value_json.rgbb/2.55) | round(0) }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ (value_json.rgbb/2.55) | round(0) }}", //set availability_topic,device_class,value_template,
                   "{\"rgbb\":{{ (value*2.55) | round(0) }},\"save\":true}", "", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoSYSset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoSYSset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain,
                   stateClassNone //State Class
   );
@@ -608,30 +608,30 @@ void pubMqttDiscovery() {
 #  ifdef OMG_DISPLAY_SSD1306
   createDiscovery("switch", //set Type
                   subjectSSD1306toMQTT, "SSD1306: Control", (char*)getUniqueId("onstate", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.onstate }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.onstate }}", //set availability_topic,device_class,value_template,
                   "{\"onstate\":true,\"save\":true}", "{\"onstate\":false,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoSSD1306set, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoSSD1306set, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
   );
   createDiscovery("switch", //set Type
                   subjectWebUItoMQTT, "SSD1306: Display metric", (char*)getUniqueId("displayMetric", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.displayMetric }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.displayMetric }}", //set availability_topic,device_class,value_template,
                   "{\"displayMetric\":true,\"save\":true}", "{\"displayMetric\":false,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoWebUIset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoWebUIset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
   );
   createDiscovery("number", //set Type
                   subjectSSD1306toMQTT, "SSD1306: Brightness", (char*)getUniqueId("brightness", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.brightness }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.brightness }}", //set availability_topic,device_class,value_template,
                   "{\"brightness\":{{value}},\"save\":true}", "", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoSSD1306set, //set,payload_available,payload_not available,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoSSD1306set, //set,payload_available,payload_not available,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -640,10 +640,10 @@ void pubMqttDiscovery() {
 #  ifndef OMG_ESP32_ETHERNET
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTT, "SYS: RSSI", (char*)getUniqueId("rssi", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "signal_strength", "{{ value_json.rssi }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "signal_strength", "{{ value_json.rssi }}", //set availability_topic,device_class,value_template,
                   "", "", "dB", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -651,47 +651,47 @@ void pubMqttDiscovery() {
 #  if defined(ESP32) && !defined(NO_INT_TEMP_READING)
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTT, "SYS: Internal temperature", (char*)getUniqueId("tempc", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "temperature", "{{ value_json.tempc  | round(1)}}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "temperature", "{{ value_json.tempc  | round(1)}}", //set availability_topic,device_class,value_template,
                   "", "", "°C", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_avalaible,payload_not avalaible   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_avalaible,payload_not avalaible   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC
                   stateClassMeasurement //State Class
   );
 #    if defined(OMG_BOARD_M5STICKC) || defined(OMG_BOARD_M5STICKCP) || defined(OMG_BOARD_M5TOUGH)
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTT, "SYS: Bat voltage", (char*)getUniqueId("m5batvoltage", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "voltage", "{{ value_json.m5batvoltage }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "voltage", "{{ value_json.m5batvoltage }}", //set availability_topic,device_class,value_template,
                   "", "", "V", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTT, "SYS: Bat current", (char*)getUniqueId("m5batcurrent", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "current", "{{ value_json.m5batcurrent }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "current", "{{ value_json.m5batcurrent }}", //set availability_topic,device_class,value_template,
                   "", "", "A", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTT, "SYS: Vin voltage", (char*)getUniqueId("m5vinvoltage", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "voltage", "{{ value_json.m5vinvoltage }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "voltage", "{{ value_json.m5vinvoltage }}", //set availability_topic,device_class,value_template,
                   "", "", "V", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTT, "SYS: Vin current", (char*)getUniqueId("m5vincurrent", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "current", "{{ value_json.m5vincurrent }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "current", "{{ value_json.m5vincurrent }}", //set availability_topic,device_class,value_template,
                   "", "", "A", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -699,58 +699,58 @@ void pubMqttDiscovery() {
 #    ifdef OMG_BOARD_M5STACK
   createDiscovery("sensor", //set Type
                   subjectSYStoMQTT, "SYS: Batt level", (char*)getUniqueId("m5battlevel", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "battery", "{{ value_json.m5battlevel }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "battery", "{{ value_json.m5battlevel }}", //set availability_topic,device_class,value_template,
                   "", "", "%", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
   createDiscovery("binary_sensor", //set Type
                   subjectSYStoMQTT, "SYS: Is Charging", (char*)getUniqueId("m5ischarging", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "{{ value_json.m5ischarging }}", "", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "{{ value_json.m5ischarging }}", "", //set availability_topic,device_class,value_template,
                   "", "", "%", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
   createDiscovery("binary_sensor", //set Type
                   subjectSYStoMQTT, "SYS: Is Charge Full", (char*)getUniqueId("m5ischargefull", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "{{ value_json.m5ischargefull }}", "", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "{{ value_json.m5ischargefull }}", "", //set availability_topic,device_class,value_template,
                   "", "", "%", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set,payload_available,payload_not available   ,is a child device, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
 #    endif
 #  endif
   createDiscovery("button", //set Type
-                  will_Topic, "SYS: Restart gateway", (char*)getUniqueId("restart", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "restart", "", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "SYS: Restart gateway", (char*)getUniqueId("restart", "").c_str(), //set state_topic,name,uniqueId
+                  OMG_MQTT_WILL_TOPIC, "restart", "", //set availability_topic,device_class,value_template,
                   "{\"cmd\":\"restart\"}", "", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoSYSset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoSYSset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
   createDiscovery("button", //set Type
-                  will_Topic, "SYS: Erase credentials", (char*)getUniqueId("erase", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "SYS: Erase credentials", (char*)getUniqueId("erase", "").c_str(), //set state_topic,name,uniqueId
+                  OMG_MQTT_WILL_TOPIC, "", "", //set availability_topic,device_class,value_template,
                   "{\"cmd\":\"erase\"}", "", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoSYSset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoSYSset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
 #  if OMG_OTA_MQTT_HTTPS_FW_UPDATE
   createDiscovery("update", //set Type
                   subjectRLStoMQTT, "SYS: Firmware Update", (char*)getUniqueId("update", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "firmware", "", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "firmware", "", //set availability_topic,device_class,value_template,
                   LATEST_OR_DEV, "", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoSYSupdate, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoSYSupdate, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -771,9 +771,9 @@ void pubMqttDiscovery() {
   for (int i = 0; i < BMEparametersCount; i++) {
     createDiscovery(BMEsensor[i][0],
                     OMG_MQTT_BME_TOPIC, BMEsensor[i][1], (char*)getUniqueId(BMEsensor[i][1], BMEsensor[i][2]).c_str(),
-                    will_Topic, BMEsensor[i][3], BMEsensor[i][4],
+                    OMG_MQTT_WILL_TOPIC, BMEsensor[i][3], BMEsensor[i][4],
                     BMEsensor[i][5], BMEsensor[i][6], BMEsensor[i][7],
-                    0, Gateway_AnnouncementMsg, will_Message, true, "",
+                    0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                     "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                     stateClassNone //State Class
     );
@@ -793,9 +793,9 @@ void pubMqttDiscovery() {
     //trc(HTUsensor[i][1]);
     createDiscovery(HTUsensor[i][0],
                     HTUTOPIC, HTUsensor[i][1], (char*)getUniqueId(HTUsensor[i][1], HTUsensor[i][2]).c_str(),
-                    will_Topic, HTUsensor[i][3], HTUsensor[i][4],
+                    OMG_MQTT_WILL_TOPIC, HTUsensor[i][3], HTUsensor[i][4],
                     HTUsensor[i][5], HTUsensor[i][6], HTUsensor[i][7],
-                    0, Gateway_AnnouncementMsg, will_Message, true, "",
+                    0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                     "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                     stateClassMeasurement //State Class
     );
@@ -809,9 +809,9 @@ void pubMqttDiscovery() {
 
   createDiscovery(LM75sensor[0],
                   LM75TOPIC, LM75sensor[1], (char*)getUniqueId(LM75sensor[1], LM75sensor[2]).c_str(),
-                  will_Topic, LM75sensor[3], LM75sensor[4],
+                  OMG_MQTT_WILL_TOPIC, LM75sensor[3], LM75sensor[4],
                   LM75sensor[5], LM75sensor[6], LM75sensor[7],
-                  0, Gateway_AnnouncementMsg, will_Message, true, "",
+                  0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassMeasurement //State Class
   );
@@ -829,9 +829,9 @@ void pubMqttDiscovery() {
   for (int i = 0; i < AHTparametersCount; i++) {
     createDiscovery(AHTsensor[i][0],
                     AHTTOPIC, AHTsensor[i][1], (char*)getUniqueId(AHTsensor[i][1], AHTsensor[i][2]).c_str(),
-                    will_Topic, AHTsensor[i][3], AHTsensor[i][4],
+                    OMG_MQTT_WILL_TOPIC, AHTsensor[i][3], AHTsensor[i][4],
                     AHTsensor[i][5], AHTsensor[i][6], AHTsensor[i][7],
-                    0, Gateway_AnnouncementMsg, will_Message, true, "",
+                    0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                     "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                     stateClassMeasurement //State Class
     );
@@ -851,9 +851,9 @@ void pubMqttDiscovery() {
     //trc(DHTsensor[i][1]);
     createDiscovery(DHTsensor[i][0],
                     OMG_MQTT_DHT_TOPIC, DHTsensor[i][1], (char*)getUniqueId(DHTsensor[i][1], DHTsensor[i][2]).c_str(),
-                    will_Topic, DHTsensor[i][3], DHTsensor[i][4],
+                    OMG_MQTT_WILL_TOPIC, DHTsensor[i][3], DHTsensor[i][4],
                     DHTsensor[i][5], DHTsensor[i][6], DHTsensor[i][7],
-                    0, Gateway_AnnouncementMsg, will_Message, true, "",
+                    0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                     "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                     stateClassMeasurement //State Class
     );
@@ -868,9 +868,9 @@ void pubMqttDiscovery() {
   //trc(ADCsensor[1]);
   createDiscovery(ADCsensor[0],
                   ADCTOPIC, ADCsensor[1], (char*)getUniqueId(ADCsensor[1], ADCsensor[2]).c_str(),
-                  will_Topic, ADCsensor[3], ADCsensor[4],
+                  OMG_MQTT_WILL_TOPIC, ADCsensor[3], ADCsensor[4],
                   ADCsensor[5], ADCsensor[6], ADCsensor[7],
-                  0, Gateway_AnnouncementMsg, will_Message, true, "",
+                  0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -890,9 +890,9 @@ void pubMqttDiscovery() {
     //trc(BH1750sensor[i][1]);
     createDiscovery(BH1750sensor[i][0],
                     subjectBH1750toMQTT, BH1750sensor[i][1], (char*)getUniqueId(BH1750sensor[i][1], BH1750sensor[i][2]).c_str(),
-                    will_Topic, BH1750sensor[i][3], BH1750sensor[i][4],
+                    OMG_MQTT_WILL_TOPIC, BH1750sensor[i][3], BH1750sensor[i][4],
                     BH1750sensor[i][5], BH1750sensor[i][6], BH1750sensor[i][7],
-                    0, Gateway_AnnouncementMsg, will_Message, true, "",
+                    0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                     "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                     stateClassMeasurement //State Class
     );
@@ -911,9 +911,9 @@ void pubMqttDiscovery() {
   for (int i = 0; i < MQ2parametersCount; i++) {
     createDiscovery(MQ2sensor[i][0],
                     subjectMQ2toMQTT, MQ2sensor[i][1], (char*)getUniqueId(MQ2sensor[i][1], MQ2sensor[i][2]).c_str(),
-                    will_Topic, MQ2sensor[i][3], MQ2sensor[i][4],
+                    OMG_MQTT_WILL_TOPIC, MQ2sensor[i][3], MQ2sensor[i][4],
                     MQ2sensor[i][5], MQ2sensor[i][6], MQ2sensor[i][7],
-                    0, Gateway_AnnouncementMsg, will_Message, true, "",
+                    0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                     "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                     stateClassNone //State Class
     );
@@ -934,9 +934,9 @@ void pubMqttDiscovery() {
     //trc(TEMT6000sensor[i][1]);
     createDiscovery(TEMT6000sensor[i][0],
                     subjectTEMT6000toMQTT, TEMT6000sensor[i][1], (char*)getUniqueId(TEMT6000sensor[i][1], TEMT6000sensor[i][2]).c_str(),
-                    will_Topic, TEMT6000sensor[i][3], TEMT6000sensor[i][4],
+                    OMG_MQTT_WILL_TOPIC, TEMT6000sensor[i][3], TEMT6000sensor[i][4],
                     TEMT6000sensor[i][5], TEMT6000sensor[i][6], TEMT6000sensor[i][7],
-                    0, Gateway_AnnouncementMsg, will_Message, true, "",
+                    0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                     "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                     stateClassMeasurement //State Class
     );
@@ -957,9 +957,9 @@ void pubMqttDiscovery() {
     //trc(TSL2561sensor[i][1]);
     createDiscovery(TSL2561sensor[i][0],
                     subjectTSL12561toMQTT, TSL2561sensor[i][1], (char*)getUniqueId(TSL2561sensor[i][1], TSL2561sensor[i][2]).c_str(),
-                    will_Topic, TSL2561sensor[i][3], TSL2561sensor[i][4],
+                    OMG_MQTT_WILL_TOPIC, TSL2561sensor[i][3], TSL2561sensor[i][4],
                     TSL2561sensor[i][5], TSL2561sensor[i][6], TSL2561sensor[i][7],
-                    0, Gateway_AnnouncementMsg, will_Message, true, "",
+                    0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                     "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                     stateClassMeasurement //State Class
     );
@@ -974,9 +974,9 @@ void pubMqttDiscovery() {
   //trc(HCSR501sensor[1]);
   createDiscovery(HCSR501sensor[0],
                   subjectHCSR501toMQTT, HCSR501sensor[1], (char*)getUniqueId(HCSR501sensor[1], HCSR501sensor[2]).c_str(),
-                  will_Topic, HCSR501sensor[3], HCSR501sensor[4],
+                  OMG_MQTT_WILL_TOPIC, HCSR501sensor[3], HCSR501sensor[4],
                   HCSR501sensor[5], HCSR501sensor[6], HCSR501sensor[7],
-                  0, Gateway_AnnouncementMsg, will_Message, true, "",
+                  0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -990,9 +990,9 @@ void pubMqttDiscovery() {
   //trc(GPIOInputsensor[1]);
   createDiscovery(GPIOInputsensor[0],
                   subjectGPIOInputtoMQTT, GPIOInputsensor[1], (char*)getUniqueId(GPIOInputsensor[1], GPIOInputsensor[2]).c_str(),
-                  will_Topic, GPIOInputsensor[3], GPIOInputsensor[4],
+                  OMG_MQTT_WILL_TOPIC, GPIOInputsensor[3], GPIOInputsensor[4],
                   GPIOInputsensor[5], GPIOInputsensor[6], GPIOInputsensor[7],
-                  0, Gateway_AnnouncementMsg, will_Message, true, "",
+                  0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -1012,9 +1012,9 @@ void pubMqttDiscovery() {
     //trc(INA226sensor[i][1]);
     createDiscovery(INA226sensor[i][0],
                     subjectINA226toMQTT, INA226sensor[i][1], (char*)getUniqueId(INA226sensor[i][1], INA226sensor[i][2]).c_str(),
-                    will_Topic, INA226sensor[i][3], INA226sensor[i][4],
+                    OMG_MQTT_WILL_TOPIC, INA226sensor[i][3], INA226sensor[i][4],
                     INA226sensor[i][5], INA226sensor[i][6], INA226sensor[i][7],
-                    0, Gateway_AnnouncementMsg, will_Message, true, "",
+                    0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                     "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                     stateClassMeasurement //State Class
     );
@@ -1034,9 +1034,9 @@ void pubMqttDiscovery() {
   //trc(actuatorONOFF[1]);
   createDiscovery(actuatorONOFF[0],
                   subjectGTWONOFFtoMQTT, actuatorONOFF[1], (char*)getUniqueId(actuatorONOFF[1], actuatorONOFF[2]).c_str(),
-                  will_Topic, actuatorONOFF[3], actuatorONOFF[4],
+                  OMG_MQTT_WILL_TOPIC, actuatorONOFF[3], actuatorONOFF[4],
                   actuatorONOFF[5], actuatorONOFF[6], actuatorONOFF[7],
-                  0, Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoONOFF,
+                  0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoONOFF,
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone, //State Class
                   "0", "1" //state_off, state_on
@@ -1058,9 +1058,9 @@ void pubMqttDiscovery() {
     String name = "NRG: " + String(RN8209sensor[i][1]);
     createDiscovery(RN8209sensor[i][0],
                     subjectRN8209toMQTT, (char*)name.c_str(), (char*)getUniqueId(RN8209sensor[i][1], RN8209sensor[i][2]).c_str(), //set state_topic,name,uniqueId
-                    will_Topic, RN8209sensor[i][3], RN8209sensor[i][4], //set availability_topic,device_class,value_template,
+                    OMG_MQTT_WILL_TOPIC, RN8209sensor[i][3], RN8209sensor[i][4], //set availability_topic,device_class,value_template,
                     RN8209sensor[i][5], RN8209sensor[i][6], RN8209sensor[i][7], //set,payload_on,payload_off,unit_of_meas
-                    0, Gateway_AnnouncementMsg, will_Message, true, "", //set  off_delay,payload_available,payload_not available   ,is a gateway entity, command topic
+                    0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "", //set  off_delay,payload_available,payload_not available   ,is a gateway entity, command topic
                     "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                     stateClassMeasurement //State Class
     );
@@ -1076,9 +1076,9 @@ void pubMqttDiscovery() {
   //trc(gatewayRF[1]);
   createDiscovery(gatewayRF[0],
                   subjectRFtoMQTT, gatewayRF[1], (char*)getUniqueId(gatewayRF[1], gatewayRF[2]).c_str(),
-                  will_Topic, gatewayRF[3], gatewayRF[4],
+                  OMG_MQTT_WILL_TOPIC, gatewayRF[3], gatewayRF[4],
                   gatewayRF[5], gatewayRF[6], gatewayRF[7],
-                  0, Gateway_AnnouncementMsg, will_Message, true, "",
+                  0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -1094,9 +1094,9 @@ void pubMqttDiscovery() {
   //trc(gatewayRF2[1]);
   createDiscovery(gatewayRF2[0],
                   subjectRF2toMQTT, gatewayRF2[1], (char*)getUniqueId(gatewayRF2[1], gatewayRF2[2]).c_str(),
-                  will_Topic, gatewayRF2[3], gatewayRF2[4],
+                  OMG_MQTT_WILL_TOPIC, gatewayRF2[3], gatewayRF2[4],
                   gatewayRF2[5], gatewayRF2[6], gatewayRF2[7],
-                  0, Gateway_AnnouncementMsg, will_Message, true, "",
+                  0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -1111,9 +1111,9 @@ void pubMqttDiscovery() {
   //trc(gatewayRFM69[1]);
   createDiscovery(gatewayRFM69[0],
                   subjectRFM69toMQTT, gatewayRFM69[1], (char*)getUniqueId(gatewayRFM69[1], gatewayRFM69[2]).c_str(),
-                  will_Topic, gatewayRFM69[3], gatewayRFM69[4],
+                  OMG_MQTT_WILL_TOPIC, gatewayRFM69[3], gatewayRFM69[4],
                   gatewayRFM69[5], gatewayRFM69[6], gatewayRFM69[7],
-                  0, Gateway_AnnouncementMsg, will_Message, true, "",
+                  0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -1128,19 +1128,19 @@ void pubMqttDiscovery() {
   //trc(gatewayLORA[1]);
   createDiscovery(gatewayLORA[0],
                   subjectLORAtoMQTT, gatewayLORA[1], (char*)getUniqueId(gatewayLORA[1], gatewayLORA[2]).c_str(),
-                  will_Topic, gatewayLORA[3], gatewayLORA[4],
+                  OMG_MQTT_WILL_TOPIC, gatewayLORA[3], gatewayLORA[4],
                   gatewayLORA[5], gatewayLORA[6], gatewayLORA[7],
-                  0, Gateway_AnnouncementMsg, will_Message, true, "",
+                  0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
 
   createDiscovery("switch", //set Type
                   subjectLORAtoMQTT, "LORA: CRC", (char*)getUniqueId("enablecrc", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.enablecrc }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.enablecrc }}", //set availability_topic,device_class,value_template,
                   "{\"enablecrc\":true,\"save\":true}", "{\"enablecrc\":false,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoLORAset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoLORAset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
@@ -1148,10 +1148,10 @@ void pubMqttDiscovery() {
 
   createDiscovery("switch", //set Type
                   subjectLORAtoMQTT, "LORA: Invert IQ", (char*)getUniqueId("invertiq", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.invertiq }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.invertiq }}", //set availability_topic,device_class,value_template,
                   "{\"invertiq\":true,\"save\":true}", "{\"invertiq\":false,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoLORAset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoLORAset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
@@ -1159,10 +1159,10 @@ void pubMqttDiscovery() {
 
   createDiscovery("switch", //set Type
                   subjectLORAtoMQTT, "LORA: Only Known", (char*)getUniqueId("onlyknown", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.onlyknown }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.onlyknown }}", //set availability_topic,device_class,value_template,
                   "{\"onlyknown\":true,\"save\":true}", "{\"onlyknown\":false,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoLORAset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoLORAset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
@@ -1178,9 +1178,9 @@ void pubMqttDiscovery() {
   //trc(gatewaySRFB[1]);
   createDiscovery(gatewaySRFB[0],
                   subjectSRFBtoMQTT, gatewaySRFB[1], (char*)getUniqueId(gatewaySRFB[1], gatewaySRFB[2]).c_str(),
-                  will_Topic, gatewaySRFB[3], gatewaySRFB[4],
+                  OMG_MQTT_WILL_TOPIC, gatewaySRFB[3], gatewaySRFB[4],
                   gatewaySRFB[5], gatewaySRFB[6], gatewaySRFB[7],
-                  0, Gateway_AnnouncementMsg, will_Message, true, "",
+                  0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -1195,9 +1195,9 @@ void pubMqttDiscovery() {
   //trc(gatewayPilight[1]);
   createDiscovery(gatewayPilight[0],
                   subjectPilighttoMQTT, gatewayPilight[1], (char*)getUniqueId(gatewayPilight[1], gatewayPilight[2]).c_str(),
-                  will_Topic, gatewayPilight[3], gatewayPilight[4],
+                  OMG_MQTT_WILL_TOPIC, gatewayPilight[3], gatewayPilight[4],
                   gatewayPilight[5], gatewayPilight[6], gatewayPilight[7],
-                  0, Gateway_AnnouncementMsg, will_Message, true, "",
+                  0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -1212,9 +1212,9 @@ void pubMqttDiscovery() {
   //trc(gatewayIR[1]);
   createDiscovery(gatewayIR[0],
                   subjectIRtoMQTT, gatewayIR[1], (char*)getUniqueId(gatewayIR[1], gatewayIR[2]).c_str(),
-                  will_Topic, gatewayIR[3], gatewayIR[4],
+                  OMG_MQTT_WILL_TOPIC, gatewayIR[3], gatewayIR[4],
                   gatewayIR[5], gatewayIR[6], gatewayIR[7],
-                  0, Gateway_AnnouncementMsg, will_Message, true, "",
+                  0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -1229,9 +1229,9 @@ void pubMqttDiscovery() {
   //trc(gateway2G[1]);
   createDiscovery(gateway2G[0],
                   subject2GtoMQTT, gateway2G[1], (char*)getUniqueId(gateway2G[1], gateway2G[2]).c_str(),
-                  will_Topic, gateway2G[3], gateway2G[4],
+                  OMG_MQTT_WILL_TOPIC, gateway2G[3], gateway2G[4],
                   gateway2G[5], gateway2G[6], gateway2G[7],
-                  0, Gateway_AnnouncementMsg, will_Message, true, "",
+                  0, OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, "",
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
@@ -1242,66 +1242,66 @@ void pubMqttDiscovery() {
 
   createDiscovery("number", //set Type
                   subjectBTtoMQTT, "BT: Connect interval", (char*)getUniqueId("intervalcnct", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.intervalcnct/60000 }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.intervalcnct/60000 }}", //set availability_topic,device_class,value_template,
                   "{\"intervalcnct\":{{value*60000}},\"save\":true}", "", "min", //set,payload_on,payload_off,unit_of_meas,
                   0, //set off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoBTset, //set,payload_available,payload_not available,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoBTset, //set,payload_available,payload_not available,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
   createDiscovery("number", //set Type
                   subjectBTtoMQTT, "BT: Scan duration", (char*)getUniqueId("scanduration", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.scanduration/1000 }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.scanduration/1000 }}", //set availability_topic,device_class,value_template,
                   "{\"scanduration\":{{value*1000}},\"save\":true}", "", "s", //set,payload_on,payload_off,unit_of_meas,
                   0, //set off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoBTset, //set,payload_available,payload_not available,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoBTset, //set,payload_available,payload_not available,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
   createDiscovery("button", //set Type
-                  will_Topic, "BT: Force scan", (char*)getUniqueId("force_scan", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "BT: Force scan", (char*)getUniqueId("force_scan", "").c_str(), //set state_topic,name,uniqueId
+                  OMG_MQTT_WILL_TOPIC, "", "", //set availability_topic,device_class,value_template,
                   "{\"interval\":0}", "", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device ID, retain
                   stateClassNone //State Class
   );
   createDiscovery("button", //set Type
-                  will_Topic, "BT: Erase config", (char*)getUniqueId("erase_bt_config", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "BT: Erase config", (char*)getUniqueId("erase_bt_config", "").c_str(), //set state_topic,name,uniqueId
+                  OMG_MQTT_WILL_TOPIC, "", "", //set availability_topic,device_class,value_template,
                   "{\"erase\":true}", "", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain
                   stateClassNone //State Class
   );
   createDiscovery("switch", //set Type
                   subjectBTtoMQTT, "BT: Publish only sensors", (char*)getUniqueId("only_sensors", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.onlysensors }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.onlysensors }}", //set availability_topic,device_class,value_template,
                   "{\"onlysensors\":true,\"save\":true}", "{\"onlysensors\":false,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
   );
   createDiscovery("switch", //set Type
                   subjectBTtoMQTT, "BT: Adaptive scan", (char*)getUniqueId("adaptive_scan", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.adaptivescan }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.adaptivescan }}", //set availability_topic,device_class,value_template,
                   "{\"adaptivescan\":true,\"save\":true}", "{\"adaptivescan\":false,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
   );
   createDiscovery("switch", //set Type
                   subjectBTtoMQTT, "BT: Enabled", (char*)getUniqueId("enabled", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.enabled }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.enabled }}", //set availability_topic,device_class,value_template,
                   "{\"enabled\":true,\"save\":true}", "{\"enabled\":false,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
@@ -1332,30 +1332,30 @@ void pubMqttDiscovery() {
 
   createDiscovery("switch", //set Type
                   subjectBTtoMQTT, "BT: Publish HASS presence", (char*)getUniqueId("hasspresence", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.hasspresence }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.hasspresence }}", //set availability_topic,device_class,value_template,
                   "{\"hasspresence\":true,\"save\":true}", "{\"hasspresence\":false,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
   );
   createDiscovery("switch", //set Type
                   subjectBTtoMQTT, "BT: Publish Advertisement data", (char*)getUniqueId("pubadvdata", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.pubadvdata }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.pubadvdata }}", //set availability_topic,device_class,value_template,
                   "{\"pubadvdata\":true,\"save\":true}", "{\"pubadvdata\":false,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
   );
   createDiscovery("switch", //set Type
                   subjectBTtoMQTT, "BT: Connect to devices", (char*)getUniqueId("bleconnect", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.bleconnect }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.bleconnect }}", //set availability_topic,device_class,value_template,
                   "{\"bleconnect\":true,\"save\":true}", "{\"bleconnect\":false,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set  off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoBTset, //set,payload_available,payload_not available   ,is a gateway entity, command topic
                   "", "", "", "", false, // device name, device manufacturer, device model, device MAC, retain
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
@@ -1363,10 +1363,10 @@ void pubMqttDiscovery() {
 #      if DEFAULT_LOW_POWER_MODE != DEACTIVATED
   createDiscovery("switch", //set Type
                   subjectSYStoMQTT, "SYS: Low Power Mode command", (char*)getUniqueId("powermode", "").c_str(), //set state_topic,name,uniqueId
-                  will_Topic, "", "{{ value_json.powermode | bool }}", //set availability_topic,device_class,value_template,
+                  OMG_MQTT_WILL_TOPIC, "", "{{ value_json.powermode | bool }}", //set availability_topic,device_class,value_template,
                   "{\"powermode\":1,\"save\":true}", "{\"powermode\":0,\"save\":true}", "", //set,payload_on,payload_off,unit_of_meas,
                   0, //set off_delay
-                  Gateway_AnnouncementMsg, will_Message, true, subjectMQTTtoSYSset, //set,payload_available,payload_not available,is a gateway entity, command topic
+                  OMG_MQTT_GW_ANNOUNCEMENT_MESSAGE, OMG_MQTT_WILL_MESSAGE, true, subjectMQTTtoSYSset, //set,payload_available,payload_not available,is a gateway entity, command topic
                   "", "", "", "", true, // device name, device manufacturer, device model, device MAC, retain
                   stateClassNone, //State Class
                   "false", "true" //state_off, state_on
