@@ -1785,10 +1785,13 @@ void ESPRestart(enum RestartReason reason) {
   StaticJsonDocument<128> jsonBuffer;
   JsonObject jsondata = jsonBuffer.to<JsonObject>();
   jsondata["reason"] = reason;
-  jsondata["retain"] = true;
   jsondata["uptime"] = uptime();
-  jsondata["origin"] = subjectLOGtoMQTT;
-  pub(jsondata); // We go to MQTT bypassing the queue to ensure the message is sent
+
+  String rsn = "";
+  serializeJson(jsonBuffer, rsn);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, RW_MODE);
+  int result = preferences.putString("ESPRestart", rsn);
+  preferences.end();
 
   // Clean queue
   while (!jsonQueue.empty()) {
@@ -2519,6 +2522,7 @@ void loop() {
 #endif
 #ifdef ESP32
       publishDeviceInfo();
+      publishRestartReason();
 #endif
       ProcessLock = false;
       firstStart = false;
@@ -3838,5 +3842,119 @@ void publishDeviceInfo() {
   info["origin"] = subjectSYStoMQTT;
   info["retain"] = true;
   enqueueJsonObject(info);
+}
+
+void publishRestartReason() {
+  StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
+
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, RW_MODE);
+  if (preferences.isKey("ESPRestart")) {
+    deserializeJson(jsonBuffer, preferences.getString("ESPRestart", "{}"));
+    preferences.remove("ESPRestart");
+  } else {
+    deserializeJson(jsonBuffer, "{}");
+  }
+  preferences.end();
+
+  JsonObject rsn = jsonBuffer.as<JsonObject>();
+
+  if (rsn.containsKey("reason")) {
+    enum RestartReason reason = rsn["reason"].as<enum RestartReason>();
+    rsn.remove("reason");
+
+    switch (reason) {
+      case ERASE_AND_RESTART:
+        rsn["reason"] = "Erase and restart";
+        break;
+      case REPEATED_MQTT_CONNECTION_FAILURE:
+        rsn["reason"] = "Repeated MQTT connection failure";
+        break;
+      case REPEATED_WIFI_CONNECTION_FAILURE:
+        rsn["reason"] = "Repeated Wi-Fi connection failure";
+        break;
+      case FAILED_WIFIMANAGER_CONFIGURATION_PORTAL:
+        rsn["reason"] = "Failed WiFiManager configuration portal";
+        break;
+      case BLE_SCAN_WATCHDOG:
+        rsn["reason"] = "BLE scan watchdog";
+        break;
+      case USER_REQUESTED_REBOOT:
+        rsn["reason"] = "User requested reboot";
+        break;
+      case OTA_UPDATE:
+        rsn["reason"] = "OTA update";
+        break;
+      case PARAMETERS_CHANGED:
+        rsn["reason"] = "Parameters changed";
+        break;
+      case NOT_ENOUGH_MEMORY_TO_PURSUE:
+        rsn["reason"] = "Not enough memory to pursue";
+        break;
+      case SELFTEST_END:
+        rsn["reason"] = "SELFTEST end";
+        break;
+      case FAILED_OTA_UPDATE:
+        rsn["reason"] = "Failed OTA update";
+        break;
+    }
+  } else {
+    switch (esp_reset_reason()) {
+      case ESP_RST_POWERON:
+        rsn["reason"] = "Reset due to power-on event";
+        break;
+      case ESP_RST_EXT:
+        rsn["reason"] = "Reset by external pin";
+        break;
+      case ESP_RST_SW:
+        rsn["reason"] = "Software reset via esp_restart";
+        break;
+      case ESP_RST_PANIC:
+        rsn["reason"] = "Software reset due to exception/panic";
+        break;
+      case ESP_RST_INT_WDT:
+        rsn["reason"] = "Reset (software or hardware) due to interrupt watchdog";
+        break;
+      case ESP_RST_TASK_WDT:
+        rsn["reason"] = "Reset due to task watchdog";
+        break;
+      case ESP_RST_WDT:
+        rsn["reason"] = "Reset due to other watchdogs";
+        break;
+      case ESP_RST_DEEPSLEEP:
+        rsn["reason"] = "Reset after exiting deep sleep mode";
+        break;
+      case ESP_RST_BROWNOUT:
+        rsn["reason"] = "Brownout reset (software or hardware)";
+        break;
+      case ESP_RST_SDIO:
+        rsn["reason"] = "Reset over SDIO";
+        break;
+#ifdef ESP32
+#  if (ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 4))
+      case ESP_RST_USB:
+        rsn["reason"] = "Reset by USB peripheral";
+        break;
+      case ESP_RST_JTAG:
+        rsn["reason"] = "Reset by JTAG";
+        break;
+      case ESP_RST_EFUSE:
+        rsn["reason"] = "Reset due to efuse error";
+        break;
+      case ESP_RST_PWR_GLITCH:
+        rsn["reason"] = "Reset due to power glitch detected";
+        break;
+      case ESP_RST_CPU_LOCKUP:
+        rsn["reason"] = "Reset due to CPU lock up (double exception)";
+        break;
+#  endif        // ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 4)
+#endif
+      default:
+        rsn["reason"] = "Unknown reset reason";
+    }
+  }
+
+  rsn["retain"] = true;
+  rsn["origin"] = subjectLOGtoMQTT;
+  enqueueJsonObject(rsn);
 }
 #endif
