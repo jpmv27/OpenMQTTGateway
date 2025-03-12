@@ -80,7 +80,7 @@ void checkSerial() {
         }
         Logger.notice(OMG_LOGID, F("SELFTEST Finished"));
         // Restart
-        ESPRestart(9);
+        ESPRestart(SELFTEST_END);
       }
     }
   }

@@ -428,7 +428,7 @@ void handleRoot() {
 
       delay(2000); // Wait for web page to be sent before
 
-      ESPRestart(5);
+      ESPRestart(USER_REQUESTED_REBOOT);
     } else {
       // WEBUI_TRACE_LOG(F("Arguments %s"), message);
       server.send(200, "text/plain", "00:14:36.767 RSL: RESULT = {\"Topic\":\"topic\"}");

@@ -1033,7 +1033,7 @@ void setupMQTT() {
 #  endif
 
       cnt_parameters_backup.reset();
-      ESPRestart(7);
+      ESPRestart(PARAMETERS_CHANGED);
     }
     handle_autodiscovery();
   };
@@ -1066,7 +1066,7 @@ void setupMQTT() {
       cnt_index = cnt_parameters_backup->cnt_index;
       mqttSetupPending = true;
       cnt_parameters_backup.reset();
-      ESPRestart(7);
+      ESPRestart(PARAMETERS_CHANGED);
       return;
     }
 
@@ -1104,7 +1104,7 @@ void setupMQTT() {
         delay(100);
       }
 #endif
-      ESPRestart(1);
+      ESPRestart(REPEATED_MQTT_CONNECTION_FAILURE);
     }
   };
 
@@ -1674,7 +1674,7 @@ void setOTA() {
     Logger.debug(OMG_LOGID, F("\nOTA done"));
     last_ota_activity_millis = 0;
     lpDisplayPrint("OTA done");
-    ESPRestart(6);
+    ESPRestart(OTA_UPDATE);
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
     Logger.debug(OMG_LOGID, F("Progress: %u%%\r"), (progress / (total / 100)));
@@ -1695,7 +1695,7 @@ void setOTA() {
       Logger.error(OMG_LOGID, F("Receive Failed"));
     else if (error == OTA_END_ERROR)
       Logger.error(OMG_LOGID, F("End Failed"));
-    ESPRestart(6);
+    ESPRestart(FAILED_OTA_UPDATE);
   });
   ArduinoOTA.begin();
 }
@@ -1773,18 +1773,8 @@ void setupTLS(int index) {
 
 /*
   Reboot for Reason Codes
-  0 - Erase and Restart
-  1 - Repeated MQTT Connection Failure
-  2 - Repeated WiFi Connection Failure
-  3 - Failed WiFiManager configuration portal
-  4 - BLE Scan watchdog
-  5 - User requested reboot
-  6 - OTA Update
-  7 - Parameters changed
-  8 - not enough memory to pursue
-  9 - SELFTEST end
 */
-void ESPRestart(byte reason) {
+void ESPRestart(enum RestartReason reason) {
 #ifdef OMG_SECONDARY_MODULE
   // Erase the secondary module config
   String restartCmdStr = "{\"cmd\":\"" + String(restartCmd) + "\"}";
@@ -1854,12 +1844,12 @@ void setupWiFiFromBuild() {
       }
     } else {
       if (failure_number_ntwk > maxRetryWatchDog) {
-        ESPRestart(2);
+        ESPRestart(REPEATED_WIFI_CONNECTION_FAILURE);
       }
     }
 #  else
     if (failure_number_ntwk > maxRetryWatchDog) {
-      ESPRestart(2);
+      ESPRestart(REPEATED_WIFI_CONNECTION_FAILURE);
     }
 #  endif
   }
@@ -2334,7 +2324,7 @@ void setupWiFiManager() {
 #  ifdef DEEP_SLEEP_IN_US
         sleep();
 #  endif
-        ESPRestart(3);
+        ESPRestart(FAILED_WIFIMANAGER_CONFIGURATION_PORTAL);
       }
     }
   }
@@ -2798,7 +2788,7 @@ void erase(bool restart) {
   nvs_flash_erase();
 #endif
   if (restart)
-    ESPRestart(0);
+    ESPRestart(ERASE_AND_RESTART);
 }
 
 String stateMeasures() {
@@ -2834,7 +2824,7 @@ String stateMeasures() {
   if (freeMem < MinimumMemory) {
     Logger.error(OMG_LOGID, F("Not enough memory %d, restarting"), freeMem);
     gatewayState = GatewayState::ERROR;
-    ESPRestart(8);
+    ESPRestart(NOT_ENOUGH_MEMORY_TO_PURSUE);
   }
 #endif
   SYSdata["freemem"] = freeMem;
@@ -3454,11 +3444,11 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
 #  ifndef OMG_ESP_WIFI_MANUAL_SETUP
           saveConfig();
 #  endif
-          ESPRestart(6);
+          ESPRestart(OTA_UPDATE);
           break;
       }
 
-      ESPRestart(6);
+      ESPRestart(FAILED_OTA_UPDATE);
     }
   }
 }
@@ -3509,7 +3499,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       const char* cmd = SYSdata["cmd"];
       Logger.notice(OMG_LOGID, F("Command: %s"), cmd);
       if (strstr(cmd, restartCmd) != NULL) { //restart
-        ESPRestart(5);
+        ESPRestart(USER_REQUESTED_REBOOT);
       } else if (strstr(cmd, eraseCmd) != NULL) { //erase and restart
         erase(true);
       } else if (strstr(cmd, statusCmd) != NULL) {
@@ -3781,7 +3771,7 @@ void XtoSYS(const char* topicOri, JsonObject& SYSdata) { // json object decoding
       stateMeasures();
     }
     if (restartESP) {
-      ESPRestart(7);
+      ESPRestart(PARAMETERS_CHANGED);
     }
   }
 }

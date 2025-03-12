@@ -761,6 +761,20 @@ enum PowerMode { DEACTIVATED = -1,
                  INTERVAL,
                  ACTION };
 
+enum RestartReason {
+  ERASE_AND_RESTART = 0,
+  REPEATED_MQTT_CONNECTION_FAILURE = 1,
+  REPEATED_WIFI_CONNECTION_FAILURE = 2,
+  FAILED_WIFIMANAGER_CONFIGURATION_PORTAL = 3,
+  BLE_SCAN_WATCHDOG = 4,
+  USER_REQUESTED_REBOOT = 5,
+  OTA_UPDATE = 6,
+  PARAMETERS_CHANGED = 7,
+  NOT_ENOUGH_MEMORY_TO_PURSUE = 8,
+  SELFTEST_END = 9,
+  FAILED_OTA_UPDATE = 10,
+};
+
 /*--------------------Check for time hogs--------------------*/
 #ifndef OMG_LOOP_TIME_LIMIT
 #  define OMG_LOOP_TIME_LIMIT 100
