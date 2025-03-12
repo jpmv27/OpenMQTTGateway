@@ -374,9 +374,17 @@ extern int getRTLPulseTrainsOverruns() {
   return ret;
 }
 
+extern void resetRTLPulseTrainsOverruns() {
+  rtl_433.pulseTrainsOverruns = 0 ;
+}
+
 extern int getRTLDecoderQueueOverflows() {
   int ret = rtl_433.decoderQueueOverflows;
   return ret;
+}
+
+extern void resetRTLDecoderQueueOverflows() {
+  rtl_433.decoderQueueOverflows = 0;
 }
 
 #  ifdef OMG_RADIO_SX127X

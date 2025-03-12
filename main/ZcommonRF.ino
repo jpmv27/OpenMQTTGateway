@@ -184,7 +184,9 @@ String stateRFMeasures() {
     RFdata["averageRssi"] = (int)getRTLAverageRSSI();
     RFdata["messageCount"] = (int)getRTLMessageCount();
     RFdata["pulseTrainsOverruns"] = (int)getRTLPulseTrainsOverruns();
+    resetRTLPulseTrainsOverruns();
     RFdata["decoderQueueOverflows"] = (int)getRTLDecoderQueueOverflows();
+    resetRTLDecoderQueueOverflows();
     // Capture high water mark of rtl_433_Decoder stack since it can run out and trigger reboot
     extern TaskHandle_t rtl_433_DecoderHandle;
     RFdata["Receiver_HWM"] = (int)uxTaskGetStackHighWaterMark(rtl_433.rtl_433_ReceiverHandle);
