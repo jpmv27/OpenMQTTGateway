@@ -60,8 +60,6 @@ unsigned long timebme280 = 0;
 #  define OMG_BME280_I2C_ADDRESS 0x76
 #endif
 
-int BME280_i2c_addr = OMG_BME280_I2C_ADDRESS; // Bosch BME280 I2C Address
-
 // Only supported for ESP
 #ifndef OMG_BME280_PIN_SDA
 #  define OMG_BME280_PIN_SDA SDA

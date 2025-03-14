@@ -47,14 +47,15 @@
 
 //Global sensor object
 BME280 mySensor;
+bool initialized = false; // Sensor successfully initialized?
 
 void setupZsensorBME280() {
   // Allow custom pins on ESP Platforms
   Wire.begin(OMG_BME280_PIN_SDA, OMG_BME280_PIN_SCL);
 
   mySensor.settings.commInterface = I2C_MODE;
-  mySensor.settings.I2CAddress = BME280_i2c_addr;
-  Logger.notice(OMG_LOGID, F("Setup BME280/BMP280 on address: %X"), BME280_i2c_addr);
+  mySensor.settings.I2CAddress = OMG_BME280_I2C_ADDRESS;
+  Logger.notice(OMG_LOGID, F("Setup BME280/BMP280 on address: 0x%02X"), OMG_BME280_I2C_ADDRESS);
   //***Operation settings*****************************//
 
   // runMode Setting - Values:
@@ -113,11 +114,13 @@ void setupZsensorBME280() {
 
   int ret = mySensor.begin();
   if (ret == 0x60) {
-    Logger.notice(OMG_LOGID, F("Bosch BME280 successfully initialized: %X"), ret);
+    Logger.notice(OMG_LOGID, F("Bosch BME280 successfully initialized: 0x%02X"), ret);
+    initialized = true;
   } else if (ret == 0x58) {
-    Logger.notice(OMG_LOGID, F("Bosch BMP280 successfully initialized: %X"), ret);
+    Logger.notice(OMG_LOGID, F("Bosch BMP280 successfully initialized: 0x%02X"), ret);
+    initialized = true;
   } else {
-    Logger.notice(OMG_LOGID, F("Bosch BME280/BMP280 failed: %X"), ret);
+    Logger.error(OMG_LOGID, F("Bosch BME280/BMP280 (address 0x%02X) initialization failed: 0x%02X"), OMG_BME280_I2C_ADDRESS, ret);
   }
 }
 
@@ -133,6 +136,11 @@ void MeasureTempHumAndPressure() {
     static float persisted_bme_altift;
 #endif
 
+    if (!initialized) {
+      Logger.notice(OMG_LOGID, F("BME280/BMP280 not initialized, skip reading"));
+      return;
+    }
+
     float BmeTempC = mySensor.readTempC();
     float BmeHum = mySensor.readFloatHumidity();
     float BmePa = mySensor.readFloatPressure();
@@ -142,65 +150,56 @@ void MeasureTempHumAndPressure() {
     float BmeTempF = mySensor.readTempF();
 #endif
 
-    // Check if reads failed and exit early (to try again).
-    if (isnan(BmeTempC) || isnan(BmeHum) || isnan(BmePa) || isnan(BmeAltiM)
-#if !OMG_BME280_METRIC_UNITS_ONLY
-        || isnan(BmeTempF) || isnan(BmeAltiFt)
-#endif
-        ) {
-      Logger.error(OMG_LOGID, F("Failed to read from BME280/BMP280!"));
+    Logger.debug(OMG_LOGID, F("Creating BME280/BMP280 buffer"));
+    StaticJsonDocument<JSON_MSG_BUFFER> BME280dataBuffer;
+    JsonObject BME280data = BME280dataBuffer.to<JsonObject>();
+    // Generate Temperature in degrees C
+    if (BmeTempC != persisted_bme_tempc || OMG_BME280_ALWAYS_SEND) {
+      BME280data["temperature_c"] = (float)BmeTempC;
     } else {
-      Logger.debug(OMG_LOGID, F("Creating BME280/BMP280 buffer"));
-      StaticJsonDocument<JSON_MSG_BUFFER> BME280dataBuffer;
-      JsonObject BME280data = BME280dataBuffer.to<JsonObject>();
-      // Generate Temperature in degrees C
-      if (BmeTempC != persisted_bme_tempc || OMG_BME280_ALWAYS_SEND) {
-        BME280data["temperature_c"] = (float)BmeTempC;
-      } else {
-        Logger.debug(OMG_LOGID, F("Same Degrees C don't send it"));
-      }
+      Logger.debug(OMG_LOGID, F("Same Degrees C don't send it"));
+    }
 
-      // Generate Humidity in percent
-      if (BmeHum != persisted_bme_hum || OMG_BME280_ALWAYS_SEND) {
-        BME280data["humidity_pct"] = (float)BmeHum;
-      } else {
-        Logger.debug(OMG_LOGID, F("Same Humidity don't send it"));
-      }
+    // Generate Humidity in percent
+    if (BmeHum != persisted_bme_hum || OMG_BME280_ALWAYS_SEND) {
+      BME280data["humidity_pct"] = (float)BmeHum;
+    } else {
+      Logger.debug(OMG_LOGID, F("Same Humidity don't send it"));
+    }
 
-      // Generate Pressure in Pa
-      if (BmePa != persisted_bme_pa || OMG_BME280_ALWAYS_SEND) {
-        BME280data["pressure_pa"] = (float)BmePa;
-      } else {
-        Logger.debug(OMG_LOGID, F("Same Pressure don't send it"));
-      }
+    // Generate Pressure in Pa
+    if (BmePa != persisted_bme_pa || OMG_BME280_ALWAYS_SEND) {
+      BME280data["pressure_pa"] = (float)BmePa;
+    } else {
+      Logger.debug(OMG_LOGID, F("Same Pressure don't send it"));
+    }
 
-      // Generate Altitude in Meter
-      if (BmeAltiM != persisted_bme_altim || OMG_BME280_ALWAYS_SEND) {
-        Logger.debug(OMG_LOGID, F("Sending Altitude Meter to MQTT"));
-        BME280data["altitude_m"] = (float)BmeAltiM;
-      } else {
-        Logger.debug(OMG_LOGID, F("Same Altitude Meter don't send it"));
-      }
+    // Generate Altitude in Meter
+    if (BmeAltiM != persisted_bme_altim || OMG_BME280_ALWAYS_SEND) {
+      Logger.debug(OMG_LOGID, F("Sending Altitude Meter to MQTT"));
+      BME280data["altitude_m"] = (float)BmeAltiM;
+    } else {
+      Logger.debug(OMG_LOGID, F("Same Altitude Meter don't send it"));
+    }
 
 #if !OMG_BME280_METRIC_UNITS_ONLY
-      // Generate Temperature in degrees F
-      if (BmeTempF != persisted_bme_tempf || OMG_BME280_ALWAYS_SEND) {
-        BME280data["temperature_f"] = (float)BmeTempF;
-      } else {
-        Logger.debug(OMG_LOGID, F("Same Degrees F don't send it"));
-      }
+    // Generate Temperature in degrees F
+    if (BmeTempF != persisted_bme_tempf || OMG_BME280_ALWAYS_SEND) {
+      BME280data["temperature_f"] = (float)BmeTempF;
+    } else {
+      Logger.debug(OMG_LOGID, F("Same Degrees F don't send it"));
+    }
 
-      // Generate Altitude in Feet
-      if (BmeAltiFt != persisted_bme_altift || OMG_BME280_ALWAYS_SEND) {
-        BME280data["altitude_ft"] = (float)BmeAltiFt;
-      } else {
-        Logger.debug(OMG_LOGID, F("Same Altitude Feet don't send it"));
-      }
+    // Generate Altitude in Feet
+    if (BmeAltiFt != persisted_bme_altift || OMG_BME280_ALWAYS_SEND) {
+      BME280data["altitude_ft"] = (float)BmeAltiFt;
+    } else {
+      Logger.debug(OMG_LOGID, F("Same Altitude Feet don't send it"));
+    }
 #endif
 
-      BME280data["origin"] = OMG_MQTT_BME_TOPIC;
-      enqueueJsonObject(BME280data);
-    }
+    BME280data["origin"] = OMG_MQTT_BME_TOPIC;
+    enqueueJsonObject(BME280data);
 
     persisted_bme_tempc = BmeTempC;
     persisted_bme_hum = BmeHum;
