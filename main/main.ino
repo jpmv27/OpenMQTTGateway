@@ -1838,7 +1838,6 @@ void setupWiFiFromBuild() {
 #  endif
 
   while (wifiMulti.run() != WL_CONNECTED) {
-    delay(500);
     Logger.debug(OMG_LOGID, F("."));
     failure_number_ntwk++;
 #  if defined(ESP32) && defined(OMG_GATEWAY_BT)
@@ -1856,6 +1855,7 @@ void setupWiFiFromBuild() {
       ESPRestart(REPEATED_WIFI_CONNECTION_FAILURE);
     }
 #  endif
+    delay(1500);
   }
   Logger.notice(OMG_LOGID, F("WiFi ok with manual config credentials"));
   displayPrint("Wifi connected");
