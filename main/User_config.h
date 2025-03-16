@@ -738,6 +738,9 @@ bool pub(const char*, const char*);
 #if defined(ESP32)
 #  include <Preferences.h>
 Preferences preferences;
+
+#define RW_MODE false
+#define RO_MODE true
 #endif
 
 unsigned long lastDiscovery = 0; // Time of the last discovery to trigger automaticaly to off after OMG_MQTT_DISCOVERY_AUTO_OFF_TIMER

@@ -245,7 +245,7 @@ void BTConfig_fromJson(JsonObject& BTdata, bool startup = false) {
 
   if (BTdata.containsKey("erase") && BTdata["erase"].as<bool>()) {
     // Erase config from NVS (non-volatile storage)
-    preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
+    preferences.begin(OMG_GATEWAY_SHORT_NAME, RW_MODE);
     if (preferences.isKey("BTConfig")) {
       int result = preferences.remove("BTConfig");
       Logger.notice(OMG_LOGID, F("BT config erase result: %d"), result);
@@ -285,7 +285,7 @@ void BTConfig_fromJson(JsonObject& BTdata, bool startup = false) {
     // Save config into NVS (non-volatile storage)
     String conf = "";
     serializeJson(jsonBuffer, conf);
-    preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
+    preferences.begin(OMG_GATEWAY_SHORT_NAME, RW_MODE);
     int result = preferences.putString("BTConfig", conf);
     preferences.end();
     Logger.notice(OMG_LOGID, F("BT config save: %s, result: %d"), conf.c_str(), result);
@@ -294,7 +294,7 @@ void BTConfig_fromJson(JsonObject& BTdata, bool startup = false) {
 
 void BTConfig_load() {
   StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
-  preferences.begin(OMG_GATEWAY_SHORT_NAME, true);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, RO_MODE);
   if (preferences.isKey("BTConfig")) {
     auto error = deserializeJson(jsonBuffer, preferences.getString("BTConfig", "{}"));
     preferences.end();

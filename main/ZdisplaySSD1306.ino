@@ -214,7 +214,7 @@ void XtoSSD1306(const char* topicOri, JsonObject& SSD1306data) { // json object 
       }
     } else if (SSD1306data.containsKey("erase") && SSD1306data["erase"]) {
       // Erase config from NVS (non-volatile storage)
-      preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
+      preferences.begin(OMG_GATEWAY_SHORT_NAME, RW_MODE);
       if (preferences.isKey("SSD1306Config")) {
         success = preferences.remove("SSD1306Config");
       }
@@ -243,7 +243,7 @@ void SSD1306Config_save() {
   // Save config into NVS (non-volatile storage)
   String conf = "";
   serializeJson(jsonBuffer, conf);
-  preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, RW_MODE);
   int result = preferences.putString("SSD1306Config", conf);
   preferences.end();
   Logger.notice(OMG_LOGID, F("SSD1306 Config_save: %s, result: %d"), conf.c_str(), result);
@@ -261,7 +261,7 @@ void SSD1306Config_init() {
 
 bool SSD1306Config_load() {
   StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
-  preferences.begin(OMG_GATEWAY_SHORT_NAME, true);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, RO_MODE);
   if (preferences.isKey("SSD1306Config")) {
     auto error = deserializeJson(jsonBuffer, preferences.getString("SSD1306Config", "{}"));
     preferences.end();

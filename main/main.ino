@@ -834,7 +834,7 @@ void SYSConfig_save() {
 #  endif
   String conf = "";
   serializeJson(jsonBuffer, conf);
-  preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, RW_MODE);
   int result = preferences.putString("SYSConfig", conf);
   preferences.end();
   Logger.notice(OMG_LOGID, F("SYS Config_save: %s, result: %d"), conf.c_str(), result);
@@ -864,7 +864,7 @@ bool cmpToMainTopic(const char* topicOri, const char* toAdd) {
 #if defined(ESP32)
 void SYSConfig_load() {
   StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
-  preferences.begin(OMG_GATEWAY_SHORT_NAME, true);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, RO_MODE);
   if (preferences.isKey("SYSConfig")) {
     auto error = deserializeJson(jsonBuffer, preferences.getString("SYSConfig", "{}"));
     preferences.end();
@@ -1789,6 +1789,7 @@ void ESPRestart(enum RestartReason reason) {
   jsondata["uptime"] = uptime();
   jsondata["origin"] = subjectLOGtoMQTT;
   pub(jsondata); // We go to MQTT bypassing the queue to ensure the message is sent
+
   // Clean queue
   while (!jsonQueue.empty()) {
     jsonQueue.pop();

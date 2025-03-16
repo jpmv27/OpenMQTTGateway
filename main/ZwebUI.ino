@@ -1809,7 +1809,7 @@ void XtoWebUI(const char* topicOri, JsonObject& WebUIdata) { // json object deco
       }
     } else if (WebUIdata.containsKey("erase") && WebUIdata["erase"]) {
       // Erase config from NVS (non-volatile storage)
-      preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
+      preferences.begin(OMG_GATEWAY_SHORT_NAME, RW_MODE);
       success = preferences.remove("WebUIConfig");
       preferences.end();
       if (success) {
@@ -1849,7 +1849,7 @@ bool WebUIConfig_save() {
   // Save config into NVS (non-volatile storage)
   String conf = "";
   serializeJson(jsonBuffer, conf);
-  preferences.begin(OMG_GATEWAY_SHORT_NAME, false);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, RW_MODE);
   int result = preferences.putString("WebUIConfig", conf);
   preferences.end();
   Logger.debug(OMG_LOGID, F("[WebUI] WebUIConfig_save: %s, result: %d"), conf.c_str(), result);
@@ -1864,7 +1864,7 @@ void WebUIConfig_init() {
 
 bool WebUIConfig_load() {
   StaticJsonDocument<JSON_MSG_BUFFER> jsonBuffer;
-  preferences.begin(OMG_GATEWAY_SHORT_NAME, true);
+  preferences.begin(OMG_GATEWAY_SHORT_NAME, RO_MODE);
   if (preferences.isKey("WebUIConfig")) {
     auto error = deserializeJson(jsonBuffer, preferences.getString("WebUIConfig", "{}"));
     preferences.end();
