@@ -776,6 +776,7 @@ enum RestartReason {
   NOT_ENOUGH_MEMORY_TO_PURSUE = 8,
   SELFTEST_END = 9,
   FAILED_OTA_UPDATE = 10,
+  OTA_UPDATE_NO_UPDATE = 11,
 };
 
 /*--------------------Check for time hogs--------------------*/

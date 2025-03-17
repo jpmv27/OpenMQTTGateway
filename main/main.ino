@@ -1671,30 +1671,39 @@ void setOTA() {
     lpDisplayPrint("OTA in progress");
   });
   ArduinoOTA.onEnd([]() {
-    Logger.debug(OMG_LOGID, F("\nOTA done"));
+    Logger.debug(OMG_LOGID, F("OTA done"));
     last_ota_activity_millis = 0;
     lpDisplayPrint("OTA done");
     ESPRestart(OTA_UPDATE);
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Logger.debug(OMG_LOGID, F("Progress: %u%%\r"), (progress / (total / 100)));
+    Logger.debug(OMG_LOGID, F("OTA progress: %u%%"), (progress / (total / 100)));
     gatewayState = GatewayState::LOCAL_OTA_IN_PROGRESS;
     last_ota_activity_millis = millis();
   });
   ArduinoOTA.onError([](ota_error_t error) {
     last_ota_activity_millis = millis();
-    Serial.printf("Error[%u]: ", error);
     gatewayState = GatewayState::ERROR;
-    if (error == OTA_AUTH_ERROR)
-      Logger.error(OMG_LOGID, F("Auth Failed"));
-    else if (error == OTA_BEGIN_ERROR)
-      Logger.error(OMG_LOGID, F("Begin Failed"));
-    else if (error == OTA_CONNECT_ERROR)
-      Logger.error(OMG_LOGID, F("Connect Failed"));
-    else if (error == OTA_RECEIVE_ERROR)
-      Logger.error(OMG_LOGID, F("Receive Failed"));
-    else if (error == OTA_END_ERROR)
-      Logger.error(OMG_LOGID, F("End Failed"));
+    switch (error) {
+      case OTA_AUTH_ERROR:
+        Logger.error(OMG_LOGID, F("OTA failed: Auth Failed"));
+        break;
+      case OTA_BEGIN_ERROR:
+        Logger.error(OMG_LOGID, F("OTA failed: Begin Failed"));
+        break;
+      case OTA_CONNECT_ERROR:
+        Logger.error(OMG_LOGID, F("OTA failed: Connect Failed"));
+        break;
+      case OTA_RECEIVE_ERROR:
+        Logger.error(OMG_LOGID, F("OTA failed: Receive Failed"));
+        break;
+      case OTA_END_ERROR:
+        Logger.error(OMG_LOGID, F("OTA failed: End Failed"));
+        break;
+      default:
+        Logger.error(OMG_LOGID, F("OTA failed: error=%u"), error);
+        break;
+    }
     ESPRestart(FAILED_OTA_UPDATE);
   });
   ArduinoOTA.begin();
@@ -1784,8 +1793,7 @@ void ESPRestart(enum RestartReason reason) {
 #endif
   StaticJsonDocument<128> jsonBuffer;
   JsonObject jsondata = jsonBuffer.to<JsonObject>();
-  jsondata["reason"] = reason;
-  jsondata["uptime"] = uptime();
+  jsondata["rawreason"] = reason;
 
   String rsn = "";
   serializeJson(jsonBuffer, rsn);
@@ -3430,10 +3438,12 @@ void MQTTHttpsFWUpdate(const char* topicOri, JsonObject& HttpsFwUpdateData) {
           Logger.error(OMG_LOGID, F("HTTP_UPDATE_FAILED Error (%d): %s\n"), ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
 #  endif
           gatewayState = GatewayState::ERROR;
+          ESPRestart(FAILED_OTA_UPDATE);
           break;
 
         case HTTP_UPDATE_NO_UPDATES:
           Logger.notice(OMG_LOGID, F("HTTP_UPDATE_NO_UPDATES"));
+          ESPRestart(OTA_UPDATE_NO_UPDATE);
           break;
 
         case HTTP_UPDATE_OK:
@@ -3858,9 +3868,8 @@ void publishRestartReason() {
 
   JsonObject rsn = jsonBuffer.as<JsonObject>();
 
-  if (rsn.containsKey("reason")) {
-    enum RestartReason reason = rsn["reason"].as<enum RestartReason>();
-    rsn.remove("reason");
+  if (rsn.containsKey("rawreason")) {
+    enum RestartReason reason = rsn["rawreason"].as<enum RestartReason>();
 
     switch (reason) {
       case ERASE_AND_RESTART:
@@ -3896,9 +3905,17 @@ void publishRestartReason() {
       case FAILED_OTA_UPDATE:
         rsn["reason"] = "Failed OTA update";
         break;
+      case OTA_UPDATE_NO_UPDATE:
+        rsn["reason"] = "No OTA update available";
+        break;
+      default:
+        rsn["reason"] = "Other internal reset reason";
+        break;
     }
   } else {
-    switch (esp_reset_reason()) {
+    esp_reset_reason_t raw_reason = esp_reset_reason();
+    rsn["rawreason"] = raw_reason;
+    switch (raw_reason) {
       case ESP_RST_POWERON:
         rsn["reason"] = "Reset due to power-on event";
         break;
@@ -3938,7 +3955,7 @@ void publishRestartReason() {
         rsn["reason"] = "Reset by JTAG";
         break;
       case ESP_RST_EFUSE:
-        rsn["reason"] = "Reset due to efuse error";
+        rsn["reason"] = "Reset due to eFuse error";
         break;
       case ESP_RST_PWR_GLITCH:
         rsn["reason"] = "Reset due to power glitch detected";
@@ -3949,12 +3966,12 @@ void publishRestartReason() {
 #  endif        // ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 4)
 #endif
       default:
-        rsn["reason"] = "Unknown reset reason";
+        rsn["reason"] = "Other reset reason";
     }
   }
 
   rsn["retain"] = true;
-  rsn["origin"] = subjectLOGtoMQTT;
+  rsn["origin"] = subjectSYStoMQTT;
   enqueueJsonObject(rsn);
 }
 #endif
